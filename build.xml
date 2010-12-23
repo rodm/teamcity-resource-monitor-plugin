@@ -1,0 +1,265 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<project name="resource-monitor" default="default">
+
+    <target name="init">
+        <property file="build.properties"/>
+
+        <property name="plugin.name" value="resource-monitor"/>
+
+        <property name="src.dir" location="src"/>
+        <property name="java.src.dir" location="${src.dir}/main/java"/>
+        <property name="resources.dir" location="${src.dir}/main/resources"/>
+        <property name="test.src.dir" location="${src.dir}/test/java"/>
+
+        <property name="build.dir" location="build"/>
+        <property name="classes.dir" location="${build.dir}/classes"/>
+        <property name="test.classes.dir" location="${build.dir}/test/classes"/>
+        <property name="test.report.dir" location="${build.dir}/test/report"/>
+
+        <property name="dist.dir" location="dist"/>
+
+        <!-- Compiler options -->
+        <property name="compiler.debug" value="on"/>
+        <property name="compiler.nowarn" value="off"/>
+        <property name="compiler.args" value=""/>
+        <property name="compiler.max.memory" value="128m"/>
+
+        <fail unless="teamcity.home" message="teamcity.home property must be set"/>
+        <fail unless="tomcat.home" message="tomcat.home property must be set"/>
+
+        <!-- Project Libraries -->
+        <path id="teamcity-server.classpath">
+            <pathelement location="${teamcity.home}/devPackage/server-api.jar"/>
+            <pathelement location="${teamcity.home}/devPackage/common-api.jar"/>
+            <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/util.jar"/>
+            <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/jdom.jar"/>
+            <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/annotations.jar"/>
+            <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/spring.jar"/>
+            <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/spring-webmvc.jar"/>
+            <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/log4j-1.2.12.jar"/>
+            <pathelement location="${teamcity.home}/buildAgent/lib/junit-4.5.jar"/>
+            <pathelement location="${tomcat.home}/lib/servlet-api.jar"/>
+        </path>
+    </target>
+
+    <target name="compile" depends="init">
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+
+        <javac destdir="${classes.dir}"
+               debug="${compiler.debug}"
+               nowarn="${compiler.nowarn}"
+               memorymaximumsize="${compiler.max.memory}"
+               fork="true"
+               target="1.5">
+            <classpath refid="teamcity-server.classpath"/>
+            <src location="${java.src.dir}"/>
+        </javac>
+
+        <copy todir="${classes.dir}">
+            <fileset dir="${resources.dir}">
+                <type type="file"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="compile-tests" depends="compile">
+        <mkdir dir="${test.classes.dir}"/>
+
+        <javac destdir="${test.classes.dir}"
+               debug="${compiler.debug}"
+               nowarn="${compiler.nowarn}"
+               memorymaximumsize="${compiler.max.memory}"
+               fork="true"
+               target="1.5">
+            <classpath location="${classes.dir}"/>
+            <classpath refid="teamcity-server.classpath"/>
+            <src location="${test.src.dir}"/>
+        </javac>
+    </target>
+
+    <target name="run-tests" depends="compile-tests">
+        <mkdir dir="${test.report.dir}"/>
+
+        <path id="test.classpath">
+            <path refid="teamcity-server.classpath"/>
+            <pathelement location="${classes.dir}"/>
+            <pathelement location="${test.classes.dir}"/>
+        </path>
+
+        <junit fork="yes"
+               forkmode="once"
+               printsummary="withOutAndErr"
+               errorproperty="tests.failed"
+               failureproperty="tests.failed"
+               showoutput="true">
+            <!--<sysproperty key="java.awt.headless" value="${java.awt.headless}"/>-->
+            <classpath refid="test.classpath"/>
+
+            <formatter type="brief" usefile="false"/>
+
+            <batchtest fork="yes" todir="${test.report.dir}">
+                <formatter type="xml"/>
+                <fileset dir="${test.src.dir}">
+                    <include name="**/*Test.java"/>
+                </fileset>
+            </batchtest>
+        </junit>
+
+        <junitreport todir="${test.report.dir}">
+            <fileset dir="${test.report.dir}">
+                <include name="TEST-*.xml" />
+            </fileset>
+            <report format="noframes" todir="${test.report.dir}" />
+        </junitreport>
+
+        <fail if="tests.failed">Unit tests failed.</fail>
+    </target>
+
+    <target name="dist" depends="run-tests">
+        <delete dir="${dist.dir}"/>
+
+        <mkdir dir="${dist.dir}/server"/>
+
+        <jar destfile="${dist.dir}/server/${plugin.name}.jar"
+             basedir="${classes.dir}">
+            <exclude name="teamcity-plugin.xml"/>
+        </jar>
+
+        <zip destfile="${dist.dir}/${plugin.name}.zip">
+            <zipfileset dir="${dist.dir}/server" prefix="server">
+                <include name="*.jar"/>
+            </zipfileset>
+            <zipfileset dir="${classes.dir}" includes="*.xml"/>
+        </zip>
+    </target>
+
+    <target name="package-plugin" depends="dist"/>
+
+    <target name="default" depends="dist"/>
+
+    <target name="clean" depends="init">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+
+    <target name="deploy" depends="init-tomcat">
+        <property name="tomcat.webapps.dir" location="${tomcat.base}/webapps"/>
+
+        <copy todir="${tomcat.webapps.dir}"
+              file="${build.dir}/webapp.war"/>
+    </target>
+
+    <target name="undeploy" depends="init-tomcat">
+        <property name="tomcat.webapps.dir" location="${tomcat.base}/webapps"/>
+
+        <delete file="${tomcat.webapps.dir}/webapp.war"/>
+    </target>
+
+    <target name="deploy-plugin" depends="package-plugin">
+        <copy todir="${teamcity.dir}/data/plugins"
+              file="${dist.dir}/${plugin.name}.zip"/>
+    </target>
+
+    <target name="undeploy-plugin">
+        <delete file="${teamcity.dir}/data/plugins/${plugin.name}.zip"/>
+    </target>
+
+    <target name="init-tomcat" depends="init">
+        <fail unless="tomcat.home" message="tomcat.home property must be set"/>
+
+        <available property="tomcat.home.valid" file="${tomcat.home}/bin/catalina.sh"/>
+        <fail unless="tomcat.home.valid" message="${tomcat.home} is not a valid Tomcat installation"/>
+
+        <property name="tomcat.host" value="localhost"/>
+        <property name="tomcat.port" value="8080"/>
+    </target>
+
+    <target  name="create-instance" depends="init-tomcat">
+        <fail  unless="tomcat.base">tomcat.base property must be set</fail>
+
+        <available property="tomcat.base.exists" file="${tomcat.base}" type="dir"/>
+        <fail if="tomcat.base.exists">${tomcat.base} exists</fail>
+
+        <mkdir dir="${tomcat.base}"/>
+        <copy todir="${tomcat.base}">
+            <fileset dir="${tomcat.home}" includes="conf/**"/>
+        </copy>
+        <mkdir dir="${tomcat.base}/logs"/>
+        <mkdir dir="${tomcat.base}/tmp"/>
+        <mkdir dir="${tomcat.base}/webapps"/>
+        <mkdir dir="${tomcat.base}/work"/>
+    </target>
+
+    <target  name="delete-instance" depends="init-tomcat">
+        <available property="tomcat.base.exists" file="${tomcat.base}" type="dir"/>
+        <fail unless="tomcat.base.exists">${tomcat.base} does not exist</fail>
+
+        <delete dir="${tomcat.base}"/>
+    </target>
+
+    <target name="start-tomcat" depends="init-tomcat">
+        <fail unless="tomcat.base">tomcat.base property must be set</fail>
+
+        <available property="tomcat.base.exists" file="${tomcat.base}/conf/server.xml" type="file"/>
+        <fail unless="tomcat.base.exists">${tomcat.base} is not a valid Tomcat configuration directory</fail>
+
+        <property name="teamcity.java.home" location="${java.home}"/>
+        <echo>teamcity.java.home: ${teamcity.java.home}</echo>
+
+        <echo message="Starting Tomcat"/>
+        <exec executable="${tomcat.home}/bin/catalina.sh" spawn="true">
+            <env key="JAVA_HOME" path="${teamcity.java.home}"/>
+            <env key="JAVA_OPTS" value="${teamcity.java.opts}"/>
+            <env key="CATALINA_HOME" file="${tomcat.home}"/>
+            <env key="CATALINA_BASE" file="${tomcat.base}"/>
+            <arg value="start"/>
+        </exec>
+
+        <echo message="Waiting for Tomcat to startup"/>
+        <waitfor maxwait="90"
+                 maxwaitunit="second"
+                 timeoutproperty="tomcat.timeout">
+            <and>
+                <socket server="${tomcat.host}" port="${tomcat.port}"/>
+                <!--<http url="http://${tomcat.host}:${tomcat.port}/"/>-->
+            </and>
+        </waitfor>
+        <fail message="Tomcat failed to start" if="tomcat.timeout"/>
+        <echo message="Tomcat ready"/>
+    </target>
+
+    <target name="start-server" depends="start-tomcat" description="Start TeamCity server"/>
+
+    <target name="stop-tomcat" depends="init-tomcat">
+        <fail unless="tomcat.base">tomcat.base property must be set</fail>
+
+        <available property="tomcat.base.exists" file="${tomcat.base}/conf/server.xml" type="file"/>
+        <fail unless="tomcat.base.exists">${tomcat.base} is not a valid Tomcat configuration directory</fail>
+
+        <property name="teamcity.java.home" location="${java.home}"/>
+        <echo>teamcity.java.home: ${teamcity.java.home}</echo>
+
+        <echo message="Stopping Tomcat"/>
+        <exec executable="${tomcat.home}/bin/catalina.sh" spawn="true">
+            <env key="JAVA_HOME" path="${teamcity.java.home}"/>
+            <env key="CATALINA_HOME" file="${tomcat.home}"/>
+            <env key="CATALINA_BASE" file="${tomcat.base}"/>
+            <arg value="stop"/>
+        </exec>
+
+        <echo message="Waiting for Tomcat to shutdown"/>
+        <!--<waitfor maxwait="90"-->
+                 <!--maxwaitunit="second"-->
+                 <!--timeoutproperty="tomcat.timeout">-->
+            <!--<and>-->
+                <!--<socket server="${tomcat.host}" port="${tomcat.port}"/>-->
+                <!--<http url="http://${tomcat.host}:${tomcat.port}/"/>-->
+            <!--</and>-->
+        <!--</waitfor>-->
+        <fail message="Tomcat failed to start" if="tomcat.timeout"/>
+        <echo message="Tomcat stopped"/>
+    </target>
+
+    <target name="stop-server" depends="stop-tomcat" description="Stop TeamCity server"/>
+</project>

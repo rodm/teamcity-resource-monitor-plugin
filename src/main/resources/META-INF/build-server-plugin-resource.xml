@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<beans default-autowire="constructor">
+    <bean id="resourceMonitor" class="teamcity.resource.ResourceMonitor"/>
+    <bean id="resourceMonitorConifgProcessor" class="teamcity.resource.ResourceMonitorConfigProcessor"/>
+    <bean id="resourceMonitorPlugin" class="teamcity.resource.ResourceMonitorPlugin"/>
+</beans>
