@@ -49,10 +49,13 @@ public class ResourceMonitorConfigProcessor implements MainConfigProcessor {
 
     private int readCheckIntervalFrom(Element configRoot) {
         int interval = DEFAULT_CHECK_INTERVAL;
+        String checkInterval = "";
         try {
-            interval = Integer.valueOf(configRoot.getAttributeValue(CONFIG_CHECK_INTERVAL));
+            checkInterval = configRoot.getAttributeValue(CONFIG_CHECK_INTERVAL);
+            interval = Integer.valueOf(checkInterval);
         }
-        catch (Exception e) {
+        catch (NumberFormatException e) {
+            log.error("Invalid check interval: " + checkInterval);
         }
         return interval;
     }
@@ -68,10 +71,13 @@ public class ResourceMonitorConfigProcessor implements MainConfigProcessor {
 
     private int readPortFrom(Element element) {
         int port = -1;
+        String portValue = "";
         try {
-            port = Integer.valueOf(element.getAttributeValue(CONFIG_PORT));
+            portValue = element.getAttributeValue(CONFIG_PORT);
+            port = Integer.valueOf(portValue);
         }
-        catch (Exception e) {
+        catch (NumberFormatException e) {
+            log.error("Invalid port: " + portValue);
         }
         return port;
     }
