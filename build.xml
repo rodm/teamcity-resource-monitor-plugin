@@ -140,15 +140,6 @@
         <delete dir="${dist.dir}"/>
     </target>
 
-    <target name="deploy-plugin" depends="package-plugin,init-teamcity">
-        <copy todir="${teamcity.plugin.dir}"
-              file="${dist.dir}/${plugin.name}.zip"/>
-    </target>
-
-    <target name="undeploy-plugin" depends="init-teamcity">
-        <delete file="${teamcity.plugin.dir}/${plugin.name}.zip"/>
-    </target>
-
     <target name="init-teamcity" depends="init">
         <property name="teamcity.host" value="localhost"/>
         <property name="teamcity.port" value="8111"/>
@@ -162,6 +153,15 @@
 
         <property name="teamcity.java.home" location="${java.home}"/>
         <echo>teamcity.java.home: ${teamcity.java.home}</echo>
+    </target>
+
+    <target name="deploy-plugin" depends="package-plugin,init-teamcity">
+        <copy todir="${teamcity.plugin.dir}"
+              file="${dist.dir}/${plugin.name}.zip"/>
+    </target>
+
+    <target name="undeploy-plugin" depends="init-teamcity">
+        <delete file="${teamcity.plugin.dir}/${plugin.name}.zip"/>
     </target>
 
     <target name="start-teamcity-server" depends="init-teamcity" description="Start TeamCity server">
