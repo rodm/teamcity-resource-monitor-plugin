@@ -164,7 +164,7 @@
         <echo>teamcity.java.home: ${teamcity.java.home}</echo>
     </target>
 
-    <target name="start-teamcity-server" depends="init-teamcity">
+    <target name="start-teamcity-server" depends="init-teamcity" description="Start TeamCity server">
         <echo message="Starting TeamCity Server"/>
         <exec executable="${teamcity.home}/bin/teamcity-server.sh" spawn="true">
             <env key="JAVA_HOME" path="${teamcity.java.home}"/>
@@ -184,9 +184,7 @@
         <echo message="TeamCity Server ready"/>
     </target>
 
-    <target name="start-server" depends="start-teamcity-server" description="Start TeamCity server"/>
-
-    <target name="stop-teamcity-server" depends="init-teamcity">
+    <target name="stop-teamcity-server" depends="init-teamcity" description="Stop TeamCity server">
         <echo message="Stopping TeamCity Server"/>
         <exec executable="${teamcity.home}/bin/teamcity-server.sh" spawn="true">
             <env key="JAVA_HOME" path="${teamcity.java.home}"/>
@@ -204,5 +202,21 @@
         <echo message="TeamCity Server stopped"/>
     </target>
 
-    <target name="stop-server" depends="stop-teamcity-server" description="Stop TeamCity server"/>
+    <target name="start-teamcity-agent" depends="init-teamcity" description="Start TeamCity Build Agent">
+        <echo message="Starting TeamCity Build Agent"/>
+        <exec executable="${teamcity.home}/buildAgent/bin/agent.sh" spawn="true">
+            <env key="JAVA_HOME" path="${teamcity.java.home}"/>
+            <arg value="start"/>
+        </exec>
+        <echo message="TeamCity Build Agent started"/>
+    </target>
+
+    <target name="stop-teamcity-agent" depends="init-teamcity" description="Stop TeamCity Build Agent">
+        <echo message="Stopping TeamCity Build Agent"/>
+        <exec executable="${teamcity.home}/buildAgent/bin/agent.sh" spawn="true">
+            <env key="JAVA_HOME" path="${teamcity.java.home}"/>
+            <arg value="stop"/>
+        </exec>
+        <echo message="TeamCity Build Agent stopped"/>
+    </target>
 </project>
