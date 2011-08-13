@@ -6,8 +6,7 @@ import jetbrains.buildServer.serverSide.MainConfigProcessor;
 import org.jdom.Content;
 import org.jdom.Element;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class ResourceMonitorConfigProcessor implements MainConfigProcessor {
 
@@ -32,7 +31,7 @@ public class ResourceMonitorConfigProcessor implements MainConfigProcessor {
 
     public void readFrom(Element rootElement) {
         log.info("ResourceMonitor reading config");
-        List<Resource> resources = new ArrayList<Resource>();
+        Map<String, Resource> resources = new HashMap<String, Resource>();
         final Element configRoot = rootElement.getChild(CONFIG_ROOT);
         if (configRoot != null) {
             resourceMonitor.setInterval(readCheckIntervalFrom(configRoot));
@@ -40,12 +39,14 @@ public class ResourceMonitorConfigProcessor implements MainConfigProcessor {
             for (Object o : list) {
                 final Element element = (Element) o;
                 Resource resource = readResourceFrom(element);
-                resources.add(resource);
+                if (!resources.containsKey(resource.getName())) {
+                    resources.put(resource.getName(), resource);
+                }
             }
         }
         log.info("ResourceMonitor config read");
         resourceMonitor.setResources(resources);
-        resourceMonitor.scheduleMonitor();
+//        resourceMonitor.scheduleMonitor();
     }
 
     private int readCheckIntervalFrom(Element configRoot) {
@@ -100,8 +101,8 @@ public class ResourceMonitorConfigProcessor implements MainConfigProcessor {
         root.setAttribute(CONFIG_CHECK_INTERVAL, Integer.toString(resourceMonitor.getInterval()));
         parentElement.addContent((Content) root);
 
-        List<Resource> resources = resourceMonitor.getResources();
-        for (Resource resource : resources) {
+        Map<String, Resource> resources = resourceMonitor.getResources();
+        for (Resource resource : resources.values()) {
             writeResourceTo(resource, root);
         }
     }

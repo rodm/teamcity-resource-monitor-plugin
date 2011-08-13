@@ -3,7 +3,7 @@ package teamcity.resource;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.List;
+import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 
@@ -18,7 +18,7 @@ public class ResourceMonitorTest {
 
     @Test
     public void newResourceMonitorHasNoResources() {
-        List<Resource> resources = monitor.getResources();
+        Map<String, Resource> resources = monitor.getResources();
         assertEquals(0, resources.size());
     }
 
@@ -27,5 +27,18 @@ public class ResourceMonitorTest {
         Resource resource = new Resource("Test Resource", null, -1);
         monitor.addResource(resource);
         assertEquals(1, monitor.getResources().size());
+    }
+
+    @Test
+    public void addingResources() {
+        monitor.addResource(new Resource("Test Resource 1", null, -1));
+        monitor.addResource(new Resource("Test Resource 2", null, -1));
+        assertEquals(2, monitor.getResources().size());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotAddResourceWithSameName() {
+        monitor.addResource(new Resource("Test Resource", null, -1));
+        monitor.addResource(new Resource("Test Resource", null, -1));
     }
 }

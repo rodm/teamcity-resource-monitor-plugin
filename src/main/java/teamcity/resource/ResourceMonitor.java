@@ -9,8 +9,9 @@ import jetbrains.buildServer.serverSide.comments.Comment;
 import jetbrains.buildServer.users.User;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -25,7 +26,7 @@ public class ResourceMonitor implements Runnable {
 
     private static final Logger log = Loggers.SERVER;
 
-    private List<Resource> resources = new ArrayList<Resource>();
+    private Map<String, Resource> resources = new HashMap<String, Resource>();
     
     private int interval = DEFAULT_INTERVAL;
 
@@ -62,7 +63,7 @@ public class ResourceMonitor implements Runnable {
 
     public void run() {
         int unavailable = 0;
-        for (Resource resource : resources) {
+        for (Resource resource : resources.values()) {
             if (resource.isAvailable()) {
                 resourceAvailable(resource);
             } else {
@@ -122,14 +123,17 @@ public class ResourceMonitor implements Runnable {
     }
 
     public void addResource(Resource resource) {
-        resources.add(resource);
+        if (resources.containsKey(resource.getName())) {
+            throw new IllegalArgumentException("resource with name " + resource.getName() + " already exists");
+        }
+        resources.put(resource.getName(), resource);
     }
 
-    public void setResources(List<Resource> resources) {
+    public void setResources(Map<String,Resource> resources) {
         this.resources = resources;
     }
 
-    public List<Resource> getResources() {
+    public Map<String,Resource> getResources() {
         return resources;
     }
 }

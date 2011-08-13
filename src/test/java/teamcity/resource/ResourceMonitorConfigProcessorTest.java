@@ -43,4 +43,25 @@ public class ResourceMonitorConfigProcessorTest {
         o.output(element, out);
         System.out.println(out);
     }
+
+    @Test
+    public void ignoreResourcesWithSameName() {
+        final Element root = new Element("root");
+        final Element configRoot = new Element("monitored-resources");
+        configRoot.setAttribute("check-interval", "30");
+        root.addContent(configRoot);
+        configRoot.addContent(createResource("resource", "host1", "123"));
+        configRoot.addContent(createResource("resource", "host2", "456"));
+
+        configProcessor.readFrom(root);
+        assertEquals(1, monitor.getResources().size());
+    }
+
+    private Element createResource(String name, String host, String port) {
+        final Element resource = new Element("resource");
+        resource.setAttribute("name", name);
+        resource.setAttribute("host", host);
+        resource.setAttribute("port", port);
+        return resource;
+    }
 }
