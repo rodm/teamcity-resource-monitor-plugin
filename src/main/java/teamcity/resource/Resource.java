@@ -1,11 +1,16 @@
 package teamcity.resource;
 
+import com.intellij.openapi.diagnostic.Logger;
+import jetbrains.buildServer.log.Loggers;
+
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Resource {
+
+    private static final Logger log = Loggers.SERVER;
 
     private String name = "";
 
@@ -55,7 +60,7 @@ public class Resource {
                 result = true;
             }
             catch (IOException e) {
-                e.printStackTrace();
+                log.error("isAvailable failed", e);
             }
         }
         return result;

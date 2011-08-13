@@ -19,16 +19,19 @@ public class ResourceMonitor implements Runnable {
 
     private static final String PLUGIN_NAME = "ResourceMonitorPlugin";
 
-    private static final Logger log1 = Logger.getInstance(ResourceMonitor.class.getName());
+    private static final int DEFAULT_INTERVAL = 30;
+
+    private static final int INITIAL_DELAY = 1;
+
     private static final Logger log = Loggers.SERVER;
 
     private List<Resource> resources = new ArrayList<Resource>();
     
-    private int interval = 30;
+    private int interval = DEFAULT_INTERVAL;
 
     private SBuildServer server;
     private ProjectManager projectManager;
-    private ScheduledFuture<?> f;
+    private ScheduledFuture<?> future;
 
     public ResourceMonitor() {
         log.info("ResourceMonitor() default constructor");
@@ -38,7 +41,6 @@ public class ResourceMonitor implements Runnable {
         log.info("ResourceMonitor(SBuildServer, ProjectManager) constructor");
         this.server = server;
         this.projectManager = projectManager;
-//        server.registerExtension(MainConfigProcessor.class, this.getClass().getSimpleName(), this);
     }
 
     public void setInterval(int interval) {
@@ -51,11 +53,11 @@ public class ResourceMonitor implements Runnable {
 
     public void scheduleMonitor() {
         log.info(PLUGIN_NAME + ": monitor check interval set to " + interval + "seconds");
-        if (f != null) {
-            f.cancel(false);
+        if (future != null) {
+            future.cancel(false);
         }
         ScheduledExecutorService executor = server.getExecutor();
-        f = executor.scheduleAtFixedRate(this, 1, interval, TimeUnit.SECONDS);
+        future = executor.scheduleAtFixedRate(this, INITIAL_DELAY, interval, TimeUnit.SECONDS);
     }
 
     public void run() {

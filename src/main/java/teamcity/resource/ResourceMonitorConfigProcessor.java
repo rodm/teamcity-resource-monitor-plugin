@@ -23,6 +23,7 @@ public class ResourceMonitorConfigProcessor implements MainConfigProcessor {
     private static final int DEFAULT_CHECK_INTERVAL = 30;
 
     private static final Logger log = Loggers.SERVER;
+
     private final ResourceMonitor resourceMonitor;
 
     public ResourceMonitorConfigProcessor(ResourceMonitor resourceMonitor) {
