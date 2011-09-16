@@ -5,4 +5,12 @@
     <bean id="resourceMonitor" class="teamcity.resource.ResourceMonitor"/>
     <bean id="resourceMonitorConifgProcessor" class="teamcity.resource.ResourceMonitorConfigProcessor"/>
     <bean id="resourceMonitorPlugin" class="teamcity.resource.ResourceMonitorPlugin"/>
+
+    <bean id="resourceMonitorConfigTab"
+          class="teamcity.resource.ResourceConfigExtension"
+          init-method="register">
+        <property name="placeId" value="ADMIN_SERVER_CONFIGURATION_TAB"/>
+        <property name="pluginName" value="resourceMonitorPlugin"/>
+        <property name="includeUrl" value="resource.jsp"/>
+    </bean>
 </beans>
