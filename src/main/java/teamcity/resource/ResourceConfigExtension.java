@@ -38,6 +38,13 @@ public class ResourceConfigExtension extends SimpleCustomTab {
         return cssPaths;
     }
 
+    @NotNull
+    public List<String> getJsPaths() {
+        List<String> jsPaths = new ArrayList<String>();
+        jsPaths.add("resource.js");
+        return jsPaths;
+    }
+
     public boolean isVisible() {
         return true;
     }
