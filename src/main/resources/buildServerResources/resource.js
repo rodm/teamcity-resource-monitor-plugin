@@ -1,4 +1,26 @@
 
+BS.EditResourceForm = OO.extend(BS.AbstractWebForm, {
+    formElement : function() {
+        return $('editResourceForm');
+    },
+
+    saveResource : function() {
+        this.formElement().submitAction.value = 'saveResource';
+
+        BS.FormSaver.save(this, this.formElement().action, OO.extend(BS.ErrorsAwareListener, {
+
+          onCompleteSave : function(form, responseXML, err) {
+            form.enable();
+            if (!err) {
+              BS.EditResourceDialog.close();
+            }
+          }
+        }), false);
+
+        return false;
+    }
+});
+
 BS.EditResourceDialog = OO.extend(BS.AbstractModalDialog, {
     getContainer : function() {
         return $('editResourceDialog');

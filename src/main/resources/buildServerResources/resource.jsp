@@ -61,7 +61,8 @@
     </div>
 
     <div class="modalDialogBody">
-        <form id="editResourceForm" method="post" onsubmit="">
+        <form id="editResourceForm" action="<c:url value='/resource.html?'/>" method="post"
+              onsubmit="return BS.EditResourceForm.saveResource();">
             <label class="resourceNameLabel" for="resourceName">Name: <l:star/></label>
             <forms:textField name="resourceName" maxlength="50" style="width: 22em;"/>
             <span class="error" id="error_resourceName" style="margin-left: 5.5em;"></span>
@@ -80,7 +81,7 @@
                 <br clear="all"/>
             </div>
 
-            <input type="hidden" name="submitAction" value="1"/>
+            <input type="hidden" name="submitAction" value=""/>
         </form>
     </div>
 </div>

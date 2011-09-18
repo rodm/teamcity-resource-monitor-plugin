@@ -13,4 +13,8 @@
         <property name="pluginName" value="resourceMonitorPlugin"/>
         <property name="includeUrl" value="resource.jsp"/>
     </bean>
+
+    <bean id="resourceController"
+          class="teamcity.resource.ResourceController"
+          init-method="register"/>
 </beans>
