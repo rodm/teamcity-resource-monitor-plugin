@@ -196,7 +196,7 @@
         <waitfor maxwait="90"
                  maxwaitunit="second"
                  timeoutproperty="teamcity.timeout">
-            <socket server="${teamcity.host}" port="${teamcity.port}"/>
+            <not><socket server="${teamcity.host}" port="${teamcity.port}"/></not>
         </waitfor>
         <fail message="TeamCity Server failed to stop" if="teamcity.timeout"/>
         <echo message="TeamCity Server stopped"/>
