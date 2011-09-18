@@ -20,7 +20,14 @@
                             <td class="name highlight">${resource.name}</td>
                             <td class="host highlight">${resource.host}</td>
                             <td class="port highlight">${resource.port}</td>
-                            <td class="edit highlight">edit</td>
+                            <td class="edit highlight"
+                                onclick="BS.EditResourceDialog.showDialog('${resource.name}', '${resource.host}', '${resource.port}');"
+                                title="Click to edit resource">
+                                <a href="javascript://"
+                                   onclick="BS.EditResourceDialog.showDialog('${resource.name}', '${resource.host}', '${resource.port}');">
+                                    edit
+                                </a>
+                            </td>
                             <td class="edit">delete</td>
                         </tr>
                         <c:forEach items="${resource.buildTypes}" var="buildType">
@@ -40,7 +47,7 @@
 </div>
 
 <p class="addNew">
-  <a href="javascript://" onclick="BS.EditResourceDialog.showDialog()">
+  <a href="javascript://" onclick="BS.EditResourceDialog.showDialog('', '', '')">
     Create new resource
   </a>
 </p>
