@@ -18,6 +18,17 @@ BS.EditResourceForm = OO.extend(BS.AbstractWebForm, {
         }), false);
 
         return false;
+    },
+
+    removeResource : function(name) {
+        if (!confirm("Are you sure you want to remove this resource?")) return;
+
+        var url = this.formElement().action + "&submitAction=removeResource&resourceName=" + name;
+        BS.ajaxRequest(url, {
+          onComplete: function() {
+            BS.EditResourceDialog.close();
+          }
+        });
     }
 });
 

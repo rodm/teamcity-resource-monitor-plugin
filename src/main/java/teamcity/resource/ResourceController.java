@@ -36,11 +36,17 @@ public class ResourceController extends BaseController {
         Loggers.SERVER.info("resource host: [" + request.getParameter("resourceHost") + "]");
         Loggers.SERVER.info("resource port: [" + request.getParameter("resourcePort") + "]");
 
-        String name = request.getParameter("resourceName");
-        String host = request.getParameter("resourceHost");
-        String port = request.getParameter("resourcePort");
-        Resource resource = new Resource(name, host, Integer.valueOf(port));
-        resourceMonitor.addResource(resource);
+        String action = request.getParameter("submitAction");
+        if ("saveResource".equals(action)) {
+            String name = request.getParameter("resourceName");
+            String host = request.getParameter("resourceHost");
+            String port = request.getParameter("resourcePort");
+            Resource resource = new Resource(name, host, Integer.valueOf(port));
+            resourceMonitor.addResource(resource);
+        } else if ("removeResource".equals(action)) {
+            String name = request.getParameter("resourceName");
+            resourceMonitor.removeResource(name);
+        }
         return new ModelAndView(pluginPath + "response.jsp");
     }
 }

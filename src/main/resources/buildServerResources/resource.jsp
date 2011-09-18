@@ -28,7 +28,9 @@
                                     edit
                                 </a>
                             </td>
-                            <td class="edit">delete</td>
+                            <td class="edit">
+                                <a href="javascript://" onclick="BS.EditResourceForm.removeResource('${resource.name}');">delete</a>
+                            </td>
                         </tr>
                         <c:forEach items="${resource.buildTypes}" var="buildType">
                             <tr class="buildConfigurationRow">

@@ -129,6 +129,13 @@ public class ResourceMonitor implements Runnable {
         resources.put(resource.getName(), resource);
     }
 
+    public void removeResource(String name) {
+        if (!resources.containsKey(name)) {
+            throw new IllegalArgumentException("resource with name " + name + " does not exist");
+        }
+        resources.remove(name);
+    }
+
     public void setResources(Map<String,Resource> resources) {
         this.resources = resources;
     }
