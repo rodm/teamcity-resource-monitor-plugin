@@ -14,13 +14,13 @@ import static junit.framework.Assert.assertEquals;
 
 public class ResourceMonitorConfigProcessorTest {
 
-    private ResourceMonitor monitor;
+    private ResourceManager manager;
     private ResourceMonitorConfigProcessor configProcessor;
 
     @Before
     public void setup() {
-        monitor = new ResourceMonitor();
-        configProcessor = new ResourceMonitorConfigProcessor(monitor);
+        manager = new ResourceManager();
+        configProcessor = new ResourceMonitorConfigProcessor(manager);
     }
 
     @Test
@@ -31,10 +31,10 @@ public class ResourceMonitorConfigProcessorTest {
         buildTypeIds.add("bt3");
         Resource resource1 = new Resource("Resource1", "locahost", 1080);
         resource1.setBuildTypes(buildTypeIds);
-        monitor.addResource(resource1);
+        manager.addResource(resource1);
 
         Resource resource2 = new Resource("Resource2", "locahost", 1080);
-        monitor.addResource(resource2);
+        manager.addResource(resource2);
         Element element = new Element("test");
         configProcessor.writeTo(element);
 
@@ -54,7 +54,7 @@ public class ResourceMonitorConfigProcessorTest {
         configRoot.addContent(createResource("resource", "host2", "456"));
 
         configProcessor.readFrom(root);
-        assertEquals(1, monitor.getResources().size());
+        assertEquals(1, manager.getResources().size());
     }
 
     private Element createResource(String name, String host, String port) {

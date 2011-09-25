@@ -3,7 +3,11 @@
 
 <beans default-autowire="constructor">
     <bean id="resourceMonitor" class="teamcity.resource.ResourceMonitor"/>
+
+    <bean id="resourceManager" class="teamcity.resource.ResourceManager"/>
+
     <bean id="resourceMonitorConifgProcessor" class="teamcity.resource.ResourceMonitorConfigProcessor"/>
+
     <bean id="resourceMonitorPlugin" class="teamcity.resource.ResourceMonitorPlugin"/>
 
     <bean id="resourceMonitorConfigTab"

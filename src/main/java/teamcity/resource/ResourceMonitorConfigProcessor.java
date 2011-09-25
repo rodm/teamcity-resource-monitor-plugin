@@ -23,10 +23,10 @@ public class ResourceMonitorConfigProcessor implements MainConfigProcessor {
 
     private static final Logger log = Loggers.SERVER;
 
-    private final ResourceMonitor resourceMonitor;
+    private final ResourceManager resourceManager;
 
-    public ResourceMonitorConfigProcessor(ResourceMonitor resourceMonitor) {
-        this.resourceMonitor = resourceMonitor;
+    public ResourceMonitorConfigProcessor(ResourceManager resourceManager) {
+        this.resourceManager = resourceManager;
     }
 
     public void readFrom(Element rootElement) {
@@ -34,7 +34,7 @@ public class ResourceMonitorConfigProcessor implements MainConfigProcessor {
         Map<String, Resource> resources = new HashMap<String, Resource>();
         final Element configRoot = rootElement.getChild(CONFIG_ROOT);
         if (configRoot != null) {
-            resourceMonitor.setInterval(readCheckIntervalFrom(configRoot));
+            resourceManager.setInterval(readCheckIntervalFrom(configRoot));
             final List list = configRoot.getChildren(CONFIG_RESOURCE);
             for (Object o : list) {
                 final Element element = (Element) o;
@@ -45,8 +45,8 @@ public class ResourceMonitorConfigProcessor implements MainConfigProcessor {
             }
         }
         log.info("ResourceMonitor config read");
-        resourceMonitor.setResources(resources);
-//        resourceMonitor.scheduleMonitor();
+        resourceManager.setResources(resources);
+//        resourceManager.scheduleMonitor();
     }
 
     private int readCheckIntervalFrom(Element configRoot) {
@@ -98,10 +98,10 @@ public class ResourceMonitorConfigProcessor implements MainConfigProcessor {
     public void writeTo(Element parentElement) {
         log.info("ResourceMonitor writing config");
         final Element root = new Element(CONFIG_ROOT);
-        root.setAttribute(CONFIG_CHECK_INTERVAL, Integer.toString(resourceMonitor.getInterval()));
+        root.setAttribute(CONFIG_CHECK_INTERVAL, Integer.toString(resourceManager.getInterval()));
         parentElement.addContent((Content) root);
 
-        Map<String, Resource> resources = resourceMonitor.getResources();
+        Map<String, Resource> resources = resourceManager.getResources();
         for (Resource resource : resources.values()) {
             writeResourceTo(resource, root);
         }

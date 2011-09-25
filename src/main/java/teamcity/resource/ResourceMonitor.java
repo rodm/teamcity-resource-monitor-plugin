@@ -9,7 +9,6 @@ import jetbrains.buildServer.serverSide.comments.Comment;
 import jetbrains.buildServer.users.User;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
@@ -20,43 +19,31 @@ public class ResourceMonitor implements Runnable {
 
     private static final String PLUGIN_NAME = "ResourceMonitorPlugin";
 
-    private static final int DEFAULT_INTERVAL = 30;
-
     private static final int INITIAL_DELAY = 1;
 
     private static final Logger log = Loggers.SERVER;
 
-    private Map<String, Resource> resources = new HashMap<String, Resource>();
-    
-    private int interval = DEFAULT_INTERVAL;
-
     private SBuildServer server;
+
     private ProjectManager projectManager;
+
+    private ResourceManager resourceManager;
+
     private ScheduledFuture<?> future;
 
     public ResourceMonitor() {
         log.info("ResourceMonitor() default constructor");
     }
 
-    public ResourceMonitor(@NotNull SBuildServer server, ProjectManager projectManager) {
-        log.info("ResourceMonitor(SBuildServer, ProjectManager) constructor");
+    public ResourceMonitor(@NotNull SBuildServer server, ProjectManager projectManager, ResourceManager resourceManager) {
+        log.info("ResourceMonitor(SBuildServer, ProjectManager, ResourceManager) constructor");
         this.server = server;
         this.projectManager = projectManager;
-    }
-
-    public void setProjectMananger(ProjectManager newProjectMananger) {
-        this.projectManager = newProjectMananger;
-    }
-
-    public void setInterval(int interval) {
-        this.interval = interval;
-    }
-
-    public int getInterval() {
-        return interval;
+        this.resourceManager = resourceManager;
     }
 
     public void scheduleMonitor() {
+        int interval = resourceManager.getInterval();
         log.info(PLUGIN_NAME + ": monitor check interval set to " + interval + "seconds");
         if (future != null) {
             future.cancel(false);
@@ -67,7 +54,7 @@ public class ResourceMonitor implements Runnable {
 
     public void run() {
         int unavailable = 0;
-        for (Resource resource : resources.values()) {
+        for (Resource resource : getResources().values()) {
             if (resource.isAvailable()) {
                 resourceAvailable(resource);
             } else {
@@ -75,7 +62,7 @@ public class ResourceMonitor implements Runnable {
                 unavailable++;
             }
         }
-        log.info("Monitored resources: " + resources.size() + ", unavailable: " + unavailable);
+        log.info("Monitored resources: " + getResources().size() + ", unavailable: " + unavailable);
     }
 
     public void resourceAvailable(Resource resource) {
@@ -126,50 +113,7 @@ public class ResourceMonitor implements Runnable {
         return new ResourceUser();
     }
 
-    public void addResource(Resource resource) {
-        if (resources.containsKey(resource.getName())) {
-            throw new IllegalArgumentException("resource with name " + resource.getName() + " already exists");
-        }
-        resources.put(resource.getName(), resource);
-    }
-
-    public void removeResource(String name) {
-        validResource(name);
-        resources.remove(name);
-    }
-
-    public void setResources(Map<String,Resource> resources) {
-        this.resources = resources;
-    }
-
-    public Map<String,Resource> getResources() {
-        return resources;
-    }
-
-    public void linkBuildToResource(String name, String buildTypeId) {
-        validResource(name);
-        validBuildType(buildTypeId);
-        Resource resource = resources.get(name);
-        resource.getBuildTypes().add(buildTypeId);
-    }
-
-    public void unlinkBuildFromResource(String name, String buildTypeId) {
-        validResource(name);
-        validBuildType(buildTypeId);
-        Resource resource = resources.get(name);
-        resource.getBuildTypes().remove(buildTypeId);
-    }
-
-    private void validResource(String name) {
-        if (!resources.containsKey(name)) {
-            throw new IllegalArgumentException("resource with name " + name + " does not exist");
-        }
-    }
-
-    private void validBuildType(String buildTypeId) {
-        SBuildType buildType = projectManager.findBuildTypeById(buildTypeId);
-        if (buildType == null) {
-            throw new IllegalArgumentException("build type id " + buildTypeId + " does not exist");
-        }
+    private Map<String,Resource> getResources() {
+        return resourceManager.getResources();
     }
 }

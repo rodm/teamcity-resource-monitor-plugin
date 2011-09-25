@@ -16,13 +16,15 @@ public class ResourceController extends BaseController {
 
     private final String pluginPath;
 
-    private ResourceMonitor resourceMonitor;
+    private ResourceManager resourceManager;
 
-    public ResourceController(SBuildServer buildServer, WebControllerManager manager, PluginDescriptor pluginDescriptor, ResourceMonitor monitor) {
+    public ResourceController(SBuildServer buildServer, WebControllerManager webControllerManager,
+                              ResourceManager resourceManager, PluginDescriptor pluginDescriptor)
+    {
         super(buildServer);
-        webControllerManager = manager;
+        this.webControllerManager = webControllerManager;
+        this.resourceManager = resourceManager;
         pluginPath = pluginDescriptor.getPluginResourcesPath();
-        resourceMonitor = monitor;
     }
 
     public void register() {
@@ -42,10 +44,10 @@ public class ResourceController extends BaseController {
             String host = request.getParameter("resourceHost");
             String port = request.getParameter("resourcePort");
             Resource resource = new Resource(name, host, Integer.valueOf(port));
-            resourceMonitor.addResource(resource);
+            resourceManager.addResource(resource);
         } else if ("removeResource".equals(action)) {
             String name = request.getParameter("resourceName");
-            resourceMonitor.removeResource(name);
+            resourceManager.removeResource(name);
         }
         return new ModelAndView(pluginPath + "response.jsp");
     }

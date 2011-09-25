@@ -13,12 +13,12 @@ public class ResourceConfigExtension extends SimpleCustomTab {
 
     private ProjectManager projectManager;
 
-    private ResourceMonitor resourceMonitor;
+    private ResourceManager resourceManager;
 
-    public ResourceConfigExtension(PagePlaces pagePlaces, ProjectManager projectManager, ResourceMonitor resourceMonitor) {
+    public ResourceConfigExtension(PagePlaces pagePlaces, ProjectManager projectManager, ResourceManager resourceManager) {
         super(pagePlaces);
         this.projectManager = projectManager;
-        this.resourceMonitor = resourceMonitor;
+        this.resourceManager = resourceManager;
     }
 
     @NotNull
@@ -59,7 +59,7 @@ public class ResourceConfigExtension extends SimpleCustomTab {
     }
 
     private List<Resource> getResources() {
-        List<Resource> resources = new ArrayList<Resource>(resourceMonitor.getResources().values());
+        List<Resource> resources = new ArrayList<Resource>(resourceManager.getResources().values());
         return resources;
     }
 

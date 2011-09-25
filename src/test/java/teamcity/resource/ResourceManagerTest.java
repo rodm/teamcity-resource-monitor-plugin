@@ -14,104 +14,104 @@ import java.util.Map;
 
 import static junit.framework.Assert.assertEquals;
 
-public class ResourceMonitorTest {
+public class ResourceManagerTest {
 
-    private ResourceMonitor monitor;
+    private ResourceManager manager;
 
     @Before
     public void setup() {
-        monitor = new ResourceMonitor();
+        manager = new ResourceManager();
     }
 
     @Test
-    public void newResourceMonitorHasNoResources() {
-        Map<String, Resource> resources = monitor.getResources();
+    public void newResourceManagerHasNoResources() {
+        Map<String, Resource> resources = manager.getResources();
         assertEquals(0, resources.size());
     }
 
     @Test
     public void addResource() {
         Resource resource = new Resource("Test Resource", null, -1);
-        monitor.addResource(resource);
-        assertEquals(1, monitor.getResources().size());
+        manager.addResource(resource);
+        assertEquals(1, manager.getResources().size());
     }
 
     @Test
     public void addingResources() {
-        monitor.addResource(new Resource("Test Resource 1", null, -1));
-        monitor.addResource(new Resource("Test Resource 2", null, -1));
-        assertEquals(2, monitor.getResources().size());
+        manager.addResource(new Resource("Test Resource 1", null, -1));
+        manager.addResource(new Resource("Test Resource 2", null, -1));
+        assertEquals(2, manager.getResources().size());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotAddResourceWithSameName() {
-        monitor.addResource(new Resource("Test Resource", null, -1));
-        monitor.addResource(new Resource("Test Resource", null, -1));
+        manager.addResource(new Resource("Test Resource", null, -1));
+        manager.addResource(new Resource("Test Resource", null, -1));
     }
 
     @Test
     public void removeResource() {
-        monitor.addResource(new Resource("Test Resource", null, -1));
+        manager.addResource(new Resource("Test Resource", null, -1));
 
-        monitor.removeResource("Test Resource");
-        assertEquals("there should be no resources", 0, monitor.getResources().size());
+        manager.removeResource("Test Resource");
+        assertEquals("there should be no resources", 0, manager.getResources().size());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void removingResourceThatDoesntExist() {
-        monitor.removeResource("Resource");
+        manager.removeResource("Resource");
     }
 
     @Test
     public void linkBuildToResource() {
-        monitor.setProjectMananger(createProjectManager());
-        monitor.addResource(new Resource("Test Resource", null, -1));
+        manager.setProjectMananger(createProjectManager());
+        manager.addResource(new Resource("Test Resource", null, -1));
 
-        monitor.linkBuildToResource("Test Resource", "bt123");
+        manager.linkBuildToResource("Test Resource", "bt123");
 
-        Map<String, Resource> resources = monitor.getResources();
+        Map<String, Resource> resources = manager.getResources();
         assertEquals(1, resources.get("Test Resource").getBuildTypes().size());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void linkBuildToInvalidResource() {
-        monitor.linkBuildToResource("Test Resource", "bt123");
+        manager.linkBuildToResource("Test Resource", "bt123");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void linkInvalidBuildToResource() {
-        monitor.setProjectMananger(createProjectManager());
-        monitor.addResource(new Resource("Test Resource", null, -1));
+        manager.setProjectMananger(createProjectManager());
+        manager.addResource(new Resource("Test Resource", null, -1));
 
-        monitor.linkBuildToResource("Test Resource", "bt124");
+        manager.linkBuildToResource("Test Resource", "bt124");
     }
 
     @Test
     public void unlinkBuildFromResource() {
-        monitor.setProjectMananger(createProjectManager());
+        manager.setProjectMananger(createProjectManager());
         List<String> buildTypes = new ArrayList<String>();
         buildTypes.add("bt123");
         Resource resource = new Resource("Test Resource", null, -1);
         resource.setBuildTypes(buildTypes);
-        monitor.addResource(resource);
+        manager.addResource(resource);
 
-        monitor.unlinkBuildFromResource("Test Resource", "bt123");
+        manager.unlinkBuildFromResource("Test Resource", "bt123");
 
-        Map<String, Resource> resources = monitor.getResources();
+        Map<String, Resource> resources = manager.getResources();
         assertEquals(0, resources.get("Test Resource").getBuildTypes().size());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void unlinkBuildFromInvalidResource() {
-        monitor.unlinkBuildFromResource("Test Resource", "bt123");
+        manager.unlinkBuildFromResource("Test Resource", "bt123");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void unlinkInvalidBuildFromResource() {
-        monitor.setProjectMananger(createProjectManager());
-        monitor.addResource(new Resource("Test Resource", null, -1));
+        manager.setProjectMananger(createProjectManager());
+        manager.addResource(new Resource("Test Resource", null, -1));
 
-        monitor.unlinkBuildFromResource("Test Resource", "bt124");
+        manager.unlinkBuildFromResource("Test Resource", "bt124");
     }
 
     private ProjectManager createProjectManager() {
