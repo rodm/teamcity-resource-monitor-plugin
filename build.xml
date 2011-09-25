@@ -30,13 +30,13 @@
         <path id="teamcity-server.classpath">
             <pathelement location="${teamcity.home}/devPackage/server-api.jar"/>
             <pathelement location="${teamcity.home}/devPackage/common-api.jar"/>
+            <pathelement location="${teamcity.home}/devPackage/runtime-util.jar"/>
             <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/util.jar"/>
             <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/jdom.jar"/>
             <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/annotations.jar"/>
             <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/spring.jar"/>
             <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/spring-webmvc.jar"/>
             <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/log4j-1.2.12.jar"/>
-            <pathelement location="${teamcity.home}/buildAgent/lib/junit-4.5.jar"/>
             <pathelement location="${teamcity.home}/lib/servlet-api.jar"/>
         </path>
     </target>
@@ -81,6 +81,7 @@
         <mkdir dir="${test.report.dir}"/>
 
         <path id="test.classpath">
+            <pathelement location="${teamcity.home}/buildAgent/lib/junit-4.5.jar"/>
             <path refid="teamcity-server.classpath"/>
             <pathelement location="${classes.dir}"/>
             <pathelement location="${test.classes.dir}"/>
