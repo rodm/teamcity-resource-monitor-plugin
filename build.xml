@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<project name="resource-monitor" default="default">
+<project name="resource-monitor" default="default"
+         xmlns:ivy="antlib:org.apache.ivy.ant">
 
     <target name="init">
         <property file="build.properties"/>
+        <property file="default.properties"/>
 
         <property name="plugin.name" value="resource-monitor"/>
 
@@ -24,24 +26,41 @@
         <property name="compiler.args" value=""/>
         <property name="compiler.max.memory" value="128m"/>
 
-        <fail unless="teamcity.home" message="teamcity.home property must be set"/>
+        <property name="ivy.filename" value="ivy-${ivy.version}.jar"/>
+        <property name="ivy.settings.filename" value="ivysettings.xml"/>
+        <property name="ivy.resolve.log" value="quiet"/>
+        <property name="ivy.default.resolver" value="chained"/>
 
-        <!-- Project Libraries -->
-        <path id="teamcity-server.classpath">
-            <pathelement location="${teamcity.home}/devPackage/server-api.jar"/>
-            <pathelement location="${teamcity.home}/devPackage/common-api.jar"/>
-            <pathelement location="${teamcity.home}/devPackage/runtime-util.jar"/>
-            <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/util.jar"/>
-            <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/jdom.jar"/>
-            <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/annotations.jar"/>
-            <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/spring.jar"/>
-            <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/spring-webmvc.jar"/>
-            <pathelement location="${teamcity.home}/webapps/ROOT/WEB-INF/lib/log4j-1.2.12.jar"/>
-            <pathelement location="${teamcity.home}/lib/servlet-api.jar"/>
-        </path>
+        <property name="lib.dir" location="lib"/>
+        <available property="download.ivy" file="${lib.dir}/${ivy.filename}"/>
     </target>
 
-    <target name="compile" depends="init">
+    <target name="download-ivy" depends="init" unless="download.ivy">
+        <mkdir dir="${lib.dir}"/>
+
+        <echo message="downloading ivy..."/>
+        <get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.version}/${ivy.filename}"
+             dest="${lib.dir}/${ivy.filename}" usetimestamp="true"/>
+    </target>
+
+    <target name="init-ivy" depends="download-ivy">
+        <path id="lib.classpath">
+            <fileset dir="${lib.dir}" includes="*.jar"/>
+        </path>
+        <taskdef resource="org/apache/ivy/ant/antlib.xml"
+                 uri="antlib:org.apache.ivy.ant"
+                 classpathref="lib.classpath"/>
+
+        <ivy:settings file="${ivy.settings.filename}" />
+    </target>
+
+    <target name="resolve-dependencies" depends="init-ivy">
+        <ivy:resolve log="${ivy.resolve.log}"/>
+        <ivy:cachepath pathid="compile.classpath" conf="compile"/>
+        <ivy:cachepath pathid="test.classpath" conf="test"/>
+    </target>
+
+    <target name="compile" depends="resolve-dependencies">
         <mkdir dir="${build.dir}"/>
         <mkdir dir="${classes.dir}"/>
 
@@ -51,7 +70,7 @@
                memorymaximumsize="${compiler.max.memory}"
                fork="true"
                target="1.5">
-            <classpath refid="teamcity-server.classpath"/>
+            <classpath refid="compile.classpath"/>
             <src location="${java.src.dir}"/>
         </javac>
 
@@ -71,21 +90,15 @@
                memorymaximumsize="${compiler.max.memory}"
                fork="true"
                target="1.5">
+            <classpath refid="compile.classpath"/>
+            <classpath refid="test.classpath"/>
             <classpath location="${classes.dir}"/>
-            <classpath refid="teamcity-server.classpath"/>
             <src location="${test.src.dir}"/>
         </javac>
     </target>
 
     <target name="run-tests" depends="compile-tests">
         <mkdir dir="${test.report.dir}"/>
-
-        <path id="test.classpath">
-            <pathelement location="${teamcity.home}/buildAgent/lib/junit-4.5.jar"/>
-            <path refid="teamcity-server.classpath"/>
-            <pathelement location="${classes.dir}"/>
-            <pathelement location="${test.classes.dir}"/>
-        </path>
 
         <junit fork="yes"
                forkmode="once"
@@ -94,7 +107,10 @@
                failureproperty="tests.failed"
                showoutput="true">
             <!--<sysproperty key="java.awt.headless" value="${java.awt.headless}"/>-->
+            <classpath refid="compile.classpath"/>
             <classpath refid="test.classpath"/>
+            <classpath location="${classes.dir}"/>
+            <classpath location="${test.classes.dir}"/>
 
             <formatter type="brief" usefile="false"/>
 
@@ -148,6 +164,8 @@
         <property name="teamcity.plugin.dir" location="${teamcity.data.path}/plugins"/>
         <property name="teamcity.server.mem.opts" value=""/>
         <property name="teamcity.server.opts" value=""/>
+
+        <fail unless="teamcity.home" message="teamcity.home property must be set"/>
 
         <available property="teamcity.exists" file="${teamcity.home}/bin/teamcity-server.sh" type="file"/>
         <fail unless="teamcity.exists">${teamcity.home} is not a valid TeamCity installation</fail>
