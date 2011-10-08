@@ -2,17 +2,16 @@ package teamcity.resource;
 
 import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SBuildType;
-import org.junit.Before;
-import org.junit.Test;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import static junit.framework.Assert.assertEquals;
+import static org.mockito.Mockito.*;
 
 public class ResourceManagerTest {
 
@@ -64,7 +63,10 @@ public class ResourceManagerTest {
 
     @Test
     public void linkBuildToResource() {
-        manager.setProjectMananger(createProjectManager());
+        SBuildType buildType = mock(SBuildType.class);
+        ProjectManager projectManager = mock(ProjectManager.class);
+        when(projectManager.findBuildTypeById(eq("bt123"))).thenReturn(buildType);
+        manager.setProjectMananger(projectManager);
         manager.addResource(new Resource("Test Resource", null, -1));
 
         manager.linkBuildToResource("Test Resource", "bt123");
@@ -80,7 +82,8 @@ public class ResourceManagerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void linkInvalidBuildToResource() {
-        manager.setProjectMananger(createProjectManager());
+        ProjectManager projectManager = mock(ProjectManager.class);
+        manager.setProjectMananger(projectManager);
         manager.addResource(new Resource("Test Resource", null, -1));
 
         manager.linkBuildToResource("Test Resource", "bt124");
@@ -88,7 +91,10 @@ public class ResourceManagerTest {
 
     @Test
     public void unlinkBuildFromResource() {
-        manager.setProjectMananger(createProjectManager());
+        SBuildType buildType = mock(SBuildType.class);
+        ProjectManager projectManager = mock(ProjectManager.class);
+        when(projectManager.findBuildTypeById(eq("bt123"))).thenReturn(buildType);
+        manager.setProjectMananger(projectManager);
         List<String> buildTypes = new ArrayList<String>();
         buildTypes.add("bt123");
         Resource resource = new Resource("Test Resource", null, -1);
@@ -108,36 +114,10 @@ public class ResourceManagerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void unlinkInvalidBuildFromResource() {
-        manager.setProjectMananger(createProjectManager());
+        ProjectManager projectManager = mock(ProjectManager.class);
+        manager.setProjectMananger(projectManager);
         manager.addResource(new Resource("Test Resource", null, -1));
 
         manager.unlinkBuildFromResource("Test Resource", "bt124");
-    }
-
-    private ProjectManager createProjectManager() {
-        ClassLoader loader = ProjectManager.class.getClassLoader();
-        Class[] proxyInterfaces = new Class[] { ProjectManager.class };
-        InvocationHandler handler = new InvocationHandler() {
-            public Object invoke(Object obj, Method method, Object[] objects) throws Throwable {
-                if ("findBuildTypeById".equals(method.getName())) {
-                    if ("bt123".equals(objects[0])) {
-                        return createBuildType();
-                    }
-                }
-                return null;
-            }
-
-            private SBuildType createBuildType() {
-                ClassLoader loader = SBuildType.class.getClassLoader();
-                Class[] proxyInterfaces = new Class[] { SBuildType.class };
-                InvocationHandler handler = new InvocationHandler() {
-                    public Object invoke(Object obj, Method method, Object[] objects) throws Throwable {
-                        return null;
-                    }
-                };
-                return (SBuildType) Proxy.newProxyInstance(loader, proxyInterfaces, handler);
-            }
-        };
-        return (ProjectManager) Proxy.newProxyInstance(loader, proxyInterfaces, handler);
     }
 }
