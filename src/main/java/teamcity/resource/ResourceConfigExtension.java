@@ -7,7 +7,10 @@ import jetbrains.buildServer.web.openapi.SimpleCustomTab;
 import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ResourceConfigExtension extends SimpleCustomTab {
 
@@ -56,6 +59,7 @@ public class ResourceConfigExtension extends SimpleCustomTab {
     public void fillModel(@NotNull Map<String, Object> model, @NotNull HttpServletRequest request) {
         model.put("resources", getResources());
         model.put("buildTypes", getBuildTypes());
+        model.put("availableBuildTypes", getAvailableBuildTypes());
     }
 
     private List<Resource> getResources() {
@@ -70,5 +74,17 @@ public class ResourceConfigExtension extends SimpleCustomTab {
             buildTypesMap.put(buildType.getBuildTypeId(), buildType);
         }
         return buildTypesMap;
+    }
+
+    private List<String> getAvailableBuildTypes() {
+        List<String> availableBuildTypes = new ArrayList<String>();
+        for (SBuildType buildType : projectManager.getAllBuildTypes()) {
+            availableBuildTypes.add(buildType.getBuildTypeId());
+        }
+        for (Resource resource : getResources()) {
+            List<String> usedBuildTypes = resource.getBuildTypes();
+            availableBuildTypes.removeAll(usedBuildTypes);
+        }
+        return availableBuildTypes;
     }
 }

@@ -2,12 +2,20 @@
 
 <jsp:useBean id="resources" scope="request" type="java.util.List"/>
 <jsp:useBean id="buildTypes" scope="request" type="java.util.Map"/>
+<jsp:useBean id="availableBuildTypes" scope="request" type="java.util.List"/>
 
 <style type="text/css">
     @import "<c:url value='/css/forms.css'/>";
     @import "<c:url value='/css/admin/adminMain.css'/>";
     @import "<c:url value='/css/admin/projectConfig.css'/>";
 </style>
+
+<script type="text/javascript">
+    function addDependency(selector, name) {
+        var buildTypeId = selector.options[selector.selectedIndex].value;
+        BS.Resource.linkBuildType(name, buildTypeId);
+    }
+</script>
 
 <div id="container">
     <div class="editResourcesPage">
@@ -42,6 +50,14 @@
                         </c:forEach>
                     </tbody>
                 </table>
+                <p class="addNew">Add dependency:
+                    <select name="buildType" onchange="addDependency(this, '${resource.name}')">
+                        <option value="">-- Please select a build configuration --</option>
+                        <c:forEach items="${availableBuildTypes}" var="buildType">
+                            <option value="${buildType}"><c:out value="${buildTypes[buildType].fullName}"/></option>
+                        </c:forEach>
+                    </select>
+                </p>
                 <br/>
             </c:forEach>
         </c:if>

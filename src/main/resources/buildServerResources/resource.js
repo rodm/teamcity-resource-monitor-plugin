@@ -53,3 +53,16 @@ BS.EditResourceDialog = OO.extend(BS.AbstractModalDialog, {
         this.close();
     }
 });
+
+BS.Resource = {
+  linkBuildType: function(name, buildTypeId) {
+    var url = "/resource.html?submitAction=linkBuildType&resourceName=" + name + "&buildTypeId=" + buildTypeId;
+    BS.ajaxRequest(url, {
+      onSuccess: function(transport) {
+      },
+      onFailure: function() {
+        alert('Unable to link dependency');
+      }
+    });
+  }
+};

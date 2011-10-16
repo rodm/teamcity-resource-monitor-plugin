@@ -37,6 +37,7 @@ public class ResourceController extends BaseController {
         Loggers.SERVER.info("resource name: [" + request.getParameter("resourceName") + "]");
         Loggers.SERVER.info("resource host: [" + request.getParameter("resourceHost") + "]");
         Loggers.SERVER.info("resource port: [" + request.getParameter("resourcePort") + "]");
+        Loggers.SERVER.info("build type id: [" + request.getParameter("buildTypeId") + "]");
 
         String action = request.getParameter("submitAction");
         if ("saveResource".equals(action)) {
@@ -48,6 +49,10 @@ public class ResourceController extends BaseController {
         } else if ("removeResource".equals(action)) {
             String name = request.getParameter("resourceName");
             resourceManager.removeResource(name);
+        } else if ("linkBuildType".equals(action)) {
+            String name = request.getParameter("resourceName");
+            String buildTypeId = request.getParameter("buildTypeId");
+            resourceManager.linkBuildToResource(name, buildTypeId);
         }
         return new ModelAndView(pluginPath + "response.jsp");
     }
