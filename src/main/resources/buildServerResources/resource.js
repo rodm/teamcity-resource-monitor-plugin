@@ -55,14 +55,27 @@ BS.EditResourceDialog = OO.extend(BS.AbstractModalDialog, {
 });
 
 BS.Resource = {
-  linkBuildType: function(name, buildTypeId) {
-    var url = "/resource.html?submitAction=linkBuildType&resourceName=" + name + "&buildTypeId=" + buildTypeId;
-    BS.ajaxRequest(url, {
-      onSuccess: function(transport) {
-      },
-      onFailure: function() {
-        alert('Unable to link dependency');
-      }
-    });
-  }
+    linkBuildType: function(name, buildTypeId) {
+        var url = "/resource.html?submitAction=linkBuildType&resourceName=" + name + "&buildTypeId=" + buildTypeId;
+        BS.ajaxRequest(url, {
+            onSuccess: function(transport) {
+            },
+            onFailure: function() {
+                alert('Unable to link dependency');
+            }
+        });
+    },
+
+    unlinkBuildType : function(name, buildTypeId) {
+        if (!confirm("Are you sure you want to remove this build configuration?")) return;
+
+        var url = "/resource.html?submitAction=unlinkBuildType&resourceName=" + name + "&buildTypeId=" + buildTypeId;
+        BS.ajaxRequest(url, {
+          onComplete: function() {
+          },
+          onFailure: function() {
+              alert('Unable to unlink dependency');
+          }
+        });
+    }
 };

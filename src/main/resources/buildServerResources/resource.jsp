@@ -45,7 +45,9 @@
                                 <td class="buildConfiguration" colspan="4">
                                     <c:out value="${buildTypes[buildType].fullName}"/>
                                 </td>
-                                <td class="edit">delete</td>
+                                <td class="edit">
+                                    <a href="javascript://" onclick="BS.Resource.unlinkBuildType('${resource.name}', '${buildType}');">delete</a>
+                                </td>
                             </tr>
                         </c:forEach>
                     </tbody>

@@ -53,6 +53,10 @@ public class ResourceController extends BaseController {
             String name = request.getParameter("resourceName");
             String buildTypeId = request.getParameter("buildTypeId");
             resourceManager.linkBuildToResource(name, buildTypeId);
+        } else if ("unlinkBuildType".equals(action)) {
+            String name = request.getParameter("resourceName");
+            String buildTypeId = request.getParameter("buildTypeId");
+            resourceManager.unlinkBuildFromResource(name, buildTypeId);
         }
         return new ModelAndView(pluginPath + "response.jsp");
     }
