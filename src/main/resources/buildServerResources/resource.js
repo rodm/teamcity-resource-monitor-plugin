@@ -55,6 +55,19 @@ BS.EditResourceDialog = OO.extend(BS.AbstractModalDialog, {
 });
 
 BS.Resource = {
+    enableResource: function(name, enable) {
+        var url = "/resource.html?submitAction=";
+        url = url + ((enable) ? "disableResource" : "enableResource");
+        url = url + "&resourceName=" + name;
+        BS.ajaxRequest(url, {
+            onSuccess: function(transport) {
+            },
+            onFailure: function() {
+                alert('Unable to enable/disable resource');
+            }
+        });
+    },
+
     linkBuildType: function(name, buildTypeId) {
         var url = "/resource.html?submitAction=linkBuildType&resourceName=" + name + "&buildTypeId=" + buildTypeId;
         BS.ajaxRequest(url, {

@@ -46,6 +46,16 @@ public class ResourceManager {
         resources.remove(name);
     }
 
+    public void enableResource(String name) {
+        validResource(name);
+        resources.get(name).enable();
+    }
+
+    public void disableResource(String name) {
+        validResource(name);
+        resources.get(name).disable();
+    }
+
     public void setResources(Map<String,Resource> resources) {
         this.resources = resources;
     }

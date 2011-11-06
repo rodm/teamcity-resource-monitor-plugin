@@ -26,6 +26,21 @@
                     <tbody>
                         <tr class="resource">
                             <td class="name highlight">${resource.name}</td>
+                            <td class="edit highlight">
+                                <a href="javascript://"
+                                   onclick="BS.Resource.enableResource('${resource.name}', ${resource.enabled})">
+                                    <c:choose>
+                                        <c:when test="${resource.enabled}">Enabled</c:when>
+                                        <c:otherwise>Disabled</c:otherwise>
+                                    </c:choose>
+                                </a>
+                            </td>
+                            <td class="edit highlight">
+                                <c:choose>
+                                    <c:when test="${resource.available}">Available</c:when>
+                                    <c:otherwise>Unavailable</c:otherwise>
+                                </c:choose>
+                            </td>
                             <td class="host highlight">${resource.host}</td>
                             <td class="port highlight">${resource.port}</td>
                             <td class="edit highlight"
@@ -42,7 +57,7 @@
                         </tr>
                         <c:forEach items="${resource.buildTypes}" var="buildType">
                             <tr class="buildConfigurationRow">
-                                <td class="buildConfiguration" colspan="4">
+                                <td class="buildConfiguration" colspan="6">
                                     <c:out value="${buildTypes[buildType].fullName}"/>
                                 </td>
                                 <td class="edit">

@@ -11,6 +11,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.assertFalse;
 import static org.mockito.Mockito.*;
 
 public class ResourceManagerTest {
@@ -59,6 +61,25 @@ public class ResourceManagerTest {
     @Test(expected = IllegalArgumentException.class)
     public void removingResourceThatDoesntExist() {
         manager.removeResource("Resource");
+    }
+
+    @Test
+    public void enableResource() {
+        Resource resource = new Resource("Test Resource", null, -1);
+        resource.disable();
+        manager.addResource(resource);
+        manager.enableResource("Test Resource");
+
+        assertTrue(resource.isEnabled());
+    }
+
+    @Test
+    public void disableResource() {
+        Resource resource = new Resource("Test Resource", null, -1);
+        manager.addResource(resource);
+        manager.disableResource("Test Resource");
+
+        assertFalse(resource.isEnabled());
     }
 
     @Test

@@ -68,6 +68,12 @@ public class ResourceController extends BaseController {
         } else if ("removeResource".equals(action)) {
             String name = request.getParameter("resourceName");
             resourceManager.removeResource(name);
+        } else if ("enableResource".equals(action)) {
+            String name = request.getParameter("resourceName");
+            resourceManager.enableResource(name);
+        } else if ("disableResource".equals(action)) {
+            String name = request.getParameter("resourceName");
+            resourceManager.disableResource(name);
         } else if ("linkBuildType".equals(action)) {
             String name = request.getParameter("resourceName");
             String buildTypeId = request.getParameter("buildTypeId");

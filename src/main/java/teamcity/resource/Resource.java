@@ -61,6 +61,10 @@ public class Resource {
         return result;
     }
 
+    public boolean isEnabled() {
+        return this.enabled;
+    }
+
     public void enable() {
         this.enabled = true;
     }
