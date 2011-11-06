@@ -1,10 +1,13 @@
 package teamcity.resource;
 
+import jetbrains.buildServer.controllers.ActionErrors;
+import jetbrains.buildServer.controllers.AjaxRequestProcessor;
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
+import org.jdom.Element;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -32,6 +35,22 @@ public class ResourceController extends BaseController {
     }
 
     protected ModelAndView doHandle(HttpServletRequest request, HttpServletResponse response) throws Exception {
+        new AjaxRequestProcessor().processRequest(request, response, new AjaxRequestProcessor.RequestHandler() {
+            public void handleRequest(final HttpServletRequest request, final HttpServletResponse response, final Element xmlResponse) {
+                try {
+                    doAction(request);
+                } catch (Exception e) {
+                    Loggers.SERVER.warn(e);
+                    ActionErrors errors = new ActionErrors();
+                    errors.addError("Resource", getMessageWithNested(e));
+                    errors.serialize(xmlResponse);
+                }
+            }
+        });
+        return null;
+    }
+
+    private void doAction(final HttpServletRequest request) throws Exception {
         Loggers.SERVER.info("       method: [" + request.getMethod() + "]");
         Loggers.SERVER.info("submit action: [" + request.getParameter("submitAction") + "]");
         Loggers.SERVER.info("resource name: [" + request.getParameter("resourceName") + "]");
@@ -58,6 +77,15 @@ public class ResourceController extends BaseController {
             String buildTypeId = request.getParameter("buildTypeId");
             resourceManager.unlinkBuildFromResource(name, buildTypeId);
         }
-        return new ModelAndView(pluginPath + "response.jsp");
+    }
+
+    private String getMessageWithNested(Throwable e) {
+        String result = e.getMessage();
+        Throwable cause = e.getCause();
+        if (cause != null) {
+            result += " Caused by: " + getMessageWithNested(cause);
+
+        }
+        return result;
     }
 }
