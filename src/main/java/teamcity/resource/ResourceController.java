@@ -5,7 +5,6 @@ import jetbrains.buildServer.controllers.AjaxRequestProcessor;
 import jetbrains.buildServer.controllers.BaseController;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.web.openapi.PluginDescriptor;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jdom.Element;
 import org.springframework.web.servlet.ModelAndView;
@@ -17,20 +16,16 @@ public class ResourceController extends BaseController {
 
     private final WebControllerManager webControllerManager;
 
-    private final String pluginPath;
+    private ResourceManager resourceManager;
 
     private ResourceMonitorPlugin plugin;
 
-    private ResourceManager resourceManager;
-
     public ResourceController(SBuildServer buildServer, WebControllerManager webControllerManager,
-                              ResourceManager resourceManager, PluginDescriptor pluginDescriptor,
-                              ResourceMonitorPlugin plugin)
+                              ResourceManager resourceManager, ResourceMonitorPlugin plugin)
     {
         super(buildServer);
         this.webControllerManager = webControllerManager;
         this.resourceManager = resourceManager;
-        this.pluginPath = pluginDescriptor.getPluginResourcesPath();
         this.plugin = plugin;
     }
 
@@ -95,7 +90,6 @@ public class ResourceController extends BaseController {
         Throwable cause = e.getCause();
         if (cause != null) {
             result += " Caused by: " + getMessageWithNested(cause);
-
         }
         return result;
     }
