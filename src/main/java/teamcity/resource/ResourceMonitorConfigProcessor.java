@@ -52,7 +52,6 @@ public class ResourceMonitorConfigProcessor {
         }
         log.info("ResourceMonitor config loaded");
         resourceManager.setResources(resources);
-//        resourceManager.scheduleMonitor();
     }
 
     private int readCheckIntervalFrom(Element configRoot) {

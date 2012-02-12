@@ -11,14 +11,17 @@ public class ResourceMonitorPlugin extends BuildServerAdapter {
 
     private SBuildServer server;
 
+    private ResourceMonitor monitor;
+
     private ResourceManager resourceManager;
 
     private String name;
 
-    public ResourceMonitorPlugin(SBuildServer server, ResourceManager resourceManager) {
+    public ResourceMonitorPlugin(SBuildServer server, ResourceMonitor monitor, ResourceManager resourceManager) {
         this.server = server;
         this.resourceManager = resourceManager;
         this.name = this.getClass().getSimpleName();
+        this.monitor = monitor;
         server.addListener(this);
     }
 
@@ -43,8 +46,6 @@ public class ResourceMonitorPlugin extends BuildServerAdapter {
 
     @Override
     public void serverShutdown() {
-//        executor.shutdown();
-//        server.unregisterExtension(MainConfigProcessor.class, sourceId);
         Loggers.SERVER.info(name + " stopped");
     }
 
@@ -57,6 +58,7 @@ public class ResourceMonitorPlugin extends BuildServerAdapter {
         try {
             ResourceMonitorConfigProcessor configProcessor = new ResourceMonitorConfigProcessor(resourceManager);
             configProcessor.readFrom(new FileReader(getConfigDirFile()));
+            monitor.scheduleMonitor();
         } catch (JDOMException e) {
             e.printStackTrace();
         } catch (FileNotFoundException e) {
