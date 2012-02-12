@@ -1,16 +1,16 @@
 package teamcity.resource;
 
-import org.jdom.Element;
-import org.jdom.output.XMLOutputter;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
+import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
 
 public class ResourceMonitorConfigProcessorTest {
 
@@ -24,44 +24,85 @@ public class ResourceMonitorConfigProcessorTest {
     }
 
     @Test
-    public void writeConfig() throws IOException {
-        List<String> buildTypeIds = new ArrayList<String>();
-        buildTypeIds.add("bt1");
-        buildTypeIds.add("bt2");
-        buildTypeIds.add("bt3");
-        Resource resource1 = new Resource("Resource1", "locahost", 1080);
-        resource1.setBuildTypes(buildTypeIds);
-        manager.addResource(resource1);
+    public void shouldWriteRootElementAndDefaultCheckInterval() throws Exception {
+        StringWriter writer = new StringWriter();
+        configProcessor.writeTo(writer);
 
-        Resource resource2 = new Resource("Resource2", "locahost", 1080);
-        manager.addResource(resource2);
-        Element element = new Element("test");
-        configProcessor.writeTo(element);
-
-        StringWriter out = new StringWriter();
-        XMLOutputter o = new XMLOutputter();
-        o.output(element, out);
-        System.out.println(out);
+        assertXpathEvaluatesTo("1", "count(//monitored-resources)", writer.toString());
+        assertXpathEvaluatesTo("30", "/monitored-resources/@check-interval", writer.toString());
     }
 
     @Test
-    public void ignoreResourcesWithSameName() {
-        final Element root = new Element("root");
-        final Element configRoot = new Element("monitored-resources");
-        configRoot.setAttribute("check-interval", "30");
-        root.addContent(configRoot);
-        configRoot.addContent(createResource("resource", "host1", "123"));
-        configRoot.addContent(createResource("resource", "host2", "456"));
+    public void shouldWriteOutNewCheckInterval() throws Exception {
+        manager.setInterval(15);
 
-        configProcessor.readFrom(root);
-        assertEquals(1, manager.getResources().size());
+        StringWriter writer = new StringWriter();
+        configProcessor.writeTo(writer);
+
+        assertXpathEvaluatesTo("15", "/monitored-resources/@check-interval", writer.toString());
     }
 
-    private Element createResource(String name, String host, String port) {
-        final Element resource = new Element("resource");
-        resource.setAttribute("name", name);
-        resource.setAttribute("host", host);
-        resource.setAttribute("port", port);
-        return resource;
+    @Test
+    public void shouldWriteOutResource() throws Exception {
+        Resource resource = new Resource("Resource1", "localhost", 1080);
+        manager.addResource(resource);
+
+        StringWriter writer = new StringWriter();
+        configProcessor.writeTo(writer);
+
+        assertXpathEvaluatesTo("Resource1", "//resource/@name", writer.toString());
+        assertXpathEvaluatesTo("localhost", "//resource/@host", writer.toString());
+        assertXpathEvaluatesTo("1080", "//resource/@port", writer.toString());
+    }
+
+    @Test
+    public void shouldWriteOutResourceWithBuildTypeIds() throws Exception {
+        List<String> buildTypeIds = new ArrayList<String>();
+        buildTypeIds.add("bt1");
+        buildTypeIds.add("bt2");
+        Resource resource = new Resource("Resource1", "locahost", 1080);
+        resource.setBuildTypes(buildTypeIds);
+        manager.addResource(resource);
+
+        StringWriter writer = new StringWriter();
+        configProcessor.writeTo(writer);
+
+        assertXpathEvaluatesTo("2", "count(//resource/build-type)", writer.toString());
+        assertXpathEvaluatesTo("bt1", "//resource/build-type[1]/@id", writer.toString());
+        assertXpathEvaluatesTo("bt2", "//resource/build-type[2]/@id", writer.toString());
+    }
+
+    @Test
+    public void shouldReadEmptyConfig() throws Exception {
+        String config = "<monitored-resources check-interval=\"25\"/>";
+        Reader reader = new StringReader(config);
+        configProcessor.readFrom(reader);
+
+        assertEquals(0, manager.getResources().size());
+        assertEquals(25, manager.getInterval());
+    }
+
+    @Test
+    public void shouldReadResource() throws Exception {
+        String config = "<monitored-resources check-interval=\"25\"><resource name=\"Resource\" host=\"localhost\" port=\"1234\"/></monitored-resources>";
+        Reader reader = new StringReader(config);
+        configProcessor.readFrom(reader);
+
+        assertEquals(1, manager.getResources().size());
+        Resource resource = manager.getResources().get("Resource");
+        assertEquals("Resource", resource.getName());
+        assertEquals("localhost", resource.getHost());
+        assertEquals(1234, resource.getPort());
+    }
+
+    @Test
+    public void shouldReadResourceWithBuildTypeIds() throws Exception {
+        String config = "<monitored-resources check-interval=\"25\"><resource name=\"Resource\" host=\"localhost\" port=\"1234\"><build-type id=\"bt1\"/></resource></monitored-resources>";
+        Reader reader = new StringReader(config);
+        configProcessor.readFrom(reader);
+
+        Resource resource = manager.getResources().get("Resource");
+        assertEquals(1, resource.getBuildTypes().size());
+        assertEquals("bt1", resource.getBuildTypes().get(0));
     }
 }

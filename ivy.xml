@@ -23,5 +23,6 @@
 
         <dependency org="junit" name="junit" rev="${junit.version}" conf="test->default"/>
         <dependency org="org.mockito" name="mockito-core" rev="${mockito.version}" conf="test->default"/>
+        <dependency  org="xmlunit" name="xmlunit" rev="${xmlunit.version}" conf="test->default"/>
     </dependencies>
 </ivy-module>

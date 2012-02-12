@@ -2,13 +2,19 @@ package teamcity.resource;
 
 import com.intellij.openapi.diagnostic.Logger;
 import jetbrains.buildServer.log.Loggers;
-import jetbrains.buildServer.serverSide.MainConfigProcessor;
-import org.jdom.Content;
+import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.input.SAXBuilder;
+import org.jdom.output.Format;
+import org.jdom.output.XMLOutputter;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.Writer;
 import java.util.*;
 
-public class ResourceMonitorConfigProcessor implements MainConfigProcessor {
+public class ResourceMonitorConfigProcessor {
 
     private static final String CONFIG_ROOT = "monitored-resources";
     private static final String CONFIG_CHECK_INTERVAL = "check-interval";
@@ -29,22 +35,22 @@ public class ResourceMonitorConfigProcessor implements MainConfigProcessor {
         this.resourceManager = resourceManager;
     }
 
-    public void readFrom(Element rootElement) {
+    public void readFrom(Reader reader) throws JDOMException, IOException {
         log.info("ResourceMonitor reading config");
+        SAXBuilder builder = new SAXBuilder();
+        Document document = builder.build(reader);
+        Element configRoot = document.getRootElement();
         Map<String, Resource> resources = new HashMap<String, Resource>();
-        final Element configRoot = rootElement.getChild(CONFIG_ROOT);
-        if (configRoot != null) {
-            resourceManager.setInterval(readCheckIntervalFrom(configRoot));
-            final List list = configRoot.getChildren(CONFIG_RESOURCE);
-            for (Object o : list) {
-                final Element element = (Element) o;
-                Resource resource = readResourceFrom(element);
-                if (!resources.containsKey(resource.getName())) {
-                    resources.put(resource.getName(), resource);
-                }
+        resourceManager.setInterval(readCheckIntervalFrom(configRoot));
+        final List list = configRoot.getChildren(CONFIG_RESOURCE);
+        for (Object o : list) {
+            final Element element = (Element) o;
+            Resource resource = readResourceFrom(element);
+            if (!resources.containsKey(resource.getName())) {
+                resources.put(resource.getName(), resource);
             }
         }
-        log.info("ResourceMonitor config read");
+        log.info("ResourceMonitor config loaded");
         resourceManager.setResources(resources);
 //        resourceManager.scheduleMonitor();
     }
@@ -95,21 +101,22 @@ public class ResourceMonitorConfigProcessor implements MainConfigProcessor {
         return buildTypes;
     }
 
-    public void writeTo(Element parentElement) {
+    public void writeTo(Writer writer) throws IOException {
         log.info("ResourceMonitor writing config");
-        final Element root = new Element(CONFIG_ROOT);
+        Element root = new Element(CONFIG_ROOT);
         root.setAttribute(CONFIG_CHECK_INTERVAL, Integer.toString(resourceManager.getInterval()));
-        parentElement.addContent((Content) root);
-
         Map<String, Resource> resources = resourceManager.getResources();
         for (Resource resource : resources.values()) {
             writeResourceTo(resource, root);
         }
+
+        XMLOutputter xmlWriter = new XMLOutputter(Format.getPrettyFormat());
+        xmlWriter.output(root, writer);
     }
 
     private void writeResourceTo(Resource resource, Element parentElement) {
         final Element element = new Element(CONFIG_RESOURCE);
-        parentElement.addContent((Content) element);
+        parentElement.addContent(element);
         element.setAttribute(CONFIG_NAME, resource.getName());
         element.setAttribute(CONFIG_HOST, resource.getHost());
         element.setAttribute(CONFIG_PORT, Integer.toString(resource.getPort()));
@@ -119,7 +126,7 @@ public class ResourceMonitorConfigProcessor implements MainConfigProcessor {
     private void writeBuildTypesTo(List<String> buildTypeIds, Element parentElement) {
         for (String id : buildTypeIds) {
             final Element element = new Element(CONFIG_BUILD_TYPE);
-            parentElement.addContent((Content) element);
+            parentElement.addContent(element);
             element.setAttribute(CONFIG_BUILD_TYPE_ID, id);
         }
     }

@@ -19,15 +19,19 @@ public class ResourceController extends BaseController {
 
     private final String pluginPath;
 
+    private ResourceMonitorPlugin plugin;
+
     private ResourceManager resourceManager;
 
     public ResourceController(SBuildServer buildServer, WebControllerManager webControllerManager,
-                              ResourceManager resourceManager, PluginDescriptor pluginDescriptor)
+                              ResourceManager resourceManager, PluginDescriptor pluginDescriptor,
+                              ResourceMonitorPlugin plugin)
     {
         super(buildServer);
         this.webControllerManager = webControllerManager;
         this.resourceManager = resourceManager;
-        pluginPath = pluginDescriptor.getPluginResourcesPath();
+        this.pluginPath = pluginDescriptor.getPluginResourcesPath();
+        this.plugin = plugin;
     }
 
     public void register() {
@@ -83,6 +87,7 @@ public class ResourceController extends BaseController {
             String buildTypeId = request.getParameter("buildTypeId");
             resourceManager.unlinkBuildFromResource(name, buildTypeId);
         }
+        plugin.saveConfiguration();
     }
 
     private String getMessageWithNested(Throwable e) {
