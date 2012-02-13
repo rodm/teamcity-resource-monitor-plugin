@@ -1,5 +1,7 @@
 package teamcity.resource;
 
+import jetbrains.buildServer.configuration.ChangeListener;
+import jetbrains.buildServer.configuration.FileWatcher;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.*;
 import org.jdom.JDOMException;
@@ -7,7 +9,7 @@ import org.jdom.JDOMException;
 import java.io.*;
 import java.util.List;
 
-public class ResourceMonitorPlugin extends BuildServerAdapter {
+public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeListener {
 
     private SBuildServer server;
 
@@ -17,12 +19,17 @@ public class ResourceMonitorPlugin extends BuildServerAdapter {
 
     private String name;
 
+    private FileWatcher fileWatcher;
+
     public ResourceMonitorPlugin(SBuildServer server, ResourceMonitor monitor, ResourceManager resourceManager) {
         this.server = server;
         this.resourceManager = resourceManager;
         this.name = this.getClass().getSimpleName();
         this.monitor = monitor;
         server.addListener(this);
+
+        fileWatcher = new FileWatcher(getConfigDirFile());
+        fileWatcher.registerListener(this);
     }
 
     @Override
@@ -42,16 +49,18 @@ public class ResourceMonitorPlugin extends BuildServerAdapter {
         }
 
         loadConfiguration();
+        fileWatcher.start();
     }
 
     @Override
     public void serverShutdown() {
+        fileWatcher.stop();
         Loggers.SERVER.info(name + " stopped");
     }
 
-    @Override
-    public void serverConfigurationReloaded() {
-        Loggers.SERVER.info(name + ": server configuration reloaded");
+    public void changeOccured(String requestor) {
+        Loggers.SERVER.info("Reloading configuration");
+        loadConfiguration();
     }
 
     public void loadConfiguration() {
