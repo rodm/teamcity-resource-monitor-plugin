@@ -28,7 +28,7 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
         this.monitor = monitor;
         server.addListener(this);
 
-        fileWatcher = new FileWatcher(getConfigDirFile());
+        fileWatcher = new FileWatcher(getConfigurationFile());
         fileWatcher.registerListener(this);
     }
 
@@ -66,7 +66,7 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
     public void loadConfiguration() {
         try {
             ResourceMonitorConfigProcessor configProcessor = new ResourceMonitorConfigProcessor(resourceManager);
-            configProcessor.readFrom(new FileReader(getConfigDirFile()));
+            configProcessor.readFrom(new FileReader(getConfigurationFile()));
             monitor.scheduleMonitor();
         } catch (JDOMException e) {
             e.printStackTrace();
@@ -80,7 +80,7 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
     public void saveConfiguration() {
         try {
             ResourceMonitorConfigProcessor configProcessor = new ResourceMonitorConfigProcessor(resourceManager);
-            configProcessor.writeTo(new FileWriter(getConfigDirFile()));
+            configProcessor.writeTo(new FileWriter(getConfigurationFile()));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -88,7 +88,7 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
         }
     }
 
-    private File getConfigDirFile() {
+    private File getConfigurationFile() {
         return new File(server.getConfigDir(), "resources.xml");
     }
 }
