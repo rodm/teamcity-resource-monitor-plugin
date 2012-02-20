@@ -69,23 +69,17 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
             configProcessor.readFrom(new FileReader(getConfigurationFile()));
             monitor.scheduleMonitor();
         } catch (JDOMException e) {
-            e.printStackTrace();
+            Loggers.SERVER.error("Error loading resources configuration file", e);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            Loggers.SERVER.warn("Resource configuration file not found");
         } catch (IOException e) {
-            e.printStackTrace();
+            Loggers.SERVER.error("Error loading resources configuration file", e);
         }
     }
 
-    public void saveConfiguration() {
-        try {
-            ResourceMonitorConfigProcessor configProcessor = new ResourceMonitorConfigProcessor(resourceManager);
-            configProcessor.writeTo(new FileWriter(getConfigurationFile()));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public void saveConfiguration() throws IOException {
+        ResourceMonitorConfigProcessor configProcessor = new ResourceMonitorConfigProcessor(resourceManager);
+        configProcessor.writeTo(new FileWriter(getConfigurationFile()));
     }
 
     private File getConfigurationFile() {
