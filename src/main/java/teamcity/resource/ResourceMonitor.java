@@ -53,16 +53,20 @@ public class ResourceMonitor implements Runnable {
     }
 
     public void run() {
-        int unavailable = 0;
+        int enabled = 0;
+        int available = 0;
         for (Resource resource : getResources().values()) {
+            if (resource.isEnabled()) {
+                enabled++;
+            }
             if (resource.isAvailable()) {
                 resourceAvailable(resource);
+                available++;
             } else {
                 resourceUnavailable(resource);
-                unavailable++;
             }
         }
-        log.info("Monitored resources: " + getResources().size() + ", unavailable: " + unavailable);
+        log.info("Monitored resources: " + getResources().size() + ", enabled: " + enabled + ", available: " + available);
     }
 
     public void resourceAvailable(Resource resource) {
