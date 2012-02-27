@@ -64,9 +64,11 @@ public class ResourceController extends BaseController {
             String port = request.getParameter("resourcePort");
             Resource resource = new Resource(name, host, Integer.valueOf(port));
             resourceManager.addResource(resource);
+            plugin.saveConfiguration();
         } else if ("removeResource".equals(action)) {
             String name = request.getParameter("resourceName");
             resourceManager.removeResource(name);
+            plugin.saveConfiguration();
         } else if ("enableResource".equals(action)) {
             String name = request.getParameter("resourceName");
             resourceManager.enableResource(name);
@@ -77,12 +79,13 @@ public class ResourceController extends BaseController {
             String name = request.getParameter("resourceName");
             String buildTypeId = request.getParameter("buildTypeId");
             resourceManager.linkBuildToResource(name, buildTypeId);
+            plugin.saveConfiguration();
         } else if ("unlinkBuildType".equals(action)) {
             String name = request.getParameter("resourceName");
             String buildTypeId = request.getParameter("buildTypeId");
             resourceManager.unlinkBuildFromResource(name, buildTypeId);
+            plugin.saveConfiguration();
         }
-        plugin.saveConfiguration();
     }
 
     private String getMessageWithNested(Throwable e) {
