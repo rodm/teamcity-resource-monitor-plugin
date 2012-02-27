@@ -61,6 +61,7 @@ BS.Resource = {
         url = url + "&resourceName=" + name;
         BS.ajaxRequest(url, {
             onSuccess: function(transport) {
+                document.location.reload();
             },
             onFailure: function() {
                 alert('Unable to enable/disable resource');
@@ -72,6 +73,7 @@ BS.Resource = {
         var url = "/resource.html?submitAction=linkBuildType&resourceName=" + name + "&buildTypeId=" + buildTypeId;
         BS.ajaxRequest(url, {
             onSuccess: function(transport) {
+                document.location.reload();
             },
             onFailure: function() {
                 alert('Unable to link dependency');
@@ -85,6 +87,7 @@ BS.Resource = {
         var url = "/resource.html?submitAction=unlinkBuildType&resourceName=" + name + "&buildTypeId=" + buildTypeId;
         BS.ajaxRequest(url, {
           onComplete: function() {
+              document.location.reload();
           },
           onFailure: function() {
               alert('Unable to unlink dependency');
