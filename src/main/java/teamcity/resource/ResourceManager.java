@@ -16,14 +16,8 @@ public class ResourceManager {
 
     private ProjectManager projectManager;
 
-    public ResourceManager() {}
-
     public ResourceManager(ProjectManager projectManager) {
         this.projectManager = projectManager;
-    }
-
-    public void setProjectMananger(ProjectManager newProjectMananger) {
-        this.projectManager = newProjectMananger;
     }
 
     public void setInterval(int interval) {

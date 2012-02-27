@@ -19,9 +19,12 @@ public class ResourceManagerTest {
 
     private ResourceManager manager;
 
+    private ProjectManager mockProjectManager;
+
     @Before
     public void setup() {
-        manager = new ResourceManager();
+        mockProjectManager = mock(ProjectManager.class);
+        manager = new ResourceManager(mockProjectManager);
     }
 
     @Test
@@ -85,9 +88,7 @@ public class ResourceManagerTest {
     @Test
     public void linkBuildToResource() {
         SBuildType buildType = mock(SBuildType.class);
-        ProjectManager projectManager = mock(ProjectManager.class);
-        when(projectManager.findBuildTypeById(eq("bt123"))).thenReturn(buildType);
-        manager.setProjectMananger(projectManager);
+        when(mockProjectManager.findBuildTypeById(eq("bt123"))).thenReturn(buildType);
         manager.addResource(new Resource("Test Resource", null, -1));
 
         manager.linkBuildToResource("Test Resource", "bt123");
@@ -103,8 +104,6 @@ public class ResourceManagerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void linkInvalidBuildToResource() {
-        ProjectManager projectManager = mock(ProjectManager.class);
-        manager.setProjectMananger(projectManager);
         manager.addResource(new Resource("Test Resource", null, -1));
 
         manager.linkBuildToResource("Test Resource", "bt124");
@@ -113,9 +112,7 @@ public class ResourceManagerTest {
     @Test
     public void unlinkBuildFromResource() {
         SBuildType buildType = mock(SBuildType.class);
-        ProjectManager projectManager = mock(ProjectManager.class);
-        when(projectManager.findBuildTypeById(eq("bt123"))).thenReturn(buildType);
-        manager.setProjectMananger(projectManager);
+        when(mockProjectManager.findBuildTypeById(eq("bt123"))).thenReturn(buildType);
         List<String> buildTypes = new ArrayList<String>();
         buildTypes.add("bt123");
         Resource resource = new Resource("Test Resource", null, -1);
@@ -135,8 +132,6 @@ public class ResourceManagerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void unlinkInvalidBuildFromResource() {
-        ProjectManager projectManager = mock(ProjectManager.class);
-        manager.setProjectMananger(projectManager);
         manager.addResource(new Resource("Test Resource", null, -1));
 
         manager.unlinkBuildFromResource("Test Resource", "bt124");

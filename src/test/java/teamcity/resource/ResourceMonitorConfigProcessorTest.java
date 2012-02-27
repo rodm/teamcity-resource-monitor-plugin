@@ -1,5 +1,6 @@
 package teamcity.resource;
 
+import jetbrains.buildServer.serverSide.ProjectManager;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -14,12 +15,14 @@ import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
 
 public class ResourceMonitorConfigProcessorTest {
 
+    private static final ProjectManager NULL_PROJECT_MANAGER = null;
+
     private ResourceManager manager;
     private ResourceMonitorConfigProcessor configProcessor;
 
     @Before
     public void setup() {
-        manager = new ResourceManager();
+        manager = new ResourceManager(NULL_PROJECT_MANAGER);
         configProcessor = new ResourceMonitorConfigProcessor(manager);
     }
 
