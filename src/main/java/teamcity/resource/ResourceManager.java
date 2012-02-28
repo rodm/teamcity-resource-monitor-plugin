@@ -3,6 +3,7 @@ package teamcity.resource;
 import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SBuildType;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,7 +63,7 @@ public class ResourceManager {
     }
 
     public Map<String,Resource> getResources() {
-        return resources;
+        return Collections.unmodifiableMap(resources);
     }
 
     public void linkBuildToResource(String name, String buildTypeId) {
