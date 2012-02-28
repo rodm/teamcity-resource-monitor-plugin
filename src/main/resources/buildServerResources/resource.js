@@ -5,8 +5,6 @@ BS.EditResourceForm = OO.extend(BS.AbstractWebForm, {
     },
 
     saveResource : function() {
-        this.formElement().submitAction.value = 'saveResource';
-
         BS.FormSaver.save(this, this.formElement().action, OO.extend(BS.ErrorsAwareListener, {
 
           onCompleteSave : function(form, responseXML, err) {
@@ -44,6 +42,8 @@ BS.EditResourceDialog = OO.extend(BS.AbstractModalDialog, {
 
         var title = name.length == 0 ? 'Add New Resource' : 'Edit Resource';
         $('resourceDialogTitle').innerHTML = title;
+        var action = name.length == 0 ? 'addResource' : 'updateResource';
+        $('submitAction').value = action;
 
         this.showCentered();
         $('resourceName').focus();

@@ -116,7 +116,7 @@
                 <br clear="all"/>
             </div>
 
-            <input type="hidden" name="submitAction" value=""/>
+            <input id="submitAction" type="hidden" name="submitAction" value=""/>
         </form>
     </div>
 </div>

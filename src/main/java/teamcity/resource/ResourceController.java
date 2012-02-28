@@ -58,12 +58,18 @@ public class ResourceController extends BaseController {
         Loggers.SERVER.info("build type id: [" + request.getParameter("buildTypeId") + "]");
 
         String action = request.getParameter("submitAction");
-        if ("saveResource".equals(action)) {
+        if ("addResource".equals(action)) {
             String name = request.getParameter("resourceName");
             String host = request.getParameter("resourceHost");
             String port = request.getParameter("resourcePort");
             Resource resource = new Resource(name, host, Integer.valueOf(port));
             resourceManager.addResource(resource);
+            plugin.saveConfiguration();
+        } else if ("updateResource".equals(action)) {
+            String name = request.getParameter("resourceName");
+            String host = request.getParameter("resourceHost");
+            String port = request.getParameter("resourcePort");
+            resourceManager.updateResource(name, host, Integer.valueOf(port));
             plugin.saveConfiguration();
         } else if ("removeResource".equals(action)) {
             String name = request.getParameter("resourceName");

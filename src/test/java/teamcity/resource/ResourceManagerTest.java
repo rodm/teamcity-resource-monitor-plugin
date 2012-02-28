@@ -54,6 +54,21 @@ public class ResourceManagerTest {
     }
 
     @Test
+    public void updateResource() {
+        Resource resource = new Resource("Test Resource", null, -1);
+        manager.addResource(resource);
+        manager.updateResource("Test Resource", "test", 1234);
+
+        assertEquals("test", resource.getHost());
+        assertEquals(1234, resource.getPort());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void updateResourceThatDoesNotExist() {
+        manager.updateResource("Test Resource", "test", 1234);
+    }
+
+    @Test
     public void removeResource() {
         manager.addResource(new Resource("Test Resource", null, -1));
 

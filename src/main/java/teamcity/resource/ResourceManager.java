@@ -35,6 +35,13 @@ public class ResourceManager {
         resources.put(resource.getName(), resource);
     }
 
+    public void updateResource(String name, String host, int port) {
+        validResource(name);
+        Resource resource = resources.get(name);
+        resource.setHost(host);
+        resource.setPort(port);
+    }
+
     public void removeResource(String name) {
         validResource(name);
         resources.remove(name);
