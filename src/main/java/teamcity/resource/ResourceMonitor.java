@@ -109,6 +109,8 @@ public class ResourceMonitor implements Runnable {
                     String message = "Resource " + resource.getName() + " is unavailable, build '" + buildType.getFullName() + "' de-activated by " + PLUGIN_NAME;
                     log.info(message);
                 }
+            } else {
+                log.warn("Resource '" + resource.getName() + "' is linked to build id '" + buildTypeId + "' that doesn't exist");
             }
         }
     }
