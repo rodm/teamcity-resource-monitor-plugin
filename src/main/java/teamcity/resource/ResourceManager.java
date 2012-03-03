@@ -3,13 +3,13 @@ package teamcity.resource;
 import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SBuildType;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class ResourceManager {
 
     private static final int DEFAULT_INTERVAL = 30;
+
+    private Set<String> ids = new HashSet<String>();
 
     private Map<String, Resource> resources = new HashMap<String, Resource>();
 
@@ -30,21 +30,25 @@ public class ResourceManager {
     }
 
     public void addResource(Resource resource) {
+        if (ids.contains(resource.getId())) {
+            throw new IllegalArgumentException("resource with id '" + resource.getId() + "' already exists");
+        }
         if (resources.containsKey(resource.getName())) {
             throw new IllegalArgumentException("resource with name " + resource.getName() + " already exists");
         }
+        ids.add(resource.getId());
         resources.put(resource.getName(), resource);
     }
 
     public void updateResource(String name, String host, int port) {
-        validResource(name);
-        Resource resource = resources.get(name);
+        Resource resource = getResource(name);
         resource.setHost(host);
         resource.setPort(port);
     }
 
     public void removeResource(String name) {
-        validResource(name);
+        Resource resource = getResource(name);
+        ids.remove(resource.getId());
         resources.remove(name);
     }
 
@@ -78,6 +82,11 @@ public class ResourceManager {
         validBuildType(buildTypeId);
         Resource resource = resources.get(name);
         resource.getBuildTypes().remove(buildTypeId);
+    }
+
+    private Resource getResource(String name) {
+        validResource(name);
+        return resources.get(name);
     }
 
     private void validResource(String name) {

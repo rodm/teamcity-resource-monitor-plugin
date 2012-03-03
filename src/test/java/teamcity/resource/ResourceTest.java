@@ -2,6 +2,7 @@ package teamcity.resource;
 
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 public class ResourceTest {
@@ -10,6 +11,15 @@ public class ResourceTest {
     private String VALID_NAME = "name";
     private String VALID_HOST = "localhost";
     private int VALID_PORT = 1234;
+
+    @Test
+    public void create() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+        assertEquals(VALID_ID, resource.getId());
+        assertEquals(VALID_NAME, resource.getName());
+        assertEquals(VALID_HOST, resource.getHost());
+        assertEquals(VALID_PORT, resource.getPort());
+    }
 
     @Test(expected = IllegalArgumentException.class)
     public void idCannotBeNull() {

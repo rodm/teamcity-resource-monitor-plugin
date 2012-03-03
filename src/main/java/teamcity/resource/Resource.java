@@ -26,6 +26,7 @@ public class Resource {
         if (name == null || "".equals(name)) {
             throw new IllegalArgumentException("name cannot be null or empty");
         }
+        this.id = id;
         this.name = name;
         this.host = host;
         this.port = port;

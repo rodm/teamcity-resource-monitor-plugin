@@ -43,14 +43,28 @@ public class ResourceManagerTest {
     @Test
     public void addingResources() {
         manager.addResource(new Resource("1", "Test Resource 1", null, -1));
-        manager.addResource(new Resource("1", "Test Resource 2", null, -1));
+        manager.addResource(new Resource("2", "Test Resource 2", null, -1));
         assertEquals(2, manager.getResources().size());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotAddResourceWithSameId() {
+        manager.addResource(new Resource("1", "Test Resource 1", null, -1));
+        manager.addResource(new Resource("1", "Test Resource 2", null, -1));
+    }
+
+    @Test
+    public void canReAddResourceWithSameId() {
+        Resource resource = new Resource("1", "Test Resource", null, -1);
+        manager.addResource(resource);
+        manager.removeResource("Test Resource");
+        manager.addResource(resource);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotAddResourceWithSameName() {
         manager.addResource(new Resource("1", "Test Resource", null, -1));
-        manager.addResource(new Resource("1", "Test Resource", null, -1));
+        manager.addResource(new Resource("2", "Test Resource", null, -1));
     }
 
     @Test
