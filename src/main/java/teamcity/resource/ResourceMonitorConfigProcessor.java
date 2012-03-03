@@ -19,6 +19,7 @@ public class ResourceMonitorConfigProcessor {
     private static final String CONFIG_ROOT = "monitored-resources";
     private static final String CONFIG_CHECK_INTERVAL = "check-interval";
     private static final String CONFIG_RESOURCE = "resource";
+    private static final String CONFIG_ID = "id";
     private static final String CONFIG_NAME = "name";
     private static final String CONFIG_HOST = "host";
     private static final String CONFIG_PORT = "port";
@@ -40,15 +41,21 @@ public class ResourceMonitorConfigProcessor {
         SAXBuilder builder = new SAXBuilder();
         Document document = builder.build(reader);
         Element configRoot = document.getRootElement();
+        Set<String> ids = new HashSet<String>();
         Map<String, Resource> resources = new HashMap<String, Resource>();
         resourceManager.setInterval(readCheckIntervalFrom(configRoot));
         final List list = configRoot.getChildren(CONFIG_RESOURCE);
         for (Object o : list) {
             final Element element = (Element) o;
             Resource resource = readResourceFrom(element);
-            if (!resources.containsKey(resource.getName())) {
-                resources.put(resource.getName(), resource);
+            if (ids.contains(resource.getId())) {
+                continue;
             }
+            if (resources.containsKey(resource.getName())) {
+                continue;
+            }
+            ids.add(resource.getId());
+            resources.put(resource.getName(), resource);
         }
         log.info("ResourceMonitor config loaded");
         resourceManager.setResources(resources);
@@ -68,10 +75,11 @@ public class ResourceMonitorConfigProcessor {
     }
 
     private Resource readResourceFrom(Element element) {
+        final String id = element.getAttributeValue(CONFIG_ID);
         final String name = element.getAttributeValue(CONFIG_NAME);
         final String host = element.getAttributeValue(CONFIG_HOST);
         final int port = readPortFrom(element);
-        Resource resource = new Resource("1", name, host, port);
+        Resource resource = new Resource(id, name, host, port);
         resource.setBuildTypes(readBuildTypesFrom(element));
         return resource;
     }
@@ -116,6 +124,7 @@ public class ResourceMonitorConfigProcessor {
     private void writeResourceTo(Resource resource, Element parentElement) {
         final Element element = new Element(CONFIG_RESOURCE);
         parentElement.addContent(element);
+        element.setAttribute(CONFIG_ID, resource.getId());
         element.setAttribute(CONFIG_NAME, resource.getName());
         element.setAttribute(CONFIG_HOST, resource.getHost());
         element.setAttribute(CONFIG_PORT, Integer.toString(resource.getPort()));
