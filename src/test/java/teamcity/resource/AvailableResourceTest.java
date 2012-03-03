@@ -18,7 +18,7 @@ public class AvailableResourceTest {
     @Before
     public void setup() throws IOException {
         resourceSocket = new ServerSocket(7400);
-        resource = new Resource("test", "localhost", 7400);
+        resource = new Resource("1", "test", "localhost", 7400);
     }
 
     @After

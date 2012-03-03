@@ -35,27 +35,27 @@ public class ResourceManagerTest {
 
     @Test
     public void addResource() {
-        Resource resource = new Resource("Test Resource", null, -1);
+        Resource resource = new Resource("1", "Test Resource", null, -1);
         manager.addResource(resource);
         assertEquals(1, manager.getResources().size());
     }
 
     @Test
     public void addingResources() {
-        manager.addResource(new Resource("Test Resource 1", null, -1));
-        manager.addResource(new Resource("Test Resource 2", null, -1));
+        manager.addResource(new Resource("1", "Test Resource 1", null, -1));
+        manager.addResource(new Resource("1", "Test Resource 2", null, -1));
         assertEquals(2, manager.getResources().size());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void cannotAddResourceWithSameName() {
-        manager.addResource(new Resource("Test Resource", null, -1));
-        manager.addResource(new Resource("Test Resource", null, -1));
+        manager.addResource(new Resource("1", "Test Resource", null, -1));
+        manager.addResource(new Resource("1", "Test Resource", null, -1));
     }
 
     @Test
     public void updateResource() {
-        Resource resource = new Resource("Test Resource", null, -1);
+        Resource resource = new Resource("1", "Test Resource", null, -1);
         manager.addResource(resource);
         manager.updateResource("Test Resource", "test", 1234);
 
@@ -70,7 +70,7 @@ public class ResourceManagerTest {
 
     @Test
     public void removeResource() {
-        manager.addResource(new Resource("Test Resource", null, -1));
+        manager.addResource(new Resource("1", "Test Resource", null, -1));
 
         manager.removeResource("Test Resource");
         assertEquals("there should be no resources", 0, manager.getResources().size());
@@ -83,7 +83,7 @@ public class ResourceManagerTest {
 
     @Test
     public void enableResource() {
-        Resource resource = new Resource("Test Resource", null, -1);
+        Resource resource = new Resource("1", "Test Resource", null, -1);
         resource.disable();
         manager.addResource(resource);
         manager.enableResource("Test Resource");
@@ -93,7 +93,7 @@ public class ResourceManagerTest {
 
     @Test
     public void disableResource() {
-        Resource resource = new Resource("Test Resource", null, -1);
+        Resource resource = new Resource("1", "Test Resource", null, -1);
         manager.addResource(resource);
         manager.disableResource("Test Resource");
 
@@ -104,7 +104,7 @@ public class ResourceManagerTest {
     public void linkBuildToResource() {
         SBuildType buildType = mock(SBuildType.class);
         when(mockProjectManager.findBuildTypeById(eq("bt123"))).thenReturn(buildType);
-        manager.addResource(new Resource("Test Resource", null, -1));
+        manager.addResource(new Resource("1", "Test Resource", null, -1));
 
         manager.linkBuildToResource("Test Resource", "bt123");
 
@@ -119,7 +119,7 @@ public class ResourceManagerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void linkInvalidBuildToResource() {
-        manager.addResource(new Resource("Test Resource", null, -1));
+        manager.addResource(new Resource("1", "Test Resource", null, -1));
 
         manager.linkBuildToResource("Test Resource", "bt124");
     }
@@ -130,7 +130,7 @@ public class ResourceManagerTest {
         when(mockProjectManager.findBuildTypeById(eq("bt123"))).thenReturn(buildType);
         List<String> buildTypes = new ArrayList<String>();
         buildTypes.add("bt123");
-        Resource resource = new Resource("Test Resource", null, -1);
+        Resource resource = new Resource("1", "Test Resource", null, -1);
         resource.setBuildTypes(buildTypes);
         manager.addResource(resource);
 
@@ -147,7 +147,7 @@ public class ResourceManagerTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void unlinkInvalidBuildFromResource() {
-        manager.addResource(new Resource("Test Resource", null, -1));
+        manager.addResource(new Resource("1", "Test Resource", null, -1));
 
         manager.unlinkBuildFromResource("Test Resource", "bt124");
     }

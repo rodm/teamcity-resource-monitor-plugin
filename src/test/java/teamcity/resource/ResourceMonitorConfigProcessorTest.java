@@ -47,7 +47,7 @@ public class ResourceMonitorConfigProcessorTest {
 
     @Test
     public void shouldWriteOutResource() throws Exception {
-        Resource resource = new Resource("Resource1", "localhost", 1080);
+        Resource resource = new Resource("1", "Resource1", "localhost", 1080);
         manager.addResource(resource);
 
         StringWriter writer = new StringWriter();
@@ -63,7 +63,7 @@ public class ResourceMonitorConfigProcessorTest {
         List<String> buildTypeIds = new ArrayList<String>();
         buildTypeIds.add("bt1");
         buildTypeIds.add("bt2");
-        Resource resource = new Resource("Resource1", "locahost", 1080);
+        Resource resource = new Resource("1", "Resource1", "locahost", 1080);
         resource.setBuildTypes(buildTypeIds);
         manager.addResource(resource);
 

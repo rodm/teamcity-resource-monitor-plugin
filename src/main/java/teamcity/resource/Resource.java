@@ -7,6 +7,8 @@ import java.util.List;
 
 public class Resource {
 
+    private String id = "";
+
     private String name = "";
 
     private String host = null;
@@ -17,13 +19,20 @@ public class Resource {
 
     private List<String> buildTypes = new ArrayList<String>();
 
-    public Resource(String name, String host, int port) {
+    public Resource(String id, String name, String host, int port) {
+        if (id == null || "".equals(id)) {
+            throw new IllegalArgumentException("id cannot be null or empty");
+        }
         if (name == null || "".equals(name)) {
             throw new IllegalArgumentException("name cannot be null or empty");
         }
         this.name = name;
         this.host = host;
         this.port = port;
+    }
+
+    public String getId() {
+        return id;
     }
 
     public String getName() {

@@ -6,19 +6,34 @@ import static org.junit.Assert.assertFalse;
 
 public class ResourceTest {
 
+    private String VALID_ID = "123";
+    private String VALID_NAME = "name";
+    private String VALID_HOST = "localhost";
+    private int VALID_PORT = 1234;
+
+    @Test(expected = IllegalArgumentException.class)
+    public void idCannotBeNull() {
+        new Resource(null, VALID_NAME, VALID_HOST, VALID_PORT);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void idCannotBeEmpty() {
+        new Resource("", VALID_NAME, VALID_HOST, VALID_PORT);
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void nameCannotBeNull() {
-        new Resource(null, null, -1);
+        new Resource(VALID_ID, null, VALID_HOST, VALID_PORT);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void nameCannotBeEmpty() {
-        new Resource("", null, -1);
+        new Resource(VALID_ID, "", VALID_HOST, VALID_PORT);
     }
 
     @Test
     public void unavailableResource() {
-        Resource rm = new Resource("test", "localhost", 7401);
+        Resource rm = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
         assertFalse(rm.isAvailable());
     }
 }

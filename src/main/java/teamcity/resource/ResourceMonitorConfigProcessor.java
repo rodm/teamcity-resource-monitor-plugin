@@ -71,7 +71,7 @@ public class ResourceMonitorConfigProcessor {
         final String name = element.getAttributeValue(CONFIG_NAME);
         final String host = element.getAttributeValue(CONFIG_HOST);
         final int port = readPortFrom(element);
-        Resource resource = new Resource(name, host, port);
+        Resource resource = new Resource("1", name, host, port);
         resource.setBuildTypes(readBuildTypesFrom(element));
         return resource;
     }

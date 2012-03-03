@@ -62,7 +62,7 @@ public class ResourceController extends BaseController {
             String name = request.getParameter("resourceName");
             String host = request.getParameter("resourceHost");
             String port = request.getParameter("resourcePort");
-            Resource resource = new Resource(name, host, Integer.valueOf(port));
+            Resource resource = new Resource("1", name, host, Integer.valueOf(port));
             resourceManager.addResource(resource);
             plugin.saveConfiguration();
         } else if ("updateResource".equals(action)) {
