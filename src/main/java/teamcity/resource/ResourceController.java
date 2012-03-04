@@ -68,36 +68,33 @@ public class ResourceController extends BaseController {
             resourceManager.addResource(resource);
             plugin.saveConfiguration();
         } else if ("updateResource".equals(action)) {
+            String id = request.getParameter("resourceId");
             String name = request.getParameter("resourceName");
             String host = request.getParameter("resourceHost");
             String port = request.getParameter("resourcePort");
-            resourceManager.updateResource(getId(name), name, host, Integer.valueOf(port));
+            resourceManager.updateResource(id, name, host, Integer.valueOf(port));
             plugin.saveConfiguration();
         } else if ("removeResource".equals(action)) {
-            String name = request.getParameter("resourceName");
-            resourceManager.removeResource(getId(name));
+            String id = request.getParameter("resourceId");
+            resourceManager.removeResource(id);
             plugin.saveConfiguration();
         } else if ("enableResource".equals(action)) {
-            String name = request.getParameter("resourceName");
-            resourceManager.enableResource(getId(name));
+            String id = request.getParameter("resourceId");
+            resourceManager.enableResource(id);
         } else if ("disableResource".equals(action)) {
-            String name = request.getParameter("resourceName");
-            resourceManager.disableResource(getId(name));
+            String id = request.getParameter("resourceId");
+            resourceManager.disableResource(id);
         } else if ("linkBuildType".equals(action)) {
-            String name = request.getParameter("resourceName");
+            String id = request.getParameter("resourceId");
             String buildTypeId = request.getParameter("buildTypeId");
-            resourceManager.linkBuildToResource(getId(name), buildTypeId);
+            resourceManager.linkBuildToResource(id, buildTypeId);
             plugin.saveConfiguration();
         } else if ("unlinkBuildType".equals(action)) {
-            String name = request.getParameter("resourceName");
+            String id = request.getParameter("resourceId");
             String buildTypeId = request.getParameter("buildTypeId");
-            resourceManager.unlinkBuildFromResource(getId(name), buildTypeId);
+            resourceManager.unlinkBuildFromResource(id, buildTypeId);
             plugin.saveConfiguration();
         }
-    }
-
-    private String getId(String name) {
-        return resourceManager.getResources().get(name).getId();
     }
 
     private String getMessageWithNested(Throwable e) {

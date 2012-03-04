@@ -11,9 +11,9 @@
 </style>
 
 <script type="text/javascript">
-    function addDependency(selector, name) {
+    function addDependency(selector, id) {
         var buildTypeId = selector.options[selector.selectedIndex].value;
-        BS.Resource.linkBuildType(name, buildTypeId);
+        BS.Resource.linkBuildType(id, buildTypeId);
     }
 </script>
 
@@ -28,7 +28,7 @@
                             <td class="name highlight">${resource.name}</td>
                             <td class="edit highlight">
                                 <a href="javascript://"
-                                   onclick="BS.Resource.enableResource('${resource.name}', ${resource.enabled})">
+                                   onclick="BS.Resource.enableResource('${resource.id}', ${resource.enabled})">
                                     <c:choose>
                                         <c:when test="${resource.enabled}">Enabled</c:when>
                                         <c:otherwise>Disabled</c:otherwise>
@@ -44,15 +44,15 @@
                             <td class="host highlight">${resource.host}</td>
                             <td class="port highlight">${resource.port}</td>
                             <td class="edit highlight"
-                                onclick="BS.EditResourceDialog.showDialog('${resource.name}', '${resource.host}', '${resource.port}');"
+                                onclick="BS.EditResourceDialog.showDialog('${resource.id}', '${resource.name}', '${resource.host}', '${resource.port}');"
                                 title="Click to edit resource">
                                 <a href="javascript://"
-                                   onclick="BS.EditResourceDialog.showDialog('${resource.name}', '${resource.host}', '${resource.port}');">
+                                   onclick="BS.EditResourceDialog.showDialog('${resource.id}', '${resource.name}', '${resource.host}', '${resource.port}');">
                                     edit
                                 </a>
                             </td>
                             <td class="edit">
-                                <a href="javascript://" onclick="BS.EditResourceForm.removeResource('${resource.name}');">delete</a>
+                                <a href="javascript://" onclick="BS.EditResourceForm.removeResource('${resource.id}');">delete</a>
                             </td>
                         </tr>
                         <c:forEach items="${resource.buildTypes}" var="buildType">
@@ -61,14 +61,14 @@
                                     <c:out value="${buildTypes[buildType].fullName}"/>
                                 </td>
                                 <td class="edit">
-                                    <a href="javascript://" onclick="BS.Resource.unlinkBuildType('${resource.name}', '${buildType}');">delete</a>
+                                    <a href="javascript://" onclick="BS.Resource.unlinkBuildType('${resource.id}', '${buildType}');">delete</a>
                                 </td>
                             </tr>
                         </c:forEach>
                     </tbody>
                 </table>
                 <p class="addNew">Add dependency:
-                    <select name="buildType" onchange="addDependency(this, '${resource.name}')">
+                    <select name="buildType" onchange="addDependency(this, '${resource.id}')">
                         <option value="">-- Please select a build configuration --</option>
                         <c:forEach items="${availableBuildTypes}" var="buildType">
                             <option value="${buildType}"><c:out value="${buildTypes[buildType].fullName}"/></option>
@@ -82,7 +82,7 @@
 </div>
 
 <p class="addNew">
-  <a href="javascript://" onclick="BS.EditResourceDialog.showDialog('', '', '')">
+  <a href="javascript://" onclick="BS.EditResourceDialog.showDialog('', '', '', '')">
     Create new resource
   </a>
 </p>
@@ -116,6 +116,7 @@
                 <br clear="all"/>
             </div>
 
+            <input id="resourceId" type="hidden" name="resourceId" value=""/>
             <input id="submitAction" type="hidden" name="submitAction" value=""/>
         </form>
     </div>

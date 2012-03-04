@@ -18,10 +18,10 @@ BS.EditResourceForm = OO.extend(BS.AbstractWebForm, {
         return false;
     },
 
-    removeResource : function(name) {
+    removeResource : function(id) {
         if (!confirm("Are you sure you want to remove this resource?")) return;
 
-        var url = this.formElement().action + "&submitAction=removeResource&resourceName=" + name;
+        var url = this.formElement().action + "&submitAction=removeResource&resourceId=" + id;
         BS.ajaxRequest(url, {
           onComplete: function() {
             BS.EditResourceDialog.close();
@@ -35,7 +35,8 @@ BS.EditResourceDialog = OO.extend(BS.AbstractModalDialog, {
         return $('editResourceDialog');
     },
 
-    showDialog : function(name, host, port) {
+    showDialog : function(id, name, host, port) {
+        $('resourceId').value = id;
         $('resourceName').value = name;
         $('resourceHost').value = host;
         $('resourcePort').value = port;
@@ -55,10 +56,10 @@ BS.EditResourceDialog = OO.extend(BS.AbstractModalDialog, {
 });
 
 BS.Resource = {
-    enableResource: function(name, enable) {
+    enableResource: function(id, enable) {
         var url = "/resource.html?submitAction=";
         url = url + ((enable) ? "disableResource" : "enableResource");
-        url = url + "&resourceName=" + name;
+        url = url + "&resourceId=" + id;
         BS.ajaxRequest(url, {
             onSuccess: function(transport) {
                 document.location.reload();
@@ -69,8 +70,8 @@ BS.Resource = {
         });
     },
 
-    linkBuildType: function(name, buildTypeId) {
-        var url = "/resource.html?submitAction=linkBuildType&resourceName=" + name + "&buildTypeId=" + buildTypeId;
+    linkBuildType: function(id, buildTypeId) {
+        var url = "/resource.html?submitAction=linkBuildType&resourceId=" + id + "&buildTypeId=" + buildTypeId;
         BS.ajaxRequest(url, {
             onSuccess: function(transport) {
                 document.location.reload();
@@ -81,10 +82,10 @@ BS.Resource = {
         });
     },
 
-    unlinkBuildType : function(name, buildTypeId) {
+    unlinkBuildType : function(id, buildTypeId) {
         if (!confirm("Are you sure you want to remove this build configuration?")) return;
 
-        var url = "/resource.html?submitAction=unlinkBuildType&resourceName=" + name + "&buildTypeId=" + buildTypeId;
+        var url = "/resource.html?submitAction=unlinkBuildType&resourceId=" + id + "&buildTypeId=" + buildTypeId;
         BS.ajaxRequest(url, {
           onComplete: function() {
               document.location.reload();
