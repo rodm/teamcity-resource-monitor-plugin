@@ -40,26 +40,25 @@ public class ResourceManager {
         resources.put(resource.getName(), resource);
     }
 
-    public void updateResource(String name, String host, int port) {
-        Resource resource = getResource(name);
+    public void updateResource(String id, String name, String host, int port) {
+        Resource resource = getResource(id);
+        resource.setName(name);
         resource.setHost(host);
         resource.setPort(port);
     }
 
-    public void removeResource(String name) {
-        Resource resource = getResource(name);
+    public void removeResource(String id) {
+        Resource resource = getResource(id);
         ids.remove(resource.getId());
-        resources.remove(name);
+        resources.remove(resource.getName());
     }
 
-    public void enableResource(String name) {
-        validResource(name);
-        resources.get(name).enable();
+    public void enableResource(String id) {
+        getResource(id).enable();
     }
 
-    public void disableResource(String name) {
-        validResource(name);
-        resources.get(name).disable();
+    public void disableResource(String id) {
+        getResource(id).disable();
     }
 
     public void setResources(Map<String,Resource> resources) {
@@ -70,28 +69,42 @@ public class ResourceManager {
         return Collections.unmodifiableMap(resources);
     }
 
-    public void linkBuildToResource(String name, String buildTypeId) {
-        validResource(name);
+    public void linkBuildToResource(String id, String buildTypeId) {
         validBuildType(buildTypeId);
-        Resource resource = resources.get(name);
+        Resource resource = getResource(id);
         resource.getBuildTypes().add(buildTypeId);
     }
 
-    public void unlinkBuildFromResource(String name, String buildTypeId) {
-        validResource(name);
+    public void unlinkBuildFromResource(String id, String buildTypeId) {
         validBuildType(buildTypeId);
-        Resource resource = resources.get(name);
+        Resource resource = getResource(id);
         resource.getBuildTypes().remove(buildTypeId);
     }
 
-    private Resource getResource(String name) {
-        validResource(name);
-        return resources.get(name);
+    public int nextId() {
+        int highestId = 0;
+        for (Resource resource : resources.values()) {
+            int id = Integer.parseInt(resource.getId());
+            if (id > highestId) {
+                highestId = id;
+            }
+        }
+        return highestId + 1;
     }
 
-    private void validResource(String name) {
-        if (!resources.containsKey(name)) {
-            throw new IllegalArgumentException("resource with name " + name + " does not exist");
+    private Resource getResource(String id) {
+        validResource(id);
+        for (Resource resource : resources.values()) {
+            if (resource.getId().equals(id)) {
+                return resource;
+            }
+        }
+        return null;
+    }
+
+    private void validResource(String id) {
+        if (!ids.contains(id)) {
+            throw new IllegalArgumentException("resource with id " + id + " does not exist");
         }
     }
 

@@ -52,6 +52,7 @@ public class ResourceController extends BaseController {
     private void doAction(final HttpServletRequest request) throws Exception {
         Loggers.SERVER.info("       method: [" + request.getMethod() + "]");
         Loggers.SERVER.info("submit action: [" + request.getParameter("submitAction") + "]");
+        Loggers.SERVER.info("  resource id: [" + request.getParameter("resourceId") + "]");
         Loggers.SERVER.info("resource name: [" + request.getParameter("resourceName") + "]");
         Loggers.SERVER.info("resource host: [" + request.getParameter("resourceHost") + "]");
         Loggers.SERVER.info("resource port: [" + request.getParameter("resourcePort") + "]");
@@ -59,39 +60,44 @@ public class ResourceController extends BaseController {
 
         String action = request.getParameter("submitAction");
         if ("addResource".equals(action)) {
+            String id = Integer.toString(resourceManager.nextId());
             String name = request.getParameter("resourceName");
             String host = request.getParameter("resourceHost");
             String port = request.getParameter("resourcePort");
-            Resource resource = new Resource("1", name, host, Integer.valueOf(port));
+            Resource resource = new Resource(id, name, host, Integer.valueOf(port));
             resourceManager.addResource(resource);
             plugin.saveConfiguration();
         } else if ("updateResource".equals(action)) {
             String name = request.getParameter("resourceName");
             String host = request.getParameter("resourceHost");
             String port = request.getParameter("resourcePort");
-            resourceManager.updateResource(name, host, Integer.valueOf(port));
+            resourceManager.updateResource(getId(name), name, host, Integer.valueOf(port));
             plugin.saveConfiguration();
         } else if ("removeResource".equals(action)) {
             String name = request.getParameter("resourceName");
-            resourceManager.removeResource(name);
+            resourceManager.removeResource(getId(name));
             plugin.saveConfiguration();
         } else if ("enableResource".equals(action)) {
             String name = request.getParameter("resourceName");
-            resourceManager.enableResource(name);
+            resourceManager.enableResource(getId(name));
         } else if ("disableResource".equals(action)) {
             String name = request.getParameter("resourceName");
-            resourceManager.disableResource(name);
+            resourceManager.disableResource(getId(name));
         } else if ("linkBuildType".equals(action)) {
             String name = request.getParameter("resourceName");
             String buildTypeId = request.getParameter("buildTypeId");
-            resourceManager.linkBuildToResource(name, buildTypeId);
+            resourceManager.linkBuildToResource(getId(name), buildTypeId);
             plugin.saveConfiguration();
         } else if ("unlinkBuildType".equals(action)) {
             String name = request.getParameter("resourceName");
             String buildTypeId = request.getParameter("buildTypeId");
-            resourceManager.unlinkBuildFromResource(name, buildTypeId);
+            resourceManager.unlinkBuildFromResource(getId(name), buildTypeId);
             plugin.saveConfiguration();
         }
+    }
+
+    private String getId(String name) {
+        return resourceManager.getResources().get(name).getId();
     }
 
     private String getMessageWithNested(Throwable e) {
