@@ -62,7 +62,11 @@ public class ResourceManager {
     }
 
     public void setResources(Map<String,Resource> resources) {
+        this.ids.clear();
         this.resources = resources;
+        for (Resource resource : resources.values()) {
+            ids.add(resource.getId());
+        }
     }
 
     public Map<String,Resource> getResources() {

@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -190,5 +191,15 @@ public class ResourceManagerTest {
     public void shouldAllocateNextHighestId() {
         manager.addResource(new Resource("123", NAME, HOST, PORT));
         assertEquals(124, manager.nextId());
+    }
+
+    @Test
+    public void replacedResourcesShouldBeAccessibleById() {
+        Resource resource = new Resource(ID, NAME, HOST, PORT);
+        Map<String, Resource> newResources = new HashMap<String, Resource>();
+        newResources.put(resource.getName(), resource);
+
+        manager.setResources(newResources);
+        manager.updateResource(ID, "newname", "newhost", 4321);
     }
 }
