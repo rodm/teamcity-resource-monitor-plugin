@@ -34,7 +34,7 @@ public class ResourceManager {
             throw new IllegalArgumentException("resource with id '" + resource.getId() + "' already exists");
         }
         if (resources.containsKey(resource.getName())) {
-            throw new IllegalArgumentException("resource with name " + resource.getName() + " already exists");
+            throw new IllegalArgumentException("resource with name '" + resource.getName() + "' already exists");
         }
         ids.add(resource.getId());
         resources.put(resource.getName(), resource);
@@ -108,14 +108,14 @@ public class ResourceManager {
 
     private void validResource(String id) {
         if (!ids.contains(id)) {
-            throw new IllegalArgumentException("resource with id " + id + " does not exist");
+            throw new IllegalArgumentException("resource with id '" + id + "' does not exist");
         }
     }
 
     private void validBuildType(String buildTypeId) {
         SBuildType buildType = projectManager.findBuildTypeById(buildTypeId);
         if (buildType == null) {
-            throw new IllegalArgumentException("build type id " + buildTypeId + " does not exist");
+            throw new IllegalArgumentException("build type id '" + buildTypeId + "' does not exist");
         }
     }
 }

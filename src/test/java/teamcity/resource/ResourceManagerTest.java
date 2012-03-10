@@ -3,7 +3,9 @@ package teamcity.resource;
 import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SBuildType;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +26,9 @@ public class ResourceManagerTest {
     private ResourceManager manager;
 
     private ProjectManager mockProjectManager;
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setup() {
@@ -51,9 +56,12 @@ public class ResourceManagerTest {
         assertEquals(2, manager.getResources().size());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void cannotAddResourceWithSameId() {
         manager.addResource(new Resource(ID, NAME + "1", HOST, PORT));
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("resource with id '" + ID + "' already exists");
         manager.addResource(new Resource(ID, NAME + "2", HOST, PORT));
     }
 
@@ -65,10 +73,13 @@ public class ResourceManagerTest {
         manager.addResource(resource);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void cannotAddResourceWithSameName() {
         manager.addResource(new Resource(ID, NAME, HOST, PORT));
-        manager.addResource(new Resource(ID, NAME, HOST, PORT));
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("resource with name '" + NAME + "' already exists");
+        manager.addResource(new Resource("2", NAME, HOST, PORT));
     }
 
     @Test
@@ -85,8 +96,10 @@ public class ResourceManagerTest {
         assertEquals(newPort, resource.getPort());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void updateResourceThatDoesNotExist() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("resource with id '" + ID + "' does not exist");
         manager.updateResource(ID, NAME, HOST, PORT);
     }
 
@@ -98,8 +111,10 @@ public class ResourceManagerTest {
         assertEquals("there should be no resources", 0, manager.getResources().size());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void removingResourceThatDoesNotExist() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("resource with id '" + ID + "' does not exist");
         manager.removeResource(ID);
     }
 
@@ -134,16 +149,22 @@ public class ResourceManagerTest {
         assertEquals(1, resources.get(NAME).getBuildTypes().size());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void linkBuildToInvalidResource() {
+        SBuildType buildType = mock(SBuildType.class);
+        when(mockProjectManager.findBuildTypeById(eq(BUILD_TYPE_ID))).thenReturn(buildType);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("resource with id '" + ID + "' does not exist");
         manager.linkBuildToResource(ID, BUILD_TYPE_ID);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void linkInvalidBuildToResource() {
         String invalidBuildTypeId = "bt124";
         manager.addResource(new Resource(ID, NAME, HOST, PORT));
 
+        thrown.expect(IllegalArgumentException.class);
         manager.linkBuildToResource(ID, invalidBuildTypeId);
     }
 
@@ -163,16 +184,23 @@ public class ResourceManagerTest {
         assertEquals(0, resources.get(NAME).getBuildTypes().size());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void unlinkBuildFromInvalidResource() {
+        SBuildType buildType = mock(SBuildType.class);
+        when(mockProjectManager.findBuildTypeById(eq(BUILD_TYPE_ID))).thenReturn(buildType);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("resource with id '" + ID + "' does not exist");
         manager.unlinkBuildFromResource(ID, BUILD_TYPE_ID);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void unlinkInvalidBuildFromResource() {
         String invalidBuildTypeId = "bt124";
         manager.addResource(new Resource(ID, NAME, HOST, PORT));
 
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("build type id");
         manager.unlinkBuildFromResource(ID, invalidBuildTypeId);
     }
 
