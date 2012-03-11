@@ -9,10 +9,13 @@ import static org.junit.Assert.assertFalse;
 
 public class ResourceTest {
 
-    private String VALID_ID = "123";
-    private String VALID_NAME = "name";
-    private String VALID_HOST = "localhost";
-    private int VALID_PORT = 1234;
+    private static final String INVALID_ID_MESSAGE = "id cannot be null or empty";
+    private static final String INVALID_NAME_MESSAGE = "name cannot be null or empty";
+
+    private static final String VALID_ID = "123";
+    private static final String VALID_NAME = "name";
+    private static final String VALID_HOST = "localhost";
+    private static final int VALID_PORT = 1234;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -29,28 +32,28 @@ public class ResourceTest {
     @Test
     public void idCannotBeNull() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("id cannot be null or empty");
+        thrown.expectMessage(INVALID_ID_MESSAGE);
         new Resource(null, VALID_NAME, VALID_HOST, VALID_PORT);
     }
 
     @Test
     public void idCannotBeEmpty() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("id cannot be null or empty");
+        thrown.expectMessage(INVALID_ID_MESSAGE);
         new Resource("", VALID_NAME, VALID_HOST, VALID_PORT);
     }
 
     @Test
     public void nameCannotBeNull() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("name cannot be null or empty");
+        thrown.expectMessage(INVALID_NAME_MESSAGE);
         new Resource(VALID_ID, null, VALID_HOST, VALID_PORT);
     }
 
     @Test
     public void nameCannotBeEmpty() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("name cannot be null or empty");
+        thrown.expectMessage(INVALID_NAME_MESSAGE);
         new Resource(VALID_ID, "", VALID_HOST, VALID_PORT);
     }
 
