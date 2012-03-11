@@ -70,7 +70,7 @@ public class Resource {
 
     public boolean isAvailable() {
         boolean result = false;
-        if (enabled) {
+        if (isEnabled()) {
             try {
                 Socket socket = new Socket(host, port);
                 socket.close();
