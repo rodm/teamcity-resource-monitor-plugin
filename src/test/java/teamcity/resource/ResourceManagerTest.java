@@ -61,7 +61,7 @@ public class ResourceManagerTest {
         manager.addResource(new Resource(ID, NAME + "1", HOST, PORT));
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("resource with id '" + ID + "' already exists");
+        thrown.expectMessage("resource with id " + ID + " already exists");
         manager.addResource(new Resource(ID, NAME + "2", HOST, PORT));
     }
 
@@ -78,7 +78,7 @@ public class ResourceManagerTest {
         manager.addResource(new Resource(ID, NAME, HOST, PORT));
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("resource with name '" + NAME + "' already exists");
+        thrown.expectMessage("resource with name " + NAME + " already exists");
         manager.addResource(new Resource("2", NAME, HOST, PORT));
     }
 
@@ -99,7 +99,7 @@ public class ResourceManagerTest {
     @Test
     public void updateResourceThatDoesNotExist() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("resource with id '" + ID + "' does not exist");
+        thrown.expectMessage("resource with id " + ID + " does not exist");
         manager.updateResource(ID, NAME, HOST, PORT);
     }
 
@@ -114,7 +114,7 @@ public class ResourceManagerTest {
     @Test
     public void removingResourceThatDoesNotExist() {
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("resource with id '" + ID + "' does not exist");
+        thrown.expectMessage("resource with id " + ID + " does not exist");
         manager.removeResource(ID);
     }
 
@@ -155,7 +155,7 @@ public class ResourceManagerTest {
         when(mockProjectManager.findBuildTypeById(eq(BUILD_TYPE_ID))).thenReturn(buildType);
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("resource with id '" + ID + "' does not exist");
+        thrown.expectMessage("resource with id " + ID + " does not exist");
         manager.linkBuildToResource(ID, BUILD_TYPE_ID);
     }
 
@@ -190,7 +190,7 @@ public class ResourceManagerTest {
         when(mockProjectManager.findBuildTypeById(eq(BUILD_TYPE_ID))).thenReturn(buildType);
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("resource with id '" + ID + "' does not exist");
+        thrown.expectMessage("resource with id " + ID + " does not exist");
         manager.unlinkBuildFromResource(ID, BUILD_TYPE_ID);
     }
 
@@ -200,7 +200,7 @@ public class ResourceManagerTest {
         manager.addResource(new Resource(ID, NAME, HOST, PORT));
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("build type id");
+        thrown.expectMessage("build type id " + invalidBuildTypeId + " does not exist");
         manager.unlinkBuildFromResource(ID, invalidBuildTypeId);
     }
 
