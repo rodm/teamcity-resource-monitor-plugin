@@ -27,9 +27,6 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
         this.name = this.getClass().getSimpleName();
         this.monitor = monitor;
         server.addListener(this);
-
-        fileWatcher = new FileWatcher(getConfigurationFile());
-        fileWatcher.registerListener(this);
     }
 
     @Override
@@ -49,6 +46,9 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
         }
 
         loadConfiguration();
+
+        fileWatcher = new FileWatcher(getConfigurationFile());
+        fileWatcher.registerListener(this);
         fileWatcher.start();
     }
 
@@ -56,6 +56,13 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
     public void serverShutdown() {
         fileWatcher.stop();
         Loggers.SERVER.info(name + " stopped");
+    }
+
+    @Override
+    public void buildTypeUnregistered(SBuildType buildType) {
+        String buildTypeId = buildType.getBuildTypeId();
+        Loggers.SERVER.info("Unregistering build type: " + buildTypeId);
+        resourceManager.unregisterBuild(buildTypeId);
     }
 
     public void changeOccured(String requestor) {

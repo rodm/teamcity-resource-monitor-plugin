@@ -85,6 +85,12 @@ public class ResourceManager {
         resource.getBuildTypes().remove(buildTypeId);
     }
 
+    public void unregisterBuild(String buildTypeId) {
+        for (Resource resource : getResources().values()) {
+            resource.getBuildTypes().remove(buildTypeId);
+        }
+    }
+
     public int nextId() {
         int highestId = 0;
         for (Resource resource : resources.values()) {
