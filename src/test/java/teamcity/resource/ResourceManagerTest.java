@@ -172,10 +172,8 @@ public class ResourceManagerTest {
     public void unlinkBuildFromResource() {
         SBuildType buildType = mock(SBuildType.class);
         when(mockProjectManager.findBuildTypeById(eq(BUILD_TYPE_ID))).thenReturn(buildType);
-        List<String> buildTypes = new ArrayList<String>();
-        buildTypes.add(BUILD_TYPE_ID);
         Resource resource = new Resource(ID, NAME, HOST, PORT);
-        resource.setBuildTypes(buildTypes);
+        resource.addBuildType(BUILD_TYPE_ID);
         manager.addResource(resource);
 
         manager.unlinkBuildFromResource(ID, BUILD_TYPE_ID);
@@ -235,10 +233,8 @@ public class ResourceManagerTest {
     public void unlinkUnregisteredBuildType() {
         SBuildType buildType = mock(SBuildType.class);
         when(buildType.getBuildTypeId()).thenReturn(BUILD_TYPE_ID);
-        List<String> buildTypes = new ArrayList<String>();
-        buildTypes.add(BUILD_TYPE_ID);
         Resource resource = new Resource(ID, NAME, HOST, PORT);
-        resource.setBuildTypes(buildTypes);
+        resource.addBuildType(BUILD_TYPE_ID);
         manager.addResource(resource);
 
         manager.unregisterBuild(BUILD_TYPE_ID);

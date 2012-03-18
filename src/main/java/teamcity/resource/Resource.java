@@ -3,6 +3,7 @@ package teamcity.resource;
 import java.io.IOException;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class Resource {
@@ -60,12 +61,16 @@ public class Resource {
         this.port = port;
     }
 
-    public void setBuildTypes(List<String> buildTypes) {
-        this.buildTypes = buildTypes;
+    public List<String> getBuildTypes() {
+        return Collections.unmodifiableList(buildTypes);
     }
 
-    public List<String> getBuildTypes() {
-        return buildTypes;
+    public void addBuildType(String buildTypeId) {
+        buildTypes.add(buildTypeId);
+    }
+
+    public void removeBuildType(String buildTypeId) {
+        buildTypes.remove(buildTypeId);
     }
 
     public boolean isAvailable() {

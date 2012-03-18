@@ -76,18 +76,18 @@ public class ResourceManager {
     public void linkBuildToResource(String id, String buildTypeId) {
         validBuildType(buildTypeId);
         Resource resource = getResource(id);
-        resource.getBuildTypes().add(buildTypeId);
+        resource.addBuildType(buildTypeId);
     }
 
     public void unlinkBuildFromResource(String id, String buildTypeId) {
         validBuildType(buildTypeId);
         Resource resource = getResource(id);
-        resource.getBuildTypes().remove(buildTypeId);
+        resource.removeBuildType(buildTypeId);
     }
 
     public void unregisterBuild(String buildTypeId) {
         for (Resource resource : getResources().values()) {
-            resource.getBuildTypes().remove(buildTypeId);
+            resource.removeBuildType(buildTypeId);
         }
     }
 

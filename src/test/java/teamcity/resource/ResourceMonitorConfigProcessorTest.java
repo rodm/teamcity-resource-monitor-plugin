@@ -7,8 +7,6 @@ import org.junit.Test;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.List;
 
 import static junit.framework.Assert.assertEquals;
 import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
@@ -61,11 +59,9 @@ public class ResourceMonitorConfigProcessorTest {
 
     @Test
     public void shouldWriteOutResourceWithBuildTypeIds() throws Exception {
-        List<String> buildTypeIds = new ArrayList<String>();
-        buildTypeIds.add("bt1");
-        buildTypeIds.add("bt2");
         Resource resource = new Resource("1", "Resource1", "locahost", 1080);
-        resource.setBuildTypes(buildTypeIds);
+        resource.addBuildType("bt1");
+        resource.addBuildType("bt2");
         manager.addResource(resource);
 
         StringWriter writer = new StringWriter();

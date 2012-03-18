@@ -80,7 +80,7 @@ public class ResourceMonitorConfigProcessor {
         final String host = element.getAttributeValue(CONFIG_HOST);
         final int port = readPortFrom(element);
         Resource resource = new Resource(id, name, host, port);
-        resource.setBuildTypes(readBuildTypesFrom(element));
+        readBuildTypesFrom(element, resource);
         return resource;
     }
 
@@ -97,15 +97,13 @@ public class ResourceMonitorConfigProcessor {
         return port;
     }
 
-    private List<String> readBuildTypesFrom(Element resourceElement) {
-        List<String> buildTypes = new ArrayList<String>();
+    private void readBuildTypesFrom(Element resourceElement, Resource resource) {
         final List list = resourceElement.getChildren(CONFIG_BUILD_TYPE);
         for (Object o : list) {
             final Element element = (Element) o;
             final String buildTypeId = element.getAttributeValue(CONFIG_BUILD_TYPE_ID);
-            buildTypes.add(buildTypeId);
+            resource.addBuildType(buildTypeId);
         }
-        return buildTypes;
     }
 
     public void writeTo(Writer writer) throws IOException {

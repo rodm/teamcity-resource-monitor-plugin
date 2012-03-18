@@ -62,4 +62,20 @@ public class ResourceTest {
         Resource rm = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
         assertFalse(rm.isAvailable());
     }
+
+    @Test
+    public void addBuildToResource() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+        resource.addBuildType("bt123");
+        assertEquals(1, resource.getBuildTypes().size());
+    }
+
+    @Test
+    public void removeBuildFromResource() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+        resource.addBuildType("bt123");
+
+        resource.removeBuildType("bt123");
+        assertEquals(0, resource.getBuildTypes().size());
+    }
 }
