@@ -6,6 +6,8 @@
 
     <bean id="resourceManager" class="teamcity.resource.ResourceManager"/>
 
+    <bean id="resourceStartPrecondition" class="teamcity.resource.ResourceStartBuildPrecondition"/>
+
     <bean id="resourceMonitorConifgProcessor" class="teamcity.resource.ResourceMonitorConfigProcessor"/>
 
     <bean id="resourceMonitorPlugin" class="teamcity.resource.ResourceMonitorPlugin"/>
