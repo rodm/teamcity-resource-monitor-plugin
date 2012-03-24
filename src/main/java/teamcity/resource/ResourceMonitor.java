@@ -29,17 +29,20 @@ public class ResourceMonitor implements Runnable {
 
     private ResourceManager resourceManager;
 
+    private AvailabilityChecker checker;
+
     private ScheduledFuture<?> future;
 
     public ResourceMonitor() {
         log.info("ResourceMonitor() default constructor");
     }
 
-    public ResourceMonitor(@NotNull SBuildServer server, ProjectManager projectManager, ResourceManager resourceManager) {
+    public ResourceMonitor(@NotNull SBuildServer server, ProjectManager projectManager, ResourceManager resourceManager, AvailabilityChecker checker) {
         log.info("ResourceMonitor(SBuildServer, ProjectManager, ResourceManager) constructor");
         this.server = server;
         this.projectManager = projectManager;
         this.resourceManager = resourceManager;
+        this.checker = checker;
     }
 
     public void scheduleMonitor() {
@@ -56,10 +59,10 @@ public class ResourceMonitor implements Runnable {
         int enabled = 0;
         int available = 0;
         for (Resource resource : getResources().values()) {
-            if (resource.isEnabled()) {
+            if (isEnabled(resource)) {
                 enabled++;
             }
-            if (resource.isAvailable()) {
+            if (checker.isAvailable(resource)) {
                 resourceAvailable(resource);
                 available++;
             } else {
@@ -67,6 +70,10 @@ public class ResourceMonitor implements Runnable {
             }
         }
         log.info("Monitored resources: " + getResources().size() + ", enabled: " + enabled + ", available: " + available);
+    }
+
+    private boolean isEnabled(Resource resource) {
+        return resource.isEnabled();
     }
 
     public void resourceAvailable(Resource resource) {
@@ -91,7 +98,7 @@ public class ResourceMonitor implements Runnable {
             Comment comment = buildType.getPauseComment();
             if (comment != null) {
                 String commentText = comment.getComment();
-                result = commentText != null && commentText.contains(PLUGIN_NAME); 
+                result = commentText != null && commentText.contains(PLUGIN_NAME);
             }
         }
         return result;

@@ -1,7 +1,5 @@
 package teamcity.resource;
 
-import java.io.IOException;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -74,18 +72,8 @@ public class Resource {
     }
 
     public boolean isAvailable() {
-        boolean result = false;
-        if (isEnabled()) {
-            try {
-                Socket socket = new Socket(host, port);
-                socket.close();
-                result = true;
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return result;
+        AvailabilityChecker checker = new AvailabilityChecker();
+        return checker.isAvailable(this);
     }
 
     public boolean isEnabled() {
