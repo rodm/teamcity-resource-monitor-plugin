@@ -30,17 +30,15 @@ public class ResourceStartBuildPrecondition implements StartBuildPrecondition, R
         Loggers.SERVER.info("Build canStart check for '" + buildTypeId + "'");
 
         WaitReason waitReason = null;
-        Collection<Resource> resources = manager.getResources().values();
-        for (Resource resource : resources) {
+        Resource resource = manager.findResourceByBuildTypeId(buildTypeId);
+        if (resource != null) {
             boolean available = isAvailable(resource);
             boolean enabled = isEnabled(resource);
             Loggers.SERVER.info("Resource: '" + resource.getName() + "', enabled: '" + enabled + "', available: '" + available + "'");
             if (!available || !enabled) {
-                if (resource.getBuildTypes().contains(buildTypeId)) {
-                    String state = enabled ? "available" : "enabled";
-                    waitReason = new SimpleWaitReason("Build cannot start until the required resource " + resource.getName() + " is " + state);
-                    Loggers.SERVER.info(waitReason.getDescription());
-                }
+                String state = enabled ? "available" : "enabled";
+                waitReason = new SimpleWaitReason("Build cannot start until the required resource " + resource.getName() + " is " + state);
+                Loggers.SERVER.info(waitReason.getDescription());
             }
         }
         return waitReason;
