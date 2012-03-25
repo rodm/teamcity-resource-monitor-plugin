@@ -119,6 +119,27 @@ public class ResourceManagerTest {
     }
 
     @Test
+    public void shouldReturnResourceForLinkedBuildType() {
+        Resource expectedResource = new Resource(ID, NAME, HOST, PORT);
+        expectedResource.addBuildType(BUILD_TYPE_ID);
+        manager.addResource(expectedResource);
+
+        Resource resource = manager.findResourceByBuildTypeId(BUILD_TYPE_ID);
+        assertNotNull(resource);
+        assertSame(expectedResource, resource);
+    }
+
+    @Test
+    public void shouldReturnNullForUnlinkedBuildType() {
+        Resource expectedResource = new Resource(ID, NAME, HOST, PORT);
+        expectedResource.addBuildType(BUILD_TYPE_ID);
+        manager.addResource(expectedResource);
+
+        Resource resource = manager.findResourceByBuildTypeId("bt124");
+        assertNull(resource);
+    }
+
+    @Test
     public void enableResource() {
         Resource resource = new Resource(ID, NAME, HOST, PORT);
         resource.disable();

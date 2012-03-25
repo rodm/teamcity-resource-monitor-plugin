@@ -53,6 +53,15 @@ public class ResourceManager {
         resources.remove(resource.getName());
     }
 
+    public Resource findResourceByBuildTypeId(String buildTypeId) {
+        for (Resource resource : getResources().values()) {
+            if (resource.getBuildTypes().contains(buildTypeId)) {
+                return resource;
+            }
+        }
+        return null;
+    }
+
     public void enableResource(String id) {
         getResource(id).enable();
     }
