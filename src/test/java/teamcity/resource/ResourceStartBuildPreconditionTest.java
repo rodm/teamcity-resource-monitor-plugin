@@ -8,6 +8,7 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
@@ -27,8 +28,9 @@ public class ResourceStartBuildPreconditionTest {
 
     @Before
     public void setup() {
+        ResourceMonitor monitor = mock(ResourceMonitor.class);
         resourceManager = new ResourceManager(null);
-        precondition = new ResourceStartBuildPrecondition(resourceManager);
+        precondition = new ResourceStartBuildPrecondition(resourceManager, monitor);
     }
 
     @Test
@@ -54,8 +56,8 @@ public class ResourceStartBuildPreconditionTest {
         Resource resource = spy(new Resource("1", "test", "localhost", 1234));
         resource.addBuildType("bt123");
         resourceManager.addResource(resource);
+        precondition.resourceUnavailable(resource);
 
-        when(resource.isAvailable()).thenReturn(false);
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt123");
 
@@ -66,13 +68,30 @@ public class ResourceStartBuildPreconditionTest {
     }
 
     @Test
+    public void shouldReturnNullWaitReasonWhenUnavailableResourceBecomesAvailable() {
+        Resource resource = spy(new Resource("1", "test", "localhost", 1234));
+        resource.addBuildType("bt123");
+        resourceManager.addResource(resource);
+        precondition.resourceUnavailable(resource);
+
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt123");
+
+        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        assertNotNull(waitReason);
+
+        precondition.resourceAvailable(resource);
+        waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        assertNull(waitReason);
+    }
+
+    @Test
     public void shouldReturnWaitReasonWhenResourceIsDisabled() {
         Resource resource = spy(new Resource("1", "test", "localhost", 1234));
         resource.addBuildType("bt123");
         resourceManager.addResource(resource);
 
         when(resource.isEnabled()).thenReturn(false);
-        when(resource.isAvailable()).thenReturn(true);
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt123");
 
