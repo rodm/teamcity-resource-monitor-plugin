@@ -30,6 +30,8 @@ public class ResourceMonitor implements Runnable {
 
     private Set<String> unavailableResources = new HashSet<String>();
 
+    private Set<String> disabledResources = new HashSet<String>();
+
     public ResourceMonitor(@NotNull SBuildServer server, ResourceManager resourceManager, AvailabilityChecker checker) {
         log.info("ResourceMonitor(SBuildServer, ProjectManager, ResourceManager) constructor");
         this.server = server;
@@ -51,6 +53,22 @@ public class ResourceMonitor implements Runnable {
         listeners.add(listener);
     }
 
+    public void enableResource(Resource resource) {
+        if (disabledResources.remove(resource.getId())) {
+            for (ResourceMonitorListener listener : listeners) {
+                listener.resourceEnabled(resource);
+            }
+        }
+    }
+
+    public void disableResource(Resource resource) {
+        if (disabledResources.add(resource.getId())) {
+            for (ResourceMonitorListener listener : listeners) {
+                listener.resourceDisabled(resource);
+            }
+        }
+    }
+
     public void run() {
         int enabled = 0;
         int available = 0;
@@ -69,7 +87,7 @@ public class ResourceMonitor implements Runnable {
     }
 
     private boolean isEnabled(Resource resource) {
-        return resource.isEnabled();
+        return !disabledResources.contains(resource.getId());
     }
 
     private void resourceAvailable(Resource resource) {

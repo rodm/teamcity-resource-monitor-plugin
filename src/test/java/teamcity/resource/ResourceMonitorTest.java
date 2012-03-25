@@ -93,4 +93,49 @@ public class ResourceMonitorTest {
         monitor.run();
         verify(listener).resourceAvailable(resource);
     }
+
+    @Test
+    public void monitorShouldNotifyListenersWhenResourceIsDisabled() {
+        ResourceMonitor monitor = new ResourceMonitor(server, manager, null);
+        ResourceMonitorListener listener = mock(ResourceMonitorListener.class);
+        monitor.addListener(listener);
+
+        monitor.disableResource(resource);
+        verify(listener).resourceDisabled(resource);
+    }
+
+    @Test
+    public void resourceMonitorListenersShouldReceiveOneDisabledNotification() {
+        ResourceMonitor monitor = new ResourceMonitor(server, manager, null);
+        ResourceMonitorListener listener = mock(ResourceMonitorListener.class);
+        monitor.addListener(listener);
+
+        monitor.disableResource(resource);
+        monitor.disableResource(resource);
+        verify(listener).resourceDisabled(resource);
+    }
+
+
+    @Test
+    public void monitorShouldNotifyListenersWhenResourceIsEnabled() {
+        ResourceMonitor monitor = new ResourceMonitor(server, manager, null);
+        ResourceMonitorListener listener = mock(ResourceMonitorListener.class);
+        monitor.addListener(listener);
+        monitor.disableResource(resource);
+
+        monitor.enableResource(resource);
+        verify(listener).resourceEnabled(resource);
+    }
+
+    @Test
+    public void resourceMonitorListenersShouldReceiveOneEnabledNotification() {
+        ResourceMonitor monitor = new ResourceMonitor(server, manager, null);
+        ResourceMonitorListener listener = mock(ResourceMonitorListener.class);
+        monitor.addListener(listener);
+        monitor.disableResource(resource);
+
+        monitor.enableResource(resource);
+        monitor.enableResource(resource);
+        verify(listener).resourceEnabled(resource);
+    }
 }

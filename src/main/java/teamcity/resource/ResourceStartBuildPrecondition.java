@@ -54,6 +54,12 @@ public class ResourceStartBuildPrecondition implements StartBuildPrecondition, R
         unavailableResources.add(resource.getId());
     }
 
+    public void resourceEnabled(Resource resource) {
+    }
+
+    public void resourceDisabled(Resource resource) {
+    }
+
     private boolean isAvailable(Resource resource) {
         return !unavailableResources.contains(resource.getId());
     }
