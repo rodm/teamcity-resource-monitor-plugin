@@ -58,12 +58,6 @@ public class ResourceTest {
     }
 
     @Test
-    public void unavailableResource() {
-        Resource rm = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
-        assertFalse(rm.isAvailable());
-    }
-
-    @Test
     public void addBuildToResource() {
         Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
         resource.addBuildType("bt123");

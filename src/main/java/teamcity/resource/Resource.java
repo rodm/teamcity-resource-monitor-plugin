@@ -71,11 +71,6 @@ public class Resource {
         buildTypes.remove(buildTypeId);
     }
 
-    public boolean isAvailable() {
-        AvailabilityChecker checker = new AvailabilityChecker();
-        return checker.isAvailable(this);
-    }
-
     public boolean isEnabled() {
         return this.enabled;
     }
