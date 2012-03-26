@@ -23,6 +23,7 @@ public class ResourceMonitorConfigProcessor {
     private static final String CONFIG_NAME = "name";
     private static final String CONFIG_HOST = "host";
     private static final String CONFIG_PORT = "port";
+    private static final String CONFIG_BUILD_LIMIT = "build-limit";
     private static final String CONFIG_BUILD_TYPE = "build-type";
     private static final String CONFIG_BUILD_TYPE_ID = "id";
 
@@ -79,7 +80,9 @@ public class ResourceMonitorConfigProcessor {
         final String name = element.getAttributeValue(CONFIG_NAME);
         final String host = element.getAttributeValue(CONFIG_HOST);
         final int port = readPortFrom(element);
+        final int buildLimit = readBuildLimit(element);
         Resource resource = new Resource(id, name, host, port);
+        resource.setBuildLimit(buildLimit);
         readBuildTypesFrom(element, resource);
         return resource;
     }
@@ -95,6 +98,19 @@ public class ResourceMonitorConfigProcessor {
             log.error("Invalid port: " + portValue);
         }
         return port;
+    }
+
+    private int readBuildLimit(Element element) {
+        int buildLimit = 0;
+        String buildLimitValue = "";
+        try {
+            buildLimitValue = element.getAttributeValue(CONFIG_BUILD_LIMIT);
+            buildLimit = Integer.valueOf(buildLimitValue);
+        }
+        catch (NumberFormatException e) {
+            log.warn("Invalid build limit: " + buildLimitValue);
+        }
+        return buildLimit;
     }
 
     private void readBuildTypesFrom(Element resourceElement, Resource resource) {
@@ -126,6 +142,7 @@ public class ResourceMonitorConfigProcessor {
         element.setAttribute(CONFIG_NAME, resource.getName());
         element.setAttribute(CONFIG_HOST, resource.getHost());
         element.setAttribute(CONFIG_PORT, Integer.toString(resource.getPort()));
+        element.setAttribute(CONFIG_BUILD_LIMIT, Integer.toString(resource.getBuildLimit()));
         writeBuildTypesTo(resource.getBuildTypes(), element);
     }
 

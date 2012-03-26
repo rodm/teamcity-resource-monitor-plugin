@@ -46,6 +46,7 @@ public class ResourceMonitorConfigProcessorTest {
     @Test
     public void shouldWriteOutResource() throws Exception {
         Resource resource = new Resource("1", "Resource1", "localhost", 1080);
+        resource.setBuildLimit(123);
         manager.addResource(resource);
 
         StringWriter writer = new StringWriter();
@@ -55,6 +56,7 @@ public class ResourceMonitorConfigProcessorTest {
         assertXpathEvaluatesTo("Resource1", "//resource/@name", writer.toString());
         assertXpathEvaluatesTo("localhost", "//resource/@host", writer.toString());
         assertXpathEvaluatesTo("1080", "//resource/@port", writer.toString());
+        assertXpathEvaluatesTo("123", "//resource/@build-limit", writer.toString());
     }
 
     @Test
@@ -85,7 +87,7 @@ public class ResourceMonitorConfigProcessorTest {
     @Test
     public void shouldReadResource() throws Exception {
         String config = "<monitored-resources check-interval=\"25\">" +
-                        "    <resource id=\"123\" name=\"Resource\" host=\"localhost\" port=\"1234\"/>" +
+                        "    <resource id=\"123\" name=\"Resource\" host=\"localhost\" port=\"1234\" build-limit=\"123\"/>" +
                         "</monitored-resources>";
         Reader reader = new StringReader(config);
         configProcessor.readFrom(reader);
@@ -96,6 +98,7 @@ public class ResourceMonitorConfigProcessorTest {
         assertEquals("Resource", resource.getName());
         assertEquals("localhost", resource.getHost());
         assertEquals(1234, resource.getPort());
+        assertEquals(123, resource.getBuildLimit());
     }
 
     @Test

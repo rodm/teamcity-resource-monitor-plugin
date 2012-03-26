@@ -14,6 +14,8 @@ public class Resource {
 
     private int port = -1;
 
+    private int buildLimit = 0;
+
     private boolean enabled = true;
 
     private List<String> buildTypes = new ArrayList<String>();
@@ -57,6 +59,14 @@ public class Resource {
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public int getBuildLimit() {
+        return buildLimit;
+    }
+
+    public void setBuildLimit(int buildLimit) {
+        this.buildLimit = buildLimit;
     }
 
     public List<String> getBuildTypes() {
