@@ -3,6 +3,7 @@ package teamcity.resource;
 import jetbrains.buildServer.log.Loggers;
 
 import java.io.IOException;
+import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -16,10 +17,13 @@ class AvailabilityChecker {
             result = true;
         }
         catch (UnknownHostException e) {
-            Loggers.SERVER.warn("Error connecting to resource " + resource.getHost() + ":" + resource.getPort(), e);
+            Loggers.SERVER.warn("Error connecting to " + resource.getHost() + ":" + resource.getPort(), e);
+        }
+        catch (ConnectException e) {
+            Loggers.SERVER.info("Failed to connect to " + resource.getHost() + ":" + resource.getPort());
         }
         catch (IOException e) {
-            Loggers.SERVER.warn("Error connecting to resource " + resource.getHost() + ":" + resource.getPort(), e);
+            Loggers.SERVER.warn("Error connecting to " + resource.getHost() + ":" + resource.getPort(), e);
         }
         return result;
     }
