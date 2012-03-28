@@ -119,6 +119,21 @@ public class ResourceManagerTest {
     }
 
     @Test
+    public void getResourceById() {
+        Resource expectedResource = new Resource(ID, NAME, HOST, PORT);
+        manager.addResource(expectedResource);
+
+        Resource resource = manager.getResourceById(ID);
+        assertSame(expectedResource, resource);
+    }
+
+    @Test
+    public void shouldReturnNullWhenIdNotFound() {
+        Resource resource = manager.getResourceById(ID);
+        assertNull(resource);
+    }
+
+    @Test
     public void shouldReturnResourceForLinkedBuildType() {
         Resource expectedResource = new Resource(ID, NAME, HOST, PORT);
         expectedResource.addBuildType(BUILD_TYPE_ID);

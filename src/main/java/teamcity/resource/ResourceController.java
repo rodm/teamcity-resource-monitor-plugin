@@ -93,10 +93,10 @@ public class ResourceController extends BaseController {
             plugin.saveConfiguration();
         } else if ("enableResource".equals(action)) {
             String id = request.getParameter("resourceId");
-            monitor.enableResource(getResource(id));
+            monitor.enableResource(resourceManager.getResourceById(id));
         } else if ("disableResource".equals(action)) {
             String id = request.getParameter("resourceId");
-            monitor.disableResource(getResource(id));
+            monitor.disableResource(resourceManager.getResourceById(id));
         }
     }
 
@@ -107,14 +107,5 @@ public class ResourceController extends BaseController {
             result += " Caused by: " + getMessageWithNested(cause);
         }
         return result;
-    }
-
-    private Resource getResource(String id) {
-        for (Resource resource : resourceManager.getResources().values()) {
-            if (resource.getId().equals(id)) {
-                return resource;
-            }
-        }
-        return null;
     }
 }

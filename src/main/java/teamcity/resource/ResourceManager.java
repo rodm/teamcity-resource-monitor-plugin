@@ -53,6 +53,15 @@ public class ResourceManager {
         resources.remove(resource.getName());
     }
 
+    public Resource getResourceById(String id) {
+        for (Resource resource : resources.values()) {
+            if (resource.getId().equals(id)) {
+                return resource;
+            }
+        }
+        return null;
+    }
+
     public Resource findResourceByBuildTypeId(String buildTypeId) {
         for (Resource resource : getResources().values()) {
             if (resource.getBuildTypes().contains(buildTypeId)) {
@@ -113,12 +122,7 @@ public class ResourceManager {
 
     private Resource getResource(String id) {
         validResource(id);
-        for (Resource resource : resources.values()) {
-            if (resource.getId().equals(id)) {
-                return resource;
-            }
-        }
-        return null;
+        return getResourceById(id);
     }
 
     private void validResource(String id) {
