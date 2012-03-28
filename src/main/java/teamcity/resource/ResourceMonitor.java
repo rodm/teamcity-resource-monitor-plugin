@@ -32,6 +32,8 @@ public class ResourceMonitor implements Runnable {
 
     private Set<String> disabledResources = new HashSet<String>();
 
+    private enum ResourceEvent { Available, Unavailable, Enabled, Disabled }
+
     public ResourceMonitor(@NotNull SBuildServer server, ResourceManager resourceManager, AvailabilityChecker checker) {
         log.info("ResourceMonitor(SBuildServer, ProjectManager, ResourceManager) constructor");
         this.server = server;
@@ -55,17 +57,13 @@ public class ResourceMonitor implements Runnable {
 
     public void enableResource(Resource resource) {
         if (disabledResources.remove(resource.getId())) {
-            for (ResourceMonitorListener listener : listeners) {
-                listener.resourceEnabled(resource);
-            }
+            notifyListeners(ResourceEvent.Enabled, resource);
         }
     }
 
     public void disableResource(Resource resource) {
         if (disabledResources.add(resource.getId())) {
-            for (ResourceMonitorListener listener : listeners) {
-                listener.resourceDisabled(resource);
-            }
+            notifyListeners(ResourceEvent.Disabled, resource);
         }
     }
 
@@ -96,16 +94,31 @@ public class ResourceMonitor implements Runnable {
 
     private void resourceAvailable(Resource resource) {
         if (unavailableResources.remove(resource.getId())) {
-            for (ResourceMonitorListener listener : listeners) {
-                listener.resourceAvailable(resource);
-            }
+            notifyListeners(ResourceEvent.Available, resource);
         }
     }
 
     private void resourceUnavailable(Resource resource) {
         if (unavailableResources.add(resource.getId())) {
-            for (ResourceMonitorListener listener : listeners) {
-                listener.resourceUnavailable(resource);
+            notifyListeners(ResourceEvent.Unavailable, resource);
+        }
+    }
+
+    private void notifyListeners(ResourceEvent event, Resource resource) {
+        for (ResourceMonitorListener listener : listeners) {
+            switch (event) {
+                case Available:
+                    listener.resourceAvailable(resource);
+                    break;
+                case Unavailable:
+                    listener.resourceUnavailable(resource);
+                    break;
+                case Enabled:
+                    listener.resourceEnabled(resource);
+                    break;
+                case Disabled:
+                    listener.resourceDisabled(resource);
+                    break;
             }
         }
     }
