@@ -18,10 +18,13 @@ public class ResourceConfigExtension extends SimpleCustomTab {
 
     private ResourceManager resourceManager;
 
-    public ResourceConfigExtension(PagePlaces pagePlaces, ProjectManager projectManager, ResourceManager resourceManager) {
+    private ResourceMonitor resourceMonitor;
+
+    public ResourceConfigExtension(PagePlaces pagePlaces, ProjectManager projectManager, ResourceManager resourceManager, ResourceMonitor resourceMonitor) {
         super(pagePlaces);
         this.projectManager = projectManager;
         this.resourceManager = resourceManager;
+        this.resourceMonitor = resourceMonitor;
     }
 
     @NotNull
@@ -62,9 +65,22 @@ public class ResourceConfigExtension extends SimpleCustomTab {
         model.put("availableBuildTypes", getAvailableBuildTypes());
     }
 
-    private List<Resource> getResources() {
-        List<Resource> resources = new ArrayList<Resource>(resourceManager.getResources().values());
+    private List<ResourceState> getResources() {
+        List<ResourceState> resources = new ArrayList<ResourceState>();
+        for (Resource resource : resourceManager.getResources().values()) {
+            boolean available = isAvailable(resource);
+            boolean enabled = isEnabled(resource);
+            resources.add(new ResourceState(resource, available, enabled));
+        }
         return resources;
+    }
+
+    private boolean isAvailable(Resource resource) {
+        return resourceMonitor.isAvailable(resource);
+    }
+
+    private boolean isEnabled(Resource resource) {
+        return resourceMonitor.isEnabled(resource);
     }
 
     private Map getBuildTypes() {
@@ -81,7 +97,7 @@ public class ResourceConfigExtension extends SimpleCustomTab {
         for (SBuildType buildType : projectManager.getAllBuildTypes()) {
             availableBuildTypes.add(buildType.getBuildTypeId());
         }
-        for (Resource resource : getResources()) {
+        for (Resource resource : resourceManager.getResources().values()) {
             List<String> usedBuildTypes = resource.getBuildTypes();
             availableBuildTypes.removeAll(usedBuildTypes);
         }

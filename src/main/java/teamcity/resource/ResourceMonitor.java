@@ -86,7 +86,11 @@ public class ResourceMonitor implements Runnable {
         log.info("Monitored resources: " + getResources().size() + ", enabled: " + enabled + ", available: " + available);
     }
 
-    private boolean isEnabled(Resource resource) {
+    public boolean isAvailable(Resource resource) {
+        return !unavailableResources.contains(resource.getId());
+    }
+
+    public boolean isEnabled(Resource resource) {
         return !disabledResources.contains(resource.getId());
     }
 

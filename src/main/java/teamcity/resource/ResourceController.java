@@ -20,13 +20,16 @@ public class ResourceController extends BaseController {
 
     private ResourceMonitorPlugin plugin;
 
+    private ResourceMonitor monitor;
+
     public ResourceController(SBuildServer buildServer, WebControllerManager webControllerManager,
-                              ResourceManager resourceManager, ResourceMonitorPlugin plugin)
+                              ResourceManager resourceManager, ResourceMonitorPlugin plugin, ResourceMonitor monitor)
     {
         super(buildServer);
         this.webControllerManager = webControllerManager;
         this.resourceManager = resourceManager;
         this.plugin = plugin;
+        this.monitor = monitor;
     }
 
     public void register() {
@@ -78,12 +81,6 @@ public class ResourceController extends BaseController {
             String id = request.getParameter("resourceId");
             resourceManager.removeResource(id);
             plugin.saveConfiguration();
-        } else if ("enableResource".equals(action)) {
-            String id = request.getParameter("resourceId");
-            resourceManager.enableResource(id);
-        } else if ("disableResource".equals(action)) {
-            String id = request.getParameter("resourceId");
-            resourceManager.disableResource(id);
         } else if ("linkBuildType".equals(action)) {
             String id = request.getParameter("resourceId");
             String buildTypeId = request.getParameter("buildTypeId");
@@ -94,6 +91,12 @@ public class ResourceController extends BaseController {
             String buildTypeId = request.getParameter("buildTypeId");
             resourceManager.unlinkBuildFromResource(id, buildTypeId);
             plugin.saveConfiguration();
+        } else if ("enableResource".equals(action)) {
+            String id = request.getParameter("resourceId");
+            monitor.enableResource(getResource(id));
+        } else if ("disableResource".equals(action)) {
+            String id = request.getParameter("resourceId");
+            monitor.disableResource(getResource(id));
         }
     }
 
@@ -104,5 +107,14 @@ public class ResourceController extends BaseController {
             result += " Caused by: " + getMessageWithNested(cause);
         }
         return result;
+    }
+
+    private Resource getResource(String id) {
+        for (Resource resource : resourceManager.getResources().values()) {
+            if (resource.getId().equals(id)) {
+                return resource;
+            }
+        }
+        return null;
     }
 }
