@@ -58,7 +58,9 @@
                         <c:forEach items="${resource.buildTypes}" var="buildType">
                             <tr class="buildConfigurationRow">
                                 <td class="buildConfiguration" colspan="6">
-                                    <c:out value="${buildTypes[buildType].fullName}"/>
+                                    <a href="/viewType.html?buildTypeId=${buildType}&tab=buildTypeStatusDiv">
+                                        <c:out value="${buildTypes[buildType].fullName}"/>
+                                    </a>
                                 </td>
                                 <td class="edit">
                                     <a href="javascript://" onclick="BS.Resource.unlinkBuildType('${resource.id}', '${buildType}');">delete</a>
