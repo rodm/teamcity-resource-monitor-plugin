@@ -16,8 +16,6 @@ public class Resource {
 
     private int buildLimit = 0;
 
-    private boolean enabled = true;
-
     private List<String> buildTypes = new ArrayList<String>();
 
     public Resource(String id, String name, String host, int port) {
@@ -76,18 +74,6 @@ public class Resource {
 
     public void removeBuildType(String buildTypeId) {
         buildTypes.remove(buildTypeId);
-    }
-
-    public boolean isEnabled() {
-        return this.enabled;
-    }
-
-    public void enable() {
-        this.enabled = true;
-    }
-
-    public void disable() {
-        this.enabled = false;
     }
 
     private void checkParameter(String value, String name) {

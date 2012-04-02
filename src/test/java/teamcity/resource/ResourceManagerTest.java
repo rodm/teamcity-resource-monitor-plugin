@@ -7,9 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static junit.framework.Assert.*;
@@ -152,25 +150,6 @@ public class ResourceManagerTest {
 
         Resource resource = manager.findResourceByBuildTypeId("bt124");
         assertNull(resource);
-    }
-
-    @Test
-    public void enableResource() {
-        Resource resource = new Resource(ID, NAME, HOST, PORT);
-        resource.disable();
-        manager.addResource(resource);
-        manager.enableResource(ID);
-
-        assertTrue(resource.isEnabled());
-    }
-
-    @Test
-    public void disableResource() {
-        Resource resource = new Resource(ID, NAME, HOST, PORT);
-        manager.addResource(resource);
-        manager.disableResource(ID);
-
-        assertFalse(resource.isEnabled());
     }
 
     @Test

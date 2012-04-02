@@ -71,14 +71,6 @@ public class ResourceManager {
         return null;
     }
 
-    public void enableResource(String id) {
-        getResource(id).enable();
-    }
-
-    public void disableResource(String id) {
-        getResource(id).disable();
-    }
-
     public void setResources(Map<String,Resource> resources) {
         this.ids.clear();
         this.resources = resources;
