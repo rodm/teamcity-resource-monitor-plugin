@@ -90,8 +90,8 @@ public class ResourceStartBuildPreconditionTest {
         Resource resource = spy(new Resource("1", "test", "localhost", 1234));
         resource.addBuildType("bt123");
         resourceManager.addResource(resource);
+        precondition.resourceDisabled(resource);
 
-        when(resource.isEnabled()).thenReturn(false);
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt123");
 
@@ -99,5 +99,23 @@ public class ResourceStartBuildPreconditionTest {
         assertNotNull(waitReason);
         assertThat(waitReason.getDescription(), containsString(resource.getName()));
         assertThat(waitReason.getDescription(), containsString("enabled"));
+    }
+
+    @Test
+    public void shouldReturnNullWaitReasonWhenDisabledResourceIsEnabled() {
+        Resource resource = spy(new Resource("1", "test", "localhost", 1234));
+        resource.addBuildType("bt123");
+        resourceManager.addResource(resource);
+        precondition.resourceDisabled(resource);
+
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt123");
+
+        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        assertNotNull(waitReason);
+
+        precondition.resourceEnabled(resource);
+        waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        assertNull(waitReason);
     }
 }

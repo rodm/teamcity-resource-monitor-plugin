@@ -16,6 +16,8 @@ public class ResourceStartBuildPrecondition implements StartBuildPrecondition, R
 
     private Set<String> unavailableResources = new HashSet<String>();
 
+    private Set<String> disabledResources = new HashSet<String>();
+
     ResourceStartBuildPrecondition(final ResourceManager manager, final ResourceMonitor monitor) {
         this.manager = manager;
         monitor.addListener(this);
@@ -53,9 +55,11 @@ public class ResourceStartBuildPrecondition implements StartBuildPrecondition, R
     }
 
     public void resourceEnabled(Resource resource) {
+        disabledResources.remove(resource.getId());
     }
 
     public void resourceDisabled(Resource resource) {
+        disabledResources.add(resource.getId());
     }
 
     private boolean isAvailable(Resource resource) {
@@ -63,6 +67,6 @@ public class ResourceStartBuildPrecondition implements StartBuildPrecondition, R
     }
 
     private boolean isEnabled(Resource resource) {
-        return resource.isEnabled();
+        return !disabledResources.contains(resource.getId());
     }
 }
