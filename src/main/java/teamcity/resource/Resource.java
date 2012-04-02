@@ -21,12 +21,9 @@ public class Resource {
     private List<String> buildTypes = new ArrayList<String>();
 
     public Resource(String id, String name, String host, int port) {
-        if (id == null || "".equals(id)) {
-            throw new IllegalArgumentException("id cannot be null or empty");
-        }
-        if (name == null || "".equals(name)) {
-            throw new IllegalArgumentException("name cannot be null or empty");
-        }
+        checkParameter(id, "id");
+        checkParameter(name, "name");
+        checkParameter(host, "host");
         this.id = id;
         this.name = name;
         this.host = host;
@@ -91,5 +88,11 @@ public class Resource {
 
     public void disable() {
         this.enabled = false;
+    }
+
+    private void checkParameter(String value, String name) {
+        if (value == null || "".equals(value)) {
+            throw new IllegalArgumentException(name + " cannot be null or empty");
+        }
     }
 }

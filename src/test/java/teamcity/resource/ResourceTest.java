@@ -11,6 +11,7 @@ public class ResourceTest {
 
     private static final String INVALID_ID_MESSAGE = "id cannot be null or empty";
     private static final String INVALID_NAME_MESSAGE = "name cannot be null or empty";
+    private static final String INVALID_HOST_MESSAGE = "host cannot be null or empty";
 
     private static final String VALID_ID = "123";
     private static final String VALID_NAME = "name";
@@ -55,6 +56,20 @@ public class ResourceTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage(INVALID_NAME_MESSAGE);
         new Resource(VALID_ID, "", VALID_HOST, VALID_PORT);
+    }
+
+    @Test
+    public void hostCannotBeNull() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(INVALID_HOST_MESSAGE);
+        new Resource(VALID_ID, VALID_NAME, null, VALID_PORT);
+    }
+
+    @Test
+    public void hostCannotBeEmpty() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage(INVALID_HOST_MESSAGE);
+        new Resource(VALID_ID, VALID_NAME, "", VALID_PORT);
     }
 
     @Test
