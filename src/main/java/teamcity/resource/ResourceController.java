@@ -97,6 +97,8 @@ public class ResourceController extends BaseController {
         } else if ("disableResource".equals(action)) {
             String id = request.getParameter("resourceId");
             monitor.disableResource(resourceManager.getResourceById(id));
+        } else {
+            throw new IllegalArgumentException("Invalid action: " + action);
         }
     }
 

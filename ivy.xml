@@ -16,7 +16,7 @@
         <dependency org="com.jetbrains.teamcity" name="runtime-util" rev="${teamcity.version}" conf="runtime->default"/>
 
         <dependency org="javax.servlet" name="servlet-api" rev="${servletapi.version}" conf="compile->default"/>
-        <dependency org="org.springframework" name="spring" rev="${spring.version}" conf="compile->default" transitive="false"/>
+        <dependency org="org.springframework" name="spring" rev="${spring.version}" conf="compile->default" transitive="true"/>
         <dependency org="org.springframework" name="spring-webmvc" rev="${spring.version}" conf="compile->default" transitive="false"/>
         <dependency org="org.jdom" name="jdom" rev="${jdom.version}" conf="compile->default"/>
         <dependency org="log4j" name="log4j" rev="${log4j.version}" conf="compile->default"/>
