@@ -17,6 +17,10 @@ public class ResourceManager {
 
     private ProjectManager projectManager;
 
+    private List<ResourceManagerListener> listeners = new ArrayList<ResourceManagerListener>();
+
+    private enum ResourceEvent { Added, Updated, Removed }
+
     public ResourceManager(ProjectManager projectManager) {
         this.projectManager = projectManager;
     }
@@ -38,6 +42,7 @@ public class ResourceManager {
         }
         ids.add(resource.getId());
         resources.put(resource.getName(), resource);
+        notifyListeners(ResourceEvent.Added, resource);
     }
 
     public void updateResource(String id, String name, String host, int port) {
@@ -45,12 +50,14 @@ public class ResourceManager {
         resource.setName(name);
         resource.setHost(host);
         resource.setPort(port);
+        notifyListeners(ResourceEvent.Updated, resource);
     }
 
     public void removeResource(String id) {
         Resource resource = getResource(id);
         ids.remove(resource.getId());
         resources.remove(resource.getName());
+        notifyListeners(ResourceEvent.Removed, resource);
     }
 
     public Resource getResourceById(String id) {
@@ -112,6 +119,10 @@ public class ResourceManager {
         return highestId + 1;
     }
 
+    public void addListener(ResourceManagerListener listener) {
+        listeners.add(listener);
+    }
+
     private Resource getResource(String id) {
         validResource(id);
         return getResourceById(id);
@@ -127,6 +138,22 @@ public class ResourceManager {
         SBuildType buildType = projectManager.findBuildTypeById(buildTypeId);
         if (buildType == null) {
             throw new IllegalArgumentException("build type id " + buildTypeId + " does not exist");
+        }
+    }
+
+    private void notifyListeners(ResourceEvent event, Resource resource) {
+        for (ResourceManagerListener listener : listeners) {
+            switch (event) {
+                case Added:
+                    listener.resourceAdded(resource);
+                    break;
+                case Updated:
+                    listener.resourceUpdated(resource);
+                    break;
+                case Removed:
+                    listener.resourceRemoved(resource);
+                    break;
+            }
         }
     }
 }

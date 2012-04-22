@@ -257,4 +257,36 @@ public class ResourceManagerTest {
         Map<String, Resource> resources = manager.getResources();
         assertEquals(0, resources.get(NAME).getBuildTypes().size());
     }
+
+    @Test
+    public void notifyListenersWhenResourceIsAdded() {
+        ResourceManagerListener listener = mock(ResourceManagerListener.class);
+        manager.addListener(listener);
+        Resource resource = new Resource(ID, NAME, HOST, PORT);
+
+        manager.addResource(resource);
+        verify(listener).resourceAdded(resource);
+    }
+
+    @Test
+    public void notifyListenersWhenResourceIsUpdated() {
+        Resource resource = new Resource(ID, NAME, HOST, PORT);
+        manager.addResource(resource);
+        ResourceManagerListener listener = mock(ResourceManagerListener.class);
+        manager.addListener(listener);
+
+        manager.updateResource(ID, "newname", "newhost", 4321);
+        verify(listener).resourceUpdated(resource);
+    }
+
+    @Test
+    public void notifyListenersWhenResourceIsRemoved() {
+        Resource resource = new Resource(ID, NAME, HOST, PORT);
+        manager.addResource(resource);
+        ResourceManagerListener listener = mock(ResourceManagerListener.class);
+        manager.addListener(listener);
+
+        manager.removeResource(ID);
+        verify(listener).resourceRemoved(resource);
+    }
 }
