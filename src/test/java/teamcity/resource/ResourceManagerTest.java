@@ -7,9 +7,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import static junit.framework.Assert.*;
 import static org.mockito.Mockito.*;
@@ -238,8 +237,8 @@ public class ResourceManagerTest {
     @Test
     public void replacedResourcesShouldBeAccessibleById() {
         Resource resource = new Resource(ID, NAME, HOST, PORT);
-        Map<String, Resource> newResources = new HashMap<String, Resource>();
-        newResources.put(resource.getName(), resource);
+        Collection<Resource> newResources = new ArrayList<Resource>();
+        newResources.add(resource);
 
         manager.setResources(newResources);
         manager.updateResource(ID, "newname", "newhost", 4321);
@@ -250,8 +249,8 @@ public class ResourceManagerTest {
         Resource resource = new Resource(ID, NAME, HOST, PORT);
         resource.addBuildType(BUILD_TYPE_ID);
         resource.addBuildType(INVALID_BUILD_TYPE_ID);
-        Map<String, Resource> newResources = new HashMap<String, Resource>();
-        newResources.put(resource.getName(), resource);
+        Collection<Resource> newResources = new ArrayList<Resource>();
+        newResources.add(resource);
 
         SBuildType buildType = mock(SBuildType.class);
         when(mockProjectManager.findBuildTypeById(BUILD_TYPE_ID)).thenReturn(buildType);

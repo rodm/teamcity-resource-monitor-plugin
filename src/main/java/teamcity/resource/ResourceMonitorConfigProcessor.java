@@ -43,7 +43,9 @@ public class ResourceMonitorConfigProcessor {
         Document document = builder.build(reader);
         Element configRoot = document.getRootElement();
         Set<String> ids = new HashSet<String>();
-        Map<String, Resource> resources = new HashMap<String, Resource>();
+        Set<String> names= new HashSet<String>();
+        Collection<Resource> resources = new ArrayList<Resource>();
+
         resourceManager.setInterval(readCheckIntervalFrom(configRoot));
         final List list = configRoot.getChildren(CONFIG_RESOURCE);
         for (Object o : list) {
@@ -52,11 +54,12 @@ public class ResourceMonitorConfigProcessor {
             if (ids.contains(resource.getId())) {
                 continue;
             }
-            if (resources.containsKey(resource.getName())) {
+            if (resources.contains(resource.getName())) {
                 continue;
             }
             ids.add(resource.getId());
-            resources.put(resource.getName(), resource);
+            names.add(resource.getName());
+            resources.add(resource);
         }
         log.info("ResourceMonitor config loaded");
         resourceManager.setResources(resources);

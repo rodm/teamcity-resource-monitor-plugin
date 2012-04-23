@@ -78,11 +78,12 @@ public class ResourceManager {
         return null;
     }
 
-    public void setResources(Map<String,Resource> resources) {
+    public void setResources(Collection<Resource> resources) {
         this.ids.clear();
-        this.resources = resources;
-        for (Resource resource : resources.values()) {
-            ids.add(resource.getId());
+        this.resources.clear();
+        for (Resource resource : resources) {
+            this.ids.add(resource.getId());
+            this.resources.put(resource.getName(), resource);
             removeInvalidBuildTypes(resource);
         }
     }
