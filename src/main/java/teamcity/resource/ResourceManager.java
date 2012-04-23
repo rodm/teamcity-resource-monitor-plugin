@@ -83,6 +83,7 @@ public class ResourceManager {
         this.resources = resources;
         for (Resource resource : resources.values()) {
             ids.add(resource.getId());
+            removeInvalidBuildTypes(resource);
         }
     }
 
@@ -154,6 +155,18 @@ public class ResourceManager {
                     listener.resourceRemoved(resource);
                     break;
             }
+        }
+    }
+
+    private void removeInvalidBuildTypes(Resource resource) {
+        List<String> invalidBuildTypeIds = new ArrayList<String>();
+        for (String buildTypeId : resource.getBuildTypes()) {
+            if (projectManager.findBuildTypeById(buildTypeId) == null) {
+                invalidBuildTypeIds.add(buildTypeId);
+            }
+        }
+        for (String buildTypeId : invalidBuildTypeIds) {
+            resource.removeBuildType(buildTypeId);
         }
     }
 }

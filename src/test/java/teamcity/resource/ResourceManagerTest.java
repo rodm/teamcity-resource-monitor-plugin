@@ -20,6 +20,7 @@ public class ResourceManagerTest {
     private static final String HOST = "test";
     private static final int PORT = 1234;
     private static final String BUILD_TYPE_ID = "bt123";
+    private static final String INVALID_BUILD_TYPE_ID = "bt124";
 
     private ResourceManager manager;
 
@@ -176,11 +177,10 @@ public class ResourceManagerTest {
 
     @Test
     public void linkInvalidBuildToResource() {
-        String invalidBuildTypeId = "bt124";
         manager.addResource(new Resource(ID, NAME, HOST, PORT));
 
         thrown.expect(IllegalArgumentException.class);
-        manager.linkBuildToResource(ID, invalidBuildTypeId);
+        manager.linkBuildToResource(ID, INVALID_BUILD_TYPE_ID);
     }
 
     @Test
@@ -209,12 +209,11 @@ public class ResourceManagerTest {
 
     @Test
     public void unlinkInvalidBuildFromResource() {
-        String invalidBuildTypeId = "bt124";
         manager.addResource(new Resource(ID, NAME, HOST, PORT));
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("build type id " + invalidBuildTypeId + " does not exist");
-        manager.unlinkBuildFromResource(ID, invalidBuildTypeId);
+        thrown.expectMessage("build type id " + INVALID_BUILD_TYPE_ID + " does not exist");
+        manager.unlinkBuildFromResource(ID, INVALID_BUILD_TYPE_ID);
     }
 
     @Test
@@ -242,6 +241,22 @@ public class ResourceManagerTest {
 
         manager.setResources(newResources);
         manager.updateResource(ID, "newname", "newhost", 4321);
+    }
+
+    @Test
+    public void settingResourcesShouldRemoveInvalidBuildTypes() {
+
+        Resource resource = new Resource(ID, NAME, HOST, PORT);
+        resource.addBuildType(BUILD_TYPE_ID);
+        resource.addBuildType(INVALID_BUILD_TYPE_ID);
+        Map<String, Resource> newResources = new HashMap<String, Resource>();
+        newResources.put(resource.getName(), resource);
+
+        SBuildType buildType = mock(SBuildType.class);
+        when(mockProjectManager.findBuildTypeById(BUILD_TYPE_ID)).thenReturn(buildType);
+
+        manager.setResources(newResources);
+        assertEquals(1, resource.getBuildTypes().size());
     }
 
     @Test

@@ -1,6 +1,7 @@
 package teamcity.resource;
 
 import jetbrains.buildServer.serverSide.ProjectManager;
+import jetbrains.buildServer.serverSide.SBuildType;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -10,18 +11,24 @@ import java.io.StringWriter;
 
 import static junit.framework.Assert.assertEquals;
 import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ResourceMonitorConfigProcessorTest {
 
-    private static final ProjectManager NULL_PROJECT_MANAGER = null;
+    private static final String BUILD_TYPE_ID = "bt1";
 
     private ResourceManager manager;
     private ResourceMonitorConfigProcessor configProcessor;
 
     @Before
     public void setup() {
-        manager = new ResourceManager(NULL_PROJECT_MANAGER);
+        ProjectManager projectManager = mock(ProjectManager.class);
+        manager = new ResourceManager(projectManager);
         configProcessor = new ResourceMonitorConfigProcessor(manager);
+
+        SBuildType buildType = mock(SBuildType.class);
+        when(projectManager.findBuildTypeById(BUILD_TYPE_ID)).thenReturn(buildType);
     }
 
     @Test
@@ -105,7 +112,7 @@ public class ResourceMonitorConfigProcessorTest {
     public void shouldReadResourceWithBuildTypeIds() throws Exception {
         String config = "<monitored-resources check-interval=\"25\">" +
                         "    <resource id=\"123\" name=\"Resource\" host=\"localhost\" port=\"1234\">" +
-                        "        <build-type id=\"bt1\"/>" +
+                        "        <build-type id=\"" + BUILD_TYPE_ID + "\"/>" +
                         "    </resource>" +
                         "</monitored-resources>";
         Reader reader = new StringReader(config);
@@ -113,7 +120,7 @@ public class ResourceMonitorConfigProcessorTest {
 
         Resource resource = manager.getResources().get("Resource");
         assertEquals(1, resource.getBuildTypes().size());
-        assertEquals("bt1", resource.getBuildTypes().get(0));
+        assertEquals(BUILD_TYPE_ID, resource.getBuildTypes().get(0));
     }
 
     @Test
