@@ -100,7 +100,7 @@ public class ResourceMonitorConfigProcessorTest {
         configProcessor.readFrom(reader);
 
         assertEquals(1, manager.getResources().size());
-        Resource resource = manager.getResources().get("Resource");
+        Resource resource = manager.getResourceById("123");
         assertEquals("123", resource.getId());
         assertEquals("Resource", resource.getName());
         assertEquals("localhost", resource.getHost());
@@ -118,7 +118,7 @@ public class ResourceMonitorConfigProcessorTest {
         Reader reader = new StringReader(config);
         configProcessor.readFrom(reader);
 
-        Resource resource = manager.getResources().get("Resource");
+        Resource resource = manager.getResourceById("123");
         assertEquals(1, resource.getBuildTypes().size());
         assertEquals(BUILD_TYPE_ID, resource.getBuildTypes().get(0));
     }

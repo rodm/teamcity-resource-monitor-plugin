@@ -126,8 +126,7 @@ public class ResourceMonitorConfigProcessor {
         log.info("ResourceMonitor writing config");
         Element root = new Element(CONFIG_ROOT);
         root.setAttribute(CONFIG_CHECK_INTERVAL, Integer.toString(resourceManager.getInterval()));
-        Map<String, Resource> resources = resourceManager.getResources();
-        for (Resource resource : resources.values()) {
+        for (Resource resource : resourceManager.getResources()) {
             writeResourceTo(resource, root);
         }
 

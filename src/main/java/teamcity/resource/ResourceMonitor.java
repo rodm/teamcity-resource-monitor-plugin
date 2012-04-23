@@ -124,6 +124,6 @@ public class ResourceMonitor implements Runnable {
     }
 
     private Collection<Resource> getResources() {
-        return resourceManager.getResources().values();
+        return resourceManager.getResources();
     }
 }

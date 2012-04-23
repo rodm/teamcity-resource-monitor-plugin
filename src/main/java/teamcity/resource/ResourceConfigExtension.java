@@ -67,7 +67,7 @@ public class ResourceConfigExtension extends SimpleCustomTab {
 
     private List<ResourceState> getResources() {
         List<ResourceState> resources = new ArrayList<ResourceState>();
-        for (Resource resource : resourceManager.getResources().values()) {
+        for (Resource resource : resourceManager.getResources()) {
             boolean available = isAvailable(resource);
             boolean enabled = isEnabled(resource);
             resources.add(new ResourceState(resource, available, enabled));
@@ -97,7 +97,7 @@ public class ResourceConfigExtension extends SimpleCustomTab {
         for (SBuildType buildType : projectManager.getAllBuildTypes()) {
             availableBuildTypes.add(buildType.getBuildTypeId());
         }
-        for (Resource resource : resourceManager.getResources().values()) {
+        for (Resource resource : resourceManager.getResources()) {
             List<String> usedBuildTypes = resource.getBuildTypes();
             availableBuildTypes.removeAll(usedBuildTypes);
         }

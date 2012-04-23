@@ -70,7 +70,7 @@ public class ResourceManager {
     }
 
     public Resource findResourceByBuildTypeId(String buildTypeId) {
-        for (Resource resource : getResources().values()) {
+        for (Resource resource : getResources()) {
             if (resource.getBuildTypes().contains(buildTypeId)) {
                 return resource;
             }
@@ -87,8 +87,8 @@ public class ResourceManager {
         }
     }
 
-    public Map<String,Resource> getResources() {
-        return Collections.unmodifiableMap(resources);
+    public Collection<Resource> getResources() {
+        return Collections.unmodifiableCollection(resources.values());
     }
 
     public void linkBuildToResource(String id, String buildTypeId) {
@@ -104,7 +104,7 @@ public class ResourceManager {
     }
 
     public void unregisterBuild(String buildTypeId) {
-        for (Resource resource : getResources().values()) {
+        for (Resource resource : getResources()) {
             resource.removeBuildType(buildTypeId);
         }
     }

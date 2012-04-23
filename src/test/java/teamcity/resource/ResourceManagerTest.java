@@ -7,6 +7,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -37,7 +38,7 @@ public class ResourceManagerTest {
 
     @Test
     public void newResourceManagerHasNoResources() {
-        Map<String, Resource> resources = manager.getResources();
+        Collection<Resource> resources = manager.getResources();
         assertEquals(0, resources.size());
     }
 
@@ -161,8 +162,9 @@ public class ResourceManagerTest {
 
         manager.linkBuildToResource(ID, BUILD_TYPE_ID);
 
-        Map<String, Resource> resources = manager.getResources();
-        assertEquals(1, resources.get(NAME).getBuildTypes().size());
+        Resource resource = manager.getResourceById(ID);
+        assertEquals(1, resource.getBuildTypes().size());
+        assertEquals(BUILD_TYPE_ID, resource.getBuildTypes().get(0));
     }
 
     @Test
@@ -193,8 +195,8 @@ public class ResourceManagerTest {
 
         manager.unlinkBuildFromResource(ID, BUILD_TYPE_ID);
 
-        Map<String, Resource> resources = manager.getResources();
-        assertEquals(0, resources.get(NAME).getBuildTypes().size());
+        Resource resource2 = manager.getResourceById(ID);
+        assertEquals(0, resource2.getBuildTypes().size());
     }
 
     @Test
@@ -245,7 +247,6 @@ public class ResourceManagerTest {
 
     @Test
     public void settingResourcesShouldRemoveInvalidBuildTypes() {
-
         Resource resource = new Resource(ID, NAME, HOST, PORT);
         resource.addBuildType(BUILD_TYPE_ID);
         resource.addBuildType(INVALID_BUILD_TYPE_ID);
@@ -257,6 +258,7 @@ public class ResourceManagerTest {
 
         manager.setResources(newResources);
         assertEquals(1, resource.getBuildTypes().size());
+        assertEquals(BUILD_TYPE_ID, resource.getBuildTypes().get(0));
     }
 
     @Test
@@ -269,8 +271,8 @@ public class ResourceManagerTest {
 
         manager.unregisterBuild(BUILD_TYPE_ID);
 
-        Map<String, Resource> resources = manager.getResources();
-        assertEquals(0, resources.get(NAME).getBuildTypes().size());
+        Resource resource2 = manager.getResourceById(ID);
+        assertEquals(0, resource2.getBuildTypes().size());
     }
 
     @Test
