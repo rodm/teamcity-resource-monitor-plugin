@@ -6,6 +6,10 @@ import jetbrains.buildServer.serverSide.SBuildServer;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
 import static org.mockito.Mockito.*;
 
 public class ResourceMonitorTest {
@@ -137,5 +141,46 @@ public class ResourceMonitorTest {
         monitor.enableResource(resource);
         monitor.enableResource(resource);
         verify(listener).resourceEnabled(resource);
+    }
+
+    @Test
+    public void scheduleMonitor() {
+        int checkInterval = 123;
+        manager.setInterval(checkInterval);
+
+        ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
+        when(server.getExecutor()).thenReturn(executorService);
+
+        ResourceMonitor monitor = new ResourceMonitor(server, manager, null);
+        monitor.scheduleMonitor();
+
+        long initialDelay = 1;
+        verify(executorService).scheduleAtFixedRate(same(monitor), eq(initialDelay), eq((long) checkInterval), eq(TimeUnit.SECONDS));
+    }
+
+    @Test
+    public void rescheduleMonitor() {
+        int checkInterval = 123;
+        manager.setInterval(checkInterval);
+
+        ScheduledExecutorService executorService = mock(ScheduledExecutorService.class);
+        when(server.getExecutor()).thenReturn(executorService);
+
+        ScheduledFuture future = mock(ScheduledFuture.class);
+        when(executorService.scheduleAtFixedRate(any(Runnable.class), anyLong(), anyLong(), any(TimeUnit.class))).thenReturn(future);
+
+        // initial schedule check of 123 seconds
+        ResourceMonitor monitor = new ResourceMonitor(server, manager, null);
+        monitor.scheduleMonitor();
+
+        // re-schedule check to 456 seconds
+        int newCheckInterval = 456;
+        manager.setInterval(newCheckInterval);
+        monitor.scheduleMonitor();
+
+        long initialDelay = 1;
+        verify(executorService).scheduleAtFixedRate(same(monitor), eq(initialDelay), eq((long) checkInterval), eq(TimeUnit.SECONDS));
+        verify(executorService).scheduleAtFixedRate(same(monitor), eq(initialDelay), eq((long) newCheckInterval), eq(TimeUnit.SECONDS));
+        verify(future).cancel(eq(false));
     }
 }
