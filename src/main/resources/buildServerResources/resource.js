@@ -12,6 +12,10 @@ BS.EditResourceForm = OO.extend(BS.AbstractWebForm, {
             if (!err) {
               BS.EditResourceDialog.close();
             }
+          },
+
+          onResourceError : function(elem) {
+              alert(elem.firstChild.nodeValue);
           }
         }), false);
 
