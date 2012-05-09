@@ -66,14 +66,14 @@ public class ResourceController extends BaseController {
             String name = request.getParameter("resourceName");
             String host = request.getParameter("resourceHost");
             String port = request.getParameter("resourcePort");
-            resourceManager.addResource(name, host, Integer.valueOf(port));
+            resourceManager.addResource(name, host, port);
             plugin.saveConfiguration();
         } else if ("updateResource".equals(action)) {
             String id = request.getParameter("resourceId");
             String name = request.getParameter("resourceName");
             String host = request.getParameter("resourceHost");
             String port = request.getParameter("resourcePort");
-            resourceManager.updateResource(id, name, host, Integer.valueOf(port));
+            resourceManager.updateResource(id, name, host, port);
             plugin.saveConfiguration();
         } else if ("removeResource".equals(action)) {
             String id = request.getParameter("resourceId");

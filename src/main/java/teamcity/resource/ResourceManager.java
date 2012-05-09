@@ -33,8 +33,10 @@ public class ResourceManager {
         return interval;
     }
 
-    public void addResource(String name, String host, int port) {
-        addResource(new Resource(Integer.toString(nextId()), name, host, port));
+    public void addResource(String name, String host, String port) {
+        String id = Integer.toString(nextId());
+        Resource resource = new Resource(id, name, host, Integer.valueOf(port));
+        addResource(resource);
     }
 
     public void addResource(Resource resource) {
@@ -49,11 +51,11 @@ public class ResourceManager {
         notifyListeners(ResourceEvent.Added, resource);
     }
 
-    public void updateResource(String id, String name, String host, int port) {
+    public void updateResource(String id, String name, String host, String port) {
         Resource resource = getResource(id);
         resource.setName(name);
         resource.setHost(host);
-        resource.setPort(port);
+        resource.setPort(Integer.valueOf(port));
         notifyListeners(ResourceEvent.Updated, resource);
     }
 

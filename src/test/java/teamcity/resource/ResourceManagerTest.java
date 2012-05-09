@@ -57,15 +57,15 @@ public class ResourceManagerTest {
 
     @Test
     public void addResource() {
-        manager.addResource(NAME, HOST, PORT);
+        manager.addResource(NAME, HOST, "" + PORT);
         assertEquals(1, manager.getResources().size());
         assertNotNull(manager.getResourceById(ID));
     }
 
     @Test
     public void addingResources() {
-        manager.addResource(NAME + "1", HOST, PORT);
-        manager.addResource(NAME + "2", HOST, PORT);
+        manager.addResource(NAME + "1", HOST, "" + PORT);
+        manager.addResource(NAME + "2", HOST, "" + PORT);
         assertEquals(2, manager.getResources().size());
         assertNotNull(manager.getResourceById("2"));
     }
@@ -103,7 +103,7 @@ public class ResourceManagerTest {
         int newPort = 4321;
         Resource resource = new Resource(ID, NAME, HOST, PORT);
         manager.addResource(resource);
-        manager.updateResource(ID, newName, newHost, newPort);
+        manager.updateResource(ID, newName, newHost, "" + newPort);
 
         assertEquals(newName, resource.getName());
         assertEquals(newHost, resource.getHost());
@@ -114,7 +114,7 @@ public class ResourceManagerTest {
     public void updateResourceThatDoesNotExist() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("resource with id " + ID + " does not exist");
-        manager.updateResource(ID, NAME, HOST, PORT);
+        manager.updateResource(ID, NAME, HOST, "" + PORT);
     }
 
     @Test
@@ -307,7 +307,7 @@ public class ResourceManagerTest {
         ResourceManagerListener listener = mock(ResourceManagerListener.class);
         manager.addListener(listener);
 
-        manager.updateResource(ID, "newname", "newhost", 4321);
+        manager.updateResource(ID, "newname", "newhost", "4321");
         verify(listener).resourceUpdated(resource);
     }
 
