@@ -42,17 +42,32 @@ public class ResourceManagerTest {
     }
 
     @Test
-    public void addResource() {
+    public void addResourceObject() {
         Resource resource = new Resource(ID, NAME, HOST, PORT);
         manager.addResource(resource);
         assertEquals(1, manager.getResources().size());
     }
 
     @Test
-    public void addingResources() {
+    public void addingResourceObjects() {
         manager.addResource(new Resource(ID, NAME + "1", HOST, PORT));
         manager.addResource(new Resource("2", NAME + "2", HOST, PORT));
         assertEquals(2, manager.getResources().size());
+    }
+
+    @Test
+    public void addResource() {
+        manager.addResource(NAME, HOST, PORT);
+        assertEquals(1, manager.getResources().size());
+        assertNotNull(manager.getResourceById(ID));
+    }
+
+    @Test
+    public void addingResources() {
+        manager.addResource(NAME + "1", HOST, PORT);
+        manager.addResource(NAME + "2", HOST, PORT);
+        assertEquals(2, manager.getResources().size());
+        assertNotNull(manager.getResourceById("2"));
     }
 
     @Test
@@ -236,12 +251,13 @@ public class ResourceManagerTest {
 
     @Test
     public void replacedResourcesShouldBeAccessibleById() {
-        Resource resource = new Resource(ID, NAME, HOST, PORT);
+        Resource expectedResource = new Resource(ID, NAME, HOST, PORT);
         Collection<Resource> newResources = new ArrayList<Resource>();
-        newResources.add(resource);
+        newResources.add(expectedResource);
 
         manager.setResources(newResources);
-        manager.updateResource(ID, "newname", "newhost", 4321);
+        Resource resource = manager.getResourceById(ID);
+        assertSame(expectedResource, resource);
     }
 
     @Test

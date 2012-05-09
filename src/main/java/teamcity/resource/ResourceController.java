@@ -63,12 +63,10 @@ public class ResourceController extends BaseController {
 
         String action = request.getParameter("submitAction");
         if ("addResource".equals(action)) {
-            String id = Integer.toString(resourceManager.nextId());
             String name = request.getParameter("resourceName");
             String host = request.getParameter("resourceHost");
             String port = request.getParameter("resourcePort");
-            Resource resource = new Resource(id, name, host, Integer.valueOf(port));
-            resourceManager.addResource(resource);
+            resourceManager.addResource(name, host, Integer.valueOf(port));
             plugin.saveConfiguration();
         } else if ("updateResource".equals(action)) {
             String id = request.getParameter("resourceId");

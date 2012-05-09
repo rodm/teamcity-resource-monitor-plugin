@@ -33,6 +33,10 @@ public class ResourceManager {
         return interval;
     }
 
+    public void addResource(String name, String host, int port) {
+        addResource(new Resource(Integer.toString(nextId()), name, host, port));
+    }
+
     public void addResource(Resource resource) {
         if (ids.contains(resource.getId())) {
             throw new IllegalArgumentException("resource with id " + resource.getId() + " already exists");
