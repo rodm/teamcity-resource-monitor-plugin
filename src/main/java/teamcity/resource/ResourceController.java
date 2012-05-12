@@ -7,6 +7,7 @@ import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jdom.Element;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -38,7 +39,10 @@ public class ResourceController extends BaseController {
 
     protected ModelAndView doHandle(HttpServletRequest request, HttpServletResponse response) throws Exception {
         new AjaxRequestProcessor().processRequest(request, response, new AjaxRequestProcessor.RequestHandler() {
-            public void handleRequest(final HttpServletRequest request, final HttpServletResponse response, final Element xmlResponse) {
+            public void handleRequest(@NotNull final HttpServletRequest request,
+                                      @NotNull final HttpServletResponse response,
+                                      @NotNull final Element xmlResponse)
+            {
                 try {
                     doAction(request);
                 } catch (Exception e) {
