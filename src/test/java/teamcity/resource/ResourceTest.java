@@ -73,6 +73,34 @@ public class ResourceTest {
     }
 
     @Test
+    public void portCannotBeNegative() {
+        thrown.expect(InvalidPortException.class);
+        new Resource(VALID_ID, VALID_NAME, VALID_HOST, -1);
+    }
+
+    @Test
+    public void portCannotInvalidValue() {
+        thrown.expect(InvalidPortException.class);
+        new Resource(VALID_ID, VALID_NAME, VALID_HOST, 65536);
+    }
+
+    @Test
+    public void portCannotBeSetToNegativeValue() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+
+        thrown.expect(InvalidPortException.class);
+        resource.setPort(-1);
+    }
+
+    @Test
+    public void portCannotBeSetToInvalidValue() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+
+        thrown.expect(InvalidPortException.class);
+        resource.setPort(65536);
+    }
+
+    @Test
     public void addBuildToResource() {
         Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
         resource.addBuildType("bt123");

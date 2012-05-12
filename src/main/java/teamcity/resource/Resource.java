@@ -22,6 +22,7 @@ public class Resource {
         checkParameter(id, "id");
         checkParameter(name, "name");
         checkParameter(host, "host");
+        checkPort(port);
         this.id = id;
         this.name = name;
         this.host = host;
@@ -53,6 +54,7 @@ public class Resource {
     }
 
     public void setPort(int port) {
+        checkPort(port);
         this.port = port;
     }
 
@@ -79,6 +81,12 @@ public class Resource {
     private void checkParameter(String value, String name) {
         if (value == null || "".equals(value)) {
             throw new IllegalArgumentException(name + " cannot be null or empty");
+        }
+    }
+
+    private void checkPort(int port) {
+        if (port < 0 || port > 65535) {
+            throw new InvalidPortException("invalid port number");
         }
     }
 }
