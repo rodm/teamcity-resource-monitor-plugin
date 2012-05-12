@@ -35,7 +35,7 @@ public class ResourceManager {
 
     public void addResource(String name, String host, String port) {
         String id = Integer.toString(nextId());
-        Resource resource = new Resource(id, name, host, Integer.valueOf(port));
+        Resource resource = new Resource(id, name, host, parsePort(port));
         addResource(resource);
     }
 
@@ -52,10 +52,12 @@ public class ResourceManager {
     }
 
     public void updateResource(String id, String name, String host, String port) {
+        Integer portNumber = parsePort(port);
+
         Resource resource = getResource(id);
         resource.setName(name);
         resource.setHost(host);
-        resource.setPort(Integer.valueOf(port));
+        resource.setPort(portNumber);
         notifyListeners(ResourceEvent.Updated, resource);
     }
 
@@ -140,6 +142,19 @@ public class ResourceManager {
         if (!ids.contains(id)) {
             throw new IllegalArgumentException("resource with id " + id + " does not exist");
         }
+    }
+
+    private Integer parsePort(String value) {
+        if (value == null || "".equals(value)) {
+            throw new InvalidPortException("invalid port number");
+        }
+        Integer port;
+        try {
+            port = Integer.valueOf(value);
+        } catch (NumberFormatException e) {
+            throw new InvalidPortException("invalid port number");
+        }
+        return port;
     }
 
     private void validBuildType(String buildTypeId) {

@@ -97,6 +97,24 @@ public class ResourceManagerTest {
     }
 
     @Test
+    public void shouldThrowExceptionAddingResourceWithNullPort() {
+        thrown.expect(InvalidPortException.class);
+        manager.addResource(NAME, HOST, null);
+    }
+
+    @Test
+    public void shouldThrowExceptionAddingResourceWithEmptyPort() {
+        thrown.expect(InvalidPortException.class);
+        manager.addResource(NAME, HOST, "");
+    }
+
+    @Test
+    public void shouldThrowExceptionAddingResourceWithInvalidPort() {
+        thrown.expect(InvalidPortException.class);
+        manager.addResource(NAME, HOST, "invalid");
+    }
+
+    @Test
     public void updateResource() {
         String newName = "new name";
         String newHost = "newhost";
@@ -115,6 +133,24 @@ public class ResourceManagerTest {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("resource with id " + ID + " does not exist");
         manager.updateResource(ID, NAME, HOST, "" + PORT);
+    }
+
+    @Test
+    public void shouldThrowExceptionUpdatingResourceWithNullPort() {
+        thrown.expect(InvalidPortException.class);
+        manager.updateResource(ID, NAME, HOST, null);
+    }
+
+    @Test
+    public void shouldThrowExceptionUpdatingResourceWithEmptyPort() {
+        thrown.expect(InvalidPortException.class);
+        manager.updateResource(ID, NAME, HOST, "");
+    }
+
+    @Test
+    public void shouldThrowExceptionUpdatingResourceWithInvalidPort() {
+        thrown.expect(InvalidPortException.class);
+        manager.updateResource(ID, NAME, HOST, "invalid");
     }
 
     @Test
