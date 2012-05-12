@@ -5,6 +5,7 @@ BS.EditResourceForm = OO.extend(BS.AbstractWebForm, {
     },
 
     saveResource : function() {
+        var that = this;
         BS.FormSaver.save(this, this.formElement().action, OO.extend(BS.ErrorsAwareListener, {
 
           onCompleteSave : function(form, responseXML, err) {
@@ -12,6 +13,11 @@ BS.EditResourceForm = OO.extend(BS.AbstractWebForm, {
             if (!err) {
               BS.EditResourceDialog.close();
             }
+          },
+
+          onInvalidPortError : function(elem) {
+              $('error_resourcePort').innerHTML = elem.firstChild.nodeValue;
+              that.highlightErrorField($('resourcePort'));
           },
 
           onResourceError : function(elem) {

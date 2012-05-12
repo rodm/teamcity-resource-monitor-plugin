@@ -45,6 +45,11 @@ public class ResourceController extends BaseController {
             {
                 try {
                     doAction(request);
+                } catch (InvalidPortException e) {
+                    Loggers.SERVER.warn(e);
+                    ActionErrors errors = new ActionErrors();
+                    errors.addError("invalidPort", getMessageWithNested(e));
+                    errors.serialize(xmlResponse);
                 } catch (Exception e) {
                     Loggers.SERVER.warn(e);
                     ActionErrors errors = new ActionErrors();

@@ -109,8 +109,9 @@
             <forms:textField name="resourceHost" maxlength="50" style="width: 22em;" onchange=""/>
 
             <div class="clr" style="height:3px;"></div>
-            <label for="resourcePort">Port:</label>
+            <label for="resourcePort">Port: <l:star/></label>
             <forms:textField name="resourcePort" maxlength="5" style="width: 5em;" onchange=""/>
+            <span class="error" id="error_resourcePort" style="margin-left: 5.5em;"></span>
 
             <div class="popupSaveButtonsBlock">
                 <a href="javascript://" onclick="BS.EditResourceDialog.cancelDialog()" class="cancel">Cancel</a>
