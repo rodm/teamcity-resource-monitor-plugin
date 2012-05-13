@@ -15,6 +15,16 @@ BS.EditResourceForm = OO.extend(BS.AbstractWebForm, {
             }
           },
 
+          onInvalidNameError : function(elem) {
+              $('error_resourceName').innerHTML = elem.firstChild.nodeValue;
+              that.highlightErrorField($('resourceName'));
+          },
+
+          onInvalidHostError : function(elem) {
+              $('error_resourceHost').innerHTML = elem.firstChild.nodeValue;
+              that.highlightErrorField($('resourceHost'));
+          },
+
           onInvalidPortError : function(elem) {
               $('error_resourcePort').innerHTML = elem.firstChild.nodeValue;
               that.highlightErrorField($('resourcePort'));

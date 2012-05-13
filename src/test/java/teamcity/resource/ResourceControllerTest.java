@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import java.io.IOException;
 
+import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
 import static org.junit.Assert.*;
 import static org.junit.matchers.JUnitMatchers.*;
 import static org.mockito.Matchers.same;
@@ -68,10 +69,7 @@ public class ResourceControllerTest {
     @Test
     public void addResource() throws Exception {
         manager = new ResourceManager(null);
-        when(request.getParameter(SUBMIT_ACTION)).thenReturn("addResource");
-        when(request.getParameter(RESOURCE_NAME)).thenReturn("test");
-        when(request.getParameter(RESOURCE_HOST)).thenReturn("localhost");
-        when(request.getParameter(RESOURCE_PORT)).thenReturn("1234");
+        setupRequest("addResource", "test", "localhost", "1234");
 
         ResourceController controller = new ResourceController(null, null, manager, plugin, monitor);
         controller.doHandle(request, response);
@@ -167,5 +165,45 @@ public class ResourceControllerTest {
         controller.doHandle(request, response);
 
         verify(monitor).disableResource(same(resource));
+    }
+
+    @Test
+    public void invalidName() throws Exception {
+        setupRequest("addResource", "", "localhost", "1234");
+
+        ResourceController controller = new ResourceController(null, null, manager, plugin, monitor);
+        controller.doHandle(request, response);
+
+        assertXpathEvaluatesTo("invalidName", "//response/errors/error/@id", responseMessage.toString());
+        assertXpathEvaluatesTo("name cannot be null or empty", "//response/errors/error", responseMessage.toString());
+    }
+
+    @Test
+    public void invalidHost() throws Exception {
+        setupRequest("addResource", "test", "", "1234");
+
+        ResourceController controller = new ResourceController(null, null, manager, plugin, monitor);
+        controller.doHandle(request, response);
+
+        assertXpathEvaluatesTo("invalidHost", "//response/errors/error/@id", responseMessage.toString());
+        assertXpathEvaluatesTo("host cannot be null or empty", "//response/errors/error", responseMessage.toString());
+    }
+
+    @Test
+    public void invalidPort() throws Exception {
+        setupRequest("addResource", "test", "localhost", "");
+
+        ResourceController controller = new ResourceController(null, null, manager, plugin, monitor);
+        controller.doHandle(request, response);
+
+        assertXpathEvaluatesTo("invalidPort", "//response/errors/error/@id", responseMessage.toString());
+        assertXpathEvaluatesTo("invalid port number", "//response/errors/error", responseMessage.toString());
+    }
+
+    private void setupRequest(String action, String name, String host, String port) {
+        when(request.getParameter(SUBMIT_ACTION)).thenReturn(action);
+        when(request.getParameter(RESOURCE_NAME)).thenReturn(name);
+        when(request.getParameter(RESOURCE_HOST)).thenReturn(host);
+        when(request.getParameter(RESOURCE_PORT)).thenReturn(port);
     }
 }

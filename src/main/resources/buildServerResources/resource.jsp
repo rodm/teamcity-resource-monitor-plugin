@@ -107,6 +107,7 @@
             <div class="clr" style="height:3px;"></div>
             <label for="resourceHost">Host:</label>
             <forms:textField name="resourceHost" maxlength="50" style="width: 22em;" onchange=""/>
+            <span class="error" id="error_resourceHost" style="margin-left: 5.5em;"></span>
 
             <div class="clr" style="height:3px;"></div>
             <label for="resourcePort">Port: <l:star/></label>

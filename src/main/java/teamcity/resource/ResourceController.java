@@ -45,16 +45,15 @@ public class ResourceController extends BaseController {
             {
                 try {
                     doAction(request);
+                } catch (InvalidNameException e) {
+                    buildExceptionResponse("invalidName", e, xmlResponse);
+                } catch (InvalidHostException e) {
+                    buildExceptionResponse("invalidHost", e, xmlResponse);
                 } catch (InvalidPortException e) {
-                    Loggers.SERVER.warn(e);
-                    ActionErrors errors = new ActionErrors();
-                    errors.addError("invalidPort", getMessageWithNested(e));
-                    errors.serialize(xmlResponse);
+                    buildExceptionResponse("invalidPort", e, xmlResponse);
                 } catch (Exception e) {
                     Loggers.SERVER.warn(e);
-                    ActionErrors errors = new ActionErrors();
-                    errors.addError("Resource", getMessageWithNested(e));
-                    errors.serialize(xmlResponse);
+                    buildExceptionResponse("resource", e, xmlResponse);
                 }
             }
         });
@@ -107,6 +106,12 @@ public class ResourceController extends BaseController {
         } else {
             throw new IllegalArgumentException("Invalid action: " + action);
         }
+    }
+
+    private void buildExceptionResponse(String name, Exception e, Element xmlResponse) {
+        ActionErrors errors = new ActionErrors();
+        errors.addError(name, getMessageWithNested(e));
+        errors.serialize(xmlResponse);
     }
 
     private String getMessageWithNested(Throwable e) {
