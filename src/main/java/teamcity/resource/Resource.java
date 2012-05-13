@@ -19,9 +19,9 @@ public class Resource {
     private List<String> buildTypes = new ArrayList<String>();
 
     public Resource(String id, String name, String host, int port) {
-        checkParameter(id, "id");
-        checkParameter(name, "name");
-        checkParameter(host, "host");
+        checkId(id);
+        checkName(name);
+        checkHost(host);
         checkPort(port);
         this.id = id;
         this.name = name;
@@ -38,6 +38,7 @@ public class Resource {
     }
 
     public void setName(String name) {
+        checkName(name);
         this.name = name;
     }
 
@@ -46,6 +47,7 @@ public class Resource {
     }
 
     public void setHost(String host) {
+        checkHost(host);
         this.host = host;
     }
 
@@ -78,14 +80,26 @@ public class Resource {
         buildTypes.remove(buildTypeId);
     }
 
-    private void checkParameter(String value, String name) {
+    private void checkId(String value) {
         if (value == null || "".equals(value)) {
-            throw new IllegalArgumentException(name + " cannot be null or empty");
+            throw new IllegalArgumentException("id cannot be null or empty");
+        }
+    }
+
+    private void checkName(String name) {
+        if (name == null || "".equals(name)) {
+            throw new InvalidNameException("name cannot be null or empty");
+        }
+    }
+
+    private void checkHost(String host) {
+        if (host == null || "".equals(host)) {
+            throw new InvalidHostException("host cannot be null or empty");
         }
     }
 
     private void checkPort(int port) {
-        if (port < 0 || port > 65535) {
+        if (port < 1 || port > 65535) {
             throw new InvalidPortException("invalid port number");
         }
     }

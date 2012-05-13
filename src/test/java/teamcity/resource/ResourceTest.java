@@ -46,30 +46,66 @@ public class ResourceTest {
 
     @Test
     public void nameCannotBeNull() {
-        thrown.expect(IllegalArgumentException.class);
+        thrown.expect(InvalidNameException.class);
         thrown.expectMessage(INVALID_NAME_MESSAGE);
         new Resource(VALID_ID, null, VALID_HOST, VALID_PORT);
     }
 
     @Test
     public void nameCannotBeEmpty() {
-        thrown.expect(IllegalArgumentException.class);
+        thrown.expect(InvalidNameException.class);
         thrown.expectMessage(INVALID_NAME_MESSAGE);
         new Resource(VALID_ID, "", VALID_HOST, VALID_PORT);
     }
 
     @Test
+    public void nameCannotBeSetToNull() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+
+        thrown.expect(InvalidNameException.class);
+        thrown.expectMessage(INVALID_NAME_MESSAGE);
+        resource.setName(null);
+    }
+
+    @Test
+    public void nameCannotBeSetToEmpty() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+
+        thrown.expect(InvalidNameException.class);
+        thrown.expectMessage(INVALID_NAME_MESSAGE);
+        resource.setName("");
+    }
+
+    @Test
     public void hostCannotBeNull() {
-        thrown.expect(IllegalArgumentException.class);
+        thrown.expect(InvalidHostException.class);
         thrown.expectMessage(INVALID_HOST_MESSAGE);
         new Resource(VALID_ID, VALID_NAME, null, VALID_PORT);
     }
 
     @Test
     public void hostCannotBeEmpty() {
-        thrown.expect(IllegalArgumentException.class);
+        thrown.expect(InvalidHostException.class);
         thrown.expectMessage(INVALID_HOST_MESSAGE);
         new Resource(VALID_ID, VALID_NAME, "", VALID_PORT);
+    }
+
+    @Test
+    public void hostCannotBeSetToNull() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+
+        thrown.expect(InvalidHostException.class);
+        thrown.expectMessage(INVALID_HOST_MESSAGE);
+        resource.setHost(null);
+    }
+
+    @Test
+    public void hostCannotBeSetToEmpty() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+
+        thrown.expect(InvalidHostException.class);
+        thrown.expectMessage(INVALID_HOST_MESSAGE);
+        resource.setHost("");
     }
 
     @Test
@@ -79,7 +115,13 @@ public class ResourceTest {
     }
 
     @Test
-    public void portCannotInvalidValue() {
+    public void portCannotBeZero() {
+        thrown.expect(InvalidPortException.class);
+        new Resource(VALID_ID, VALID_NAME, VALID_HOST, 0);
+    }
+
+    @Test
+    public void portCannotBeInvalidValue() {
         thrown.expect(InvalidPortException.class);
         new Resource(VALID_ID, VALID_NAME, VALID_HOST, 65536);
     }
