@@ -8,6 +8,7 @@
     <property name="repo.host" value="repo1.maven.org" override="false"/>
     <property name="repo.port" value="80" override="false"/>
     <property name="repo.path" value="maven2" override="false"/>
+    <property name="repo.url" value="http://${repo.host}:${repo.port}/${repo.path}" override="false"/>
 
     <resolvers>
         <filesystem name="local">
@@ -15,7 +16,7 @@
             <artifact pattern="${local.repo.dir}/${default.pattern}"/>
         </filesystem>
 
-        <ibiblio name="maven" m2compatible="true" root="http://${repo.host}:${repo.port}/${repo.path}"/>
+        <ibiblio name="maven" m2compatible="true" root="${repo.url}"/>
 
         <chain name="chained" returnFirst="true">
             <resolver ref="local"/>
