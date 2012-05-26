@@ -77,7 +77,7 @@ BS.EditResourceDialog = OO.extend(BS.AbstractModalDialog, {
 
 BS.Resource = {
     enableResource: function(id, enable) {
-        var url = "/resource.html?submitAction=";
+        var url = base_uri + "/resource.html?submitAction=";
         url = url + ((enable) ? "disableResource" : "enableResource");
         url = url + "&resourceId=" + id;
         BS.ajaxRequest(url, {
@@ -91,7 +91,7 @@ BS.Resource = {
     },
 
     linkBuildType: function(id, buildTypeId) {
-        var url = "/resource.html?submitAction=linkBuildType&resourceId=" + id + "&buildTypeId=" + buildTypeId;
+        var url = base_uri + "/resource.html?submitAction=linkBuildType&resourceId=" + id + "&buildTypeId=" + buildTypeId;
         BS.ajaxRequest(url, {
             onSuccess: function(transport) {
                 document.location.reload();
@@ -105,7 +105,7 @@ BS.Resource = {
     unlinkBuildType : function(id, buildTypeId) {
         if (!confirm("Are you sure you want to remove this build configuration?")) return;
 
-        var url = "/resource.html?submitAction=unlinkBuildType&resourceId=" + id + "&buildTypeId=" + buildTypeId;
+        var url = base_uri + "/resource.html?submitAction=unlinkBuildType&resourceId=" + id + "&buildTypeId=" + buildTypeId;
         BS.ajaxRequest(url, {
           onComplete: function() {
               document.location.reload();
