@@ -20,7 +20,7 @@ class AvailabilityChecker {
             Loggers.SERVER.warn("Error connecting to " + resource.getHost() + ":" + resource.getPort(), e);
         }
         catch (ConnectException e) {
-            Loggers.SERVER.info("Failed to connect to " + resource.getHost() + ":" + resource.getPort());
+            Loggers.SERVER.debug("Failed to connect to " + resource.getHost() + ":" + resource.getPort());
         }
         catch (IOException e) {
             Loggers.SERVER.warn("Error connecting to " + resource.getHost() + ":" + resource.getPort(), e);

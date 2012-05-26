@@ -29,18 +29,18 @@ public class ResourceStartBuildPrecondition implements StartBuildPrecondition, R
                                boolean emulationMode)
     {
         String buildTypeId = queuedBuildInfo.getBuildConfiguration().getId();
-        Loggers.SERVER.info("Build canStart check for '" + buildTypeId + "'");
+        Loggers.SERVER.debug("Build canStart check for '" + buildTypeId + "'");
 
         WaitReason waitReason = null;
         Resource resource = manager.findResourceByBuildTypeId(buildTypeId);
         if (resource != null) {
             boolean available = isAvailable(resource);
             boolean enabled = isEnabled(resource);
-            Loggers.SERVER.info("Resource: '" + resource.getName() + "', enabled: '" + enabled + "', available: '" + available + "'");
+            Loggers.SERVER.debug("Resource: '" + resource.getName() + "', enabled: '" + enabled + "', available: '" + available + "'");
             if (!available || !enabled) {
                 String state = enabled ? "available" : "enabled";
                 waitReason = new SimpleWaitReason("Build cannot start until the required resource " + resource.getName() + " is " + state);
-                Loggers.SERVER.info(waitReason.getDescription());
+                Loggers.SERVER.debug(waitReason.getDescription());
             }
         }
         return waitReason;

@@ -26,7 +26,7 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter impl
                                boolean emulationMode)
     {
         String buildTypeId = queuedBuildInfo.getBuildConfiguration().getId();
-        Loggers.SERVER.info("Build canStart check for '" + buildTypeId + "'");
+        Loggers.SERVER.debug("Build canStart check for '" + buildTypeId + "'");
 
         WaitReason waitReason = null;
         Resource resource = manager.findResourceByBuildTypeId(buildTypeId);
@@ -38,7 +38,7 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter impl
 //            Loggers.SERVER.info("Resource: '" + resource.getName() + "', enabled: '" + enabled + "', available: '" + available + "'");
                 if (currentBuilds >= buildLimit) {
                     waitReason = new SimpleWaitReason("Build cannot start until the required resource " + resource.getName() + " build limit is " + buildLimit);
-                    Loggers.SERVER.info(waitReason.getDescription());
+                    Loggers.SERVER.debug(waitReason.getDescription());
                 }
             }
         }

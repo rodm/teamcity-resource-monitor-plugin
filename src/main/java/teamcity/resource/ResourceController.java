@@ -61,13 +61,13 @@ public class ResourceController extends BaseController {
     }
 
     private void doAction(final HttpServletRequest request) throws Exception {
-        Loggers.SERVER.info("       method: [" + request.getMethod() + "]");
-        Loggers.SERVER.info("submit action: [" + request.getParameter("submitAction") + "]");
-        Loggers.SERVER.info("  resource id: [" + request.getParameter("resourceId") + "]");
-        Loggers.SERVER.info("resource name: [" + request.getParameter("resourceName") + "]");
-        Loggers.SERVER.info("resource host: [" + request.getParameter("resourceHost") + "]");
-        Loggers.SERVER.info("resource port: [" + request.getParameter("resourcePort") + "]");
-        Loggers.SERVER.info("build type id: [" + request.getParameter("buildTypeId") + "]");
+        Loggers.SERVER.debug("       method: [" + request.getMethod() + "]");
+        Loggers.SERVER.debug("submit action: [" + request.getParameter("submitAction") + "]");
+        Loggers.SERVER.debug("  resource id: [" + request.getParameter("resourceId") + "]");
+        Loggers.SERVER.debug("resource name: [" + request.getParameter("resourceName") + "]");
+        Loggers.SERVER.debug("resource host: [" + request.getParameter("resourceHost") + "]");
+        Loggers.SERVER.debug("resource port: [" + request.getParameter("resourcePort") + "]");
+        Loggers.SERVER.debug("build type id: [" + request.getParameter("buildTypeId") + "]");
 
         String action = request.getParameter("submitAction");
         if ("addResource".equals(action)) {
