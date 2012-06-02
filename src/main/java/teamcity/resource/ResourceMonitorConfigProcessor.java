@@ -42,23 +42,14 @@ public class ResourceMonitorConfigProcessor {
         SAXBuilder builder = new SAXBuilder();
         Document document = builder.build(reader);
         Element configRoot = document.getRootElement();
-        Set<String> ids = new HashSet<String>();
-        Set<String> names= new HashSet<String>();
-        Collection<Resource> resources = new ArrayList<Resource>();
 
         resourceManager.setInterval(readCheckIntervalFrom(configRoot));
+
+        Collection<Resource> resources = new ArrayList<Resource>();
         final List list = configRoot.getChildren(CONFIG_RESOURCE);
         for (Object o : list) {
             final Element element = (Element) o;
             Resource resource = readResourceFrom(element);
-            if (ids.contains(resource.getId())) {
-                continue;
-            }
-            if (resources.contains(resource.getName())) {
-                continue;
-            }
-            ids.add(resource.getId());
-            names.add(resource.getName());
             resources.add(resource);
         }
         log.info("ResourceMonitor config loaded");

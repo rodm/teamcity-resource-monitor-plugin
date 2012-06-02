@@ -313,6 +313,28 @@ public class ResourceManagerTest {
     }
 
     @Test
+    public void shouldIgnoreResourceWithSameId() throws Exception {
+        Collection<Resource> newResources = new ArrayList<Resource>();
+        newResources.add(new Resource(ID, NAME + "1", HOST, PORT));
+        newResources.add(new Resource(ID, NAME + "2", HOST, PORT));
+
+        manager.setResources(newResources);
+        assertEquals(1, manager.getResources().size());
+        assertEquals(NAME + "1", manager.getResourceById(ID).getName());
+    }
+
+    @Test
+    public void shouldIgnoreResourceWithSameName() throws Exception {
+        Collection<Resource> newResources = new ArrayList<Resource>();
+        newResources.add(new Resource(ID + "1", NAME, HOST, PORT));
+        newResources.add(new Resource(ID + "2", NAME, HOST, PORT));
+
+        manager.setResources(newResources);
+        assertEquals(1, manager.getResources().size());
+        assertNotNull(manager.getResourceById(ID + "1"));
+    }
+
+    @Test
     public void unlinkUnregisteredBuildType() {
         SBuildType buildType = mock(SBuildType.class);
         when(buildType.getBuildTypeId()).thenReturn(BUILD_TYPE_ID);

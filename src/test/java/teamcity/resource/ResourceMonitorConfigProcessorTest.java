@@ -122,26 +122,4 @@ public class ResourceMonitorConfigProcessorTest {
         assertEquals(1, resource.getBuildTypes().size());
         assertEquals(BUILD_TYPE_ID, resource.getBuildTypes().get(0));
     }
-
-    @Test
-    public void ignoreResourcesWithSameId() throws Exception {
-        String config = "<monitored-resources check-interval=\"25\">" +
-                        "    <resource id=\"1\" name=\"Resource1\" host=\"host1\" port=\"123\"/>" +
-                        "    <resource id=\"1\" name=\"Resource2\" host=\"host2\" port=\"456\"/>" +
-                        "</monitored-resources>";
-        Reader reader = new StringReader(config);
-        configProcessor.readFrom(reader);
-        assertEquals(1, manager.getResources().size());
-    }
-
-    @Test
-    public void ignoreResourcesWithSameName() throws Exception {
-        String config = "<monitored-resources check-interval=\"25\">" +
-                        "    <resource id=\"1\" name=\"Resource\" host=\"host1\" port=\"123\"/>" +
-                        "    <resource id=\"2\" name=\"Resource\" host=\"host2\" port=\"456\"/>" +
-                        "</monitored-resources>";
-        Reader reader = new StringReader(config);
-        configProcessor.readFrom(reader);
-        assertEquals(1, manager.getResources().size());
-    }
 }

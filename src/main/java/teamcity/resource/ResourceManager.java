@@ -90,6 +90,12 @@ public class ResourceManager {
         this.ids.clear();
         this.resources.clear();
         for (Resource resource : resources) {
+            if (this.ids.contains(resource.getId())) {
+                continue;
+            }
+            if (this.resources.containsKey(resource.getName())) {
+                continue;
+            }
             this.ids.add(resource.getId());
             this.resources.put(resource.getName(), resource);
             removeInvalidBuildTypes(resource);
