@@ -25,4 +25,7 @@
     <bean id="resourceController"
           class="teamcity.resource.ResourceController"
           init-method="register"/>
+
+    <bean id="resourceStatus"
+          class="teamcity.resource.ResourceStatusController"/>
 </beans>

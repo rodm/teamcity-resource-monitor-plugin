@@ -11,6 +11,10 @@
 </style>
 
 <script type="text/javascript">
+    BS.ResourceMonitor.start("<c:url value='/resourceStatus.html'/>");
+</script>
+
+<script type="text/javascript">
     function addDependency(selector, id) {
         var buildTypeId = selector.options[selector.selectedIndex].value;
         BS.Resource.linkBuildType(id, buildTypeId);
@@ -35,7 +39,7 @@
                                     </c:choose>
                                 </a>
                             </td>
-                            <td class="edit highlight">
+                            <td id="resourceStatus_${resource.id}" class="edit highlight">
                                 <c:choose>
                                     <c:when test="${resource.available}">Available</c:when>
                                     <c:otherwise>Unavailable</c:otherwise>

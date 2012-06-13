@@ -116,3 +116,25 @@ BS.Resource = {
         });
     }
 };
+
+BS.ResourceMonitor = {
+    start:function (url) {
+        this._updater = new BS.PeriodicalUpdater(null, url, {
+            frequency:15,
+            onSuccess:function (transport) {
+                var doc = BS.Util.documentRoot(transport);
+                var resources = doc.getElementsByTagName("resource");
+                if (!resources || resources.length == 0) return;
+
+                for (var i = 0; i < resources.length; i++) {
+                    var id = resources[i].getAttribute("id");
+                    var available = resources[i].getAttribute("available");
+                    var container = $('resourceStatus_' + id);
+                    if (container) {
+                        container.innerHTML = (available == 'true') ? "Available" : "Unavailable";
+                    }
+                }
+            }
+        });
+    }
+}
