@@ -23,6 +23,7 @@
         <!-- Compiler options -->
         <property name="compiler.debug" value="on"/>
         <property name="compiler.nowarn" value="off"/>
+        <property name="compiler.target" value="1.5"/>
         <property name="compiler.args" value=""/>
         <property name="compiler.max.memory" value="128m"/>
 
@@ -96,7 +97,7 @@
                nowarn="${compiler.nowarn}"
                memorymaximumsize="${compiler.max.memory}"
                fork="true"
-               target="1.5">
+               target="${compiler.target}">
             <classpath refid="compile.classpath"/>
             <src location="${java.src.dir}"/>
         </javac>
@@ -116,7 +117,7 @@
                nowarn="${compiler.nowarn}"
                memorymaximumsize="${compiler.max.memory}"
                fork="true"
-               target="1.5">
+               target="${compiler.target}">
             <classpath refid="compile.classpath"/>
             <classpath refid="test.classpath"/>
             <classpath location="${classes.dir}"/>
