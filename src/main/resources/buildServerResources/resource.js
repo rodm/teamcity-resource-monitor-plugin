@@ -12,6 +12,7 @@ BS.EditResourceForm = OO.extend(BS.AbstractWebForm, {
             form.enable();
             if (!err) {
               BS.EditResourceDialog.close();
+              document.location.reload();
             }
           },
 
@@ -45,6 +46,7 @@ BS.EditResourceForm = OO.extend(BS.AbstractWebForm, {
         BS.ajaxRequest(url, {
           onComplete: function() {
             BS.EditResourceDialog.close();
+            document.location.reload();
           }
         });
     }
