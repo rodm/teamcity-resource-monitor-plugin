@@ -130,4 +130,17 @@ public class ResourceStatusControllerTest {
         assertXpathEvaluatesTo("123", "//resource/@id", responseMessage.toString());
         assertXpathEvaluatesTo("false", "//resource/@available", responseMessage.toString());
     }
+
+    @Test
+    public void shouldReturnResourceStatusChangeOnce() throws Exception {
+        ResourceStatusController controller = new ResourceStatusController(controllerManager, monitor);
+        controller.resourceAvailable(resource1);
+
+        controller.doHandle(request, response);
+        assertXpathEvaluatesTo("1", "count(//resource)", responseMessage.toString()); // returns available status
+
+        responseMessage.setLength(0);
+        controller.doHandle(request, response);
+        assertEquals("<response />", responseMessage.toString());
+    }
 }

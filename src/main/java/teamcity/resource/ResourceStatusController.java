@@ -58,6 +58,7 @@ public class ResourceStatusController extends BaseController implements Resource
             for (Map.Entry<String, Boolean> entry : availability.entrySet()) {
                 addAvailabilityStatusTo(resources, entry.getKey(), entry.getValue());
             }
+            availability.clear();
             xmlResponse.addContent(resources);
         }
     }
