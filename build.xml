@@ -37,7 +37,11 @@
     </target>
 
     <target name="dev-package-install" depends="init">
+        <fail unless="teamcity.home" message="teamcity.home property must be set"/>
         <fail unless="teamcity.version" message="teamcity.version property must be set"/>
+
+        <available property="teamcity.exists" file="${teamcity.home}/bin/teamcity-server.sh" type="file"/>
+        <fail unless="teamcity.exists">${teamcity.home} is not a valid TeamCity installation</fail>
 
         <!-- TeamCity 6 and later have a runtime directory for runtime-util.jar -->
         <condition property="teamcity.runtime.available">
