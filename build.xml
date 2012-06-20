@@ -146,8 +146,6 @@
             <classpath location="${classes.dir}"/>
             <classpath location="${test.classes.dir}"/>
 
-            <formatter type="brief" usefile="false"/>
-
             <batchtest fork="yes" todir="${test.report.dir}">
                 <formatter type="xml"/>
                 <fileset dir="${test.src.dir}">
