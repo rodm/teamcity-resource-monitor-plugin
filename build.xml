@@ -71,8 +71,10 @@
         <mkdir dir="${lib.dir}"/>
 
         <echo message="downloading ivy..."/>
-        <get src="http://repo1.maven.org/maven2/org/apache/ivy/ivy/${ivy.version}/${ivy.filename}"
-             dest="${lib.dir}/${ivy.filename}" usetimestamp="true"/>
+        <property name="repo.url" value="http://repo1.maven.org/maven2"/>
+        <get src="${repo.url}/org/apache/ivy/ivy/${ivy.version}/${ivy.filename}"
+             dest="${lib.dir}/${ivy.filename}"
+             usetimestamp="true"/>
     </target>
 
     <target name="init-ivy" depends="download-ivy">
