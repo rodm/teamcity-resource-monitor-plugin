@@ -1,6 +1,7 @@
 package teamcity.resource;
 
 import jetbrains.buildServer.BuildAgent;
+import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SRunningBuild;
 import jetbrains.buildServer.serverSide.buildDistribution.BuildConfigurationInfo;
 import jetbrains.buildServer.serverSide.buildDistribution.BuildDistributorInput;
@@ -28,8 +29,9 @@ public class ResourceBuildLimitStartPreconditionTest {
 
     @Before
     public void setup() {
+        SBuildServer buildServer = mock(SBuildServer.class);
         resourceManager = new ResourceManager(null);
-        precondition = new ResourceBuildLimitStartPrecondition(resourceManager);
+        precondition = new ResourceBuildLimitStartPrecondition(buildServer, resourceManager);
 
         resource.addBuildType("bt123");
         resource.addBuildType("bt124");
@@ -37,6 +39,14 @@ public class ResourceBuildLimitStartPreconditionTest {
 
         build = mock(SRunningBuild.class);
         when(build.getBuildTypeId()).thenReturn("bt123");
+    }
+
+    @Test
+    public void shouldRegisterWithBuildServer() {
+        SBuildServer buildServer = mock(SBuildServer.class);
+        precondition = new ResourceBuildLimitStartPrecondition(buildServer, resourceManager);
+
+        verify(buildServer).addListener(same(precondition));
     }
 
     @Test

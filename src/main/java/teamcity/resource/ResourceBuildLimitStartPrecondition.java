@@ -3,6 +3,7 @@ package teamcity.resource;
 import jetbrains.buildServer.BuildAgent;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.BuildServerAdapter;
+import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SRunningBuild;
 import jetbrains.buildServer.serverSide.buildDistribution.*;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +17,8 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter impl
 
     private Map<String, Integer> resourceBuildCounts = new HashMap<String, Integer>();
 
-    ResourceBuildLimitStartPrecondition(final ResourceManager manager) {
+    ResourceBuildLimitStartPrecondition(SBuildServer buildServer, final ResourceManager manager) {
+        buildServer.addListener(this);
         this.manager = manager;
     }
 
