@@ -37,9 +37,9 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter impl
             if (buildLimit > 0) {
                 int currentBuilds = getBuildCount(resource.getId());
 
-//            Loggers.SERVER.info("Resource: '" + resource.getName() + "', enabled: '" + enabled + "', available: '" + available + "'");
                 if (currentBuilds >= buildLimit) {
-                    waitReason = new SimpleWaitReason("Build cannot start until the required resource " + resource.getName() + " build limit is " + buildLimit);
+                    waitReason = new SimpleWaitReason("Build cannot start until the number of builds using the resource "
+                            + resource.getName() + " is below the limit of " + buildLimit);
                     Loggers.SERVER.debug(waitReason.getDescription());
                 }
             }
