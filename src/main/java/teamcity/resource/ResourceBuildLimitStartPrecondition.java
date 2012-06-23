@@ -15,7 +15,7 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter impl
 
     private ResourceManager manager;
 
-    private Map<String, Integer> resourceBuildCounts = new HashMap<String, Integer>();
+    private Map<String, ResourceBuildCount> resourceBuildCounts = new HashMap<String, ResourceBuildCount>();
 
     ResourceBuildLimitStartPrecondition(SBuildServer buildServer, final ResourceManager manager) {
         buildServer.addListener(this);
@@ -35,7 +35,7 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter impl
         if (resource != null) {
             int buildLimit = resource.getBuildLimit();
             if (buildLimit > 0) {
-                int currentBuilds = getBuildCount(resource.getId());
+                int currentBuilds = getResourceBuildCount(resource.getId()).value;
 
                 if (currentBuilds >= buildLimit) {
                     waitReason = new SimpleWaitReason("Build cannot start until the number of builds using the resource "
@@ -52,13 +52,8 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter impl
         String buildTypeId = build.getBuildTypeId();
         Resource resource = manager.findResourceByBuildTypeId(buildTypeId);
         if (resource != null) {
-            Integer buildCount = resourceBuildCounts.get(resource.getId());
-            if (buildCount == null) {
-                buildCount = 1;
-            } else {
-                buildCount = buildCount + 1;
-            }
-            resourceBuildCounts.put(resource.getId(), buildCount);
+            ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
+            resourceBuildCount.value++;
         }
     }
 
@@ -67,18 +62,21 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter impl
         String buildTypeId = build.getBuildTypeId();
         Resource resource = manager.findResourceByBuildTypeId(buildTypeId);
         if (resource != null) {
-            Integer buildCount = resourceBuildCounts.get(resource.getId());
-            if (buildCount == null) {
-                buildCount = 0;
-            } else {
-                buildCount = buildCount - 1;
-            }
-            resourceBuildCounts.put(resource.getId(), buildCount);
+            ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
+            resourceBuildCount.value--;
         }
     }
 
-    private int getBuildCount(String id) {
-        Integer buildCount = resourceBuildCounts.get(id);
-        return (buildCount == null) ? 0 : buildCount;
+    private ResourceBuildCount getResourceBuildCount(String id) {
+        ResourceBuildCount buildCount = resourceBuildCounts.get(id);
+        if (buildCount == null) {
+            buildCount = new ResourceBuildCount();
+            resourceBuildCounts.put(id, buildCount);
+        }
+        return buildCount;
+    }
+
+    private static class ResourceBuildCount {
+        int value = 0;
     }
 }
