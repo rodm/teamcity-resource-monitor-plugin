@@ -62,7 +62,7 @@
                         <c:forEach items="${resource.buildTypes}" var="buildType">
                             <tr class="buildConfigurationRow">
                                 <td class="buildConfiguration" colspan="6">
-                                    <a href="/viewType.html?buildTypeId=${buildType}&tab=buildTypeStatusDiv">
+                                    <a href="<c:url value='/viewType.html?buildTypeId=${buildType}&tab=buildTypeStatusDiv'/>">
                                         <c:out value="${buildTypes[buildType].fullName}"/>
                                     </a>
                                 </td>
