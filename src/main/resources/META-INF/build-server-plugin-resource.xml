@@ -10,6 +10,8 @@
 
     <bean id="resourceStartPrecondition" class="teamcity.resource.ResourceStartBuildPrecondition"/>
 
+    <bean id="resourceBuildLimitPrecondition" class="teamcity.resource.ResourceBuildLimitStartPrecondition"/>
+
     <bean id="resourceMonitorConifgProcessor" class="teamcity.resource.ResourceMonitorConfigProcessor"/>
 
     <bean id="resourceMonitorPlugin" class="teamcity.resource.ResourceMonitorPlugin"/>
