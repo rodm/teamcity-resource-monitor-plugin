@@ -35,7 +35,7 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter impl
         if (resource != null) {
             int buildLimit = resource.getBuildLimit();
             if (buildLimit > 0) {
-                int currentBuilds = getResourceBuildCount(resource.getId()).value;
+                int currentBuilds = getResourceBuildCount(resource.getId()).getValue();
 
                 if (currentBuilds >= buildLimit) {
                     waitReason = new SimpleWaitReason("Build cannot start until the number of builds using the resource "
@@ -53,7 +53,8 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter impl
         Resource resource = manager.findResourceByBuildTypeId(buildTypeId);
         if (resource != null) {
             ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
-            resourceBuildCount.value++;
+            resourceBuildCount.increment();
+            Loggers.SERVER.info("Running builds using resource " + resource.getName() + " - " + resourceBuildCount.getValue());
         }
     }
 
@@ -63,7 +64,8 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter impl
         Resource resource = manager.findResourceByBuildTypeId(buildTypeId);
         if (resource != null) {
             ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
-            resourceBuildCount.value--;
+            resourceBuildCount.decrement();
+            Loggers.SERVER.info("Running builds using resource " + resource.getName() + " - " + resourceBuildCount.getValue());
         }
     }
 
@@ -75,8 +77,20 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter impl
         }
         return buildCount;
     }
+}
 
-    private static class ResourceBuildCount {
-        int value = 0;
+class ResourceBuildCount {
+    private int value = 0;
+
+    public synchronized int getValue() {
+        return value;
+    }
+
+    public synchronized void increment() {
+        value++;
+    }
+
+    public synchronized void decrement() {
+        if (value > 0) value--;
     }
 }
