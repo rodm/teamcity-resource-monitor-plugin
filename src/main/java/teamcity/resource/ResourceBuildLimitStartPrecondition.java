@@ -60,6 +60,15 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter impl
 
     @Override
     public void buildFinished(SRunningBuild build) {
+        buildCompleted(build);
+    }
+
+    @Override
+    public void buildInterrupted(SRunningBuild build) {
+        buildCompleted(build);
+    }
+
+    private void buildCompleted(SRunningBuild build) {
         String buildTypeId = build.getBuildTypeId();
         Resource resource = manager.findResourceByBuildTypeId(buildTypeId);
         if (resource != null) {

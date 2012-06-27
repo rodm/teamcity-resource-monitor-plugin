@@ -113,6 +113,21 @@ public class ResourceBuildLimitStartPreconditionTest {
     }
 
     @Test
+    public void shouldReturnNullWaitReasonAfterBuildIsInterrupted() {
+        resource.setBuildLimit(1);
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt124");
+
+        precondition.buildStarted(build);
+        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        assertNotNull(waitReason);
+
+        precondition.buildInterrupted(build);
+        waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        assertNull(waitReason);
+    }
+
+    @Test
     public void shouldReturnNullWaitReasonWhenResourceIsUnavailable() {
         resource.setBuildLimit(1);
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
