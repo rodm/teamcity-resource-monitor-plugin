@@ -59,29 +59,52 @@ public class ResourceBuildLimitStartPreconditionTest {
     }
 
     @Test
+    public void shouldReturnNullWaitReasonBuildCountDoesNotExceedResourceBuildLimit() {
+        resource.setBuildLimit(1);
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt124");
+
+        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        assertNull(waitReason);
+    }
+
+    @Test
     public void shouldReturnWaitReasonWhenBuildCountExceedsResourceBuildLimit() {
         resource.setBuildLimit(1);
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt124");
 
-        precondition.buildStarted(build);
+        // use resource build limit
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+
         WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
         assertNotNull(waitReason);
     }
 
     @Test
-    public void shouldReturnNullWaitReason() {
+    public void shouldReturnNullWaitReasonAfterBuildFinishes() {
         resource.setBuildLimit(1);
-        Resource resource2 = new Resource("2", "test2", "localhost", 1234);
-        resource2.setBuildLimit(1);
-        resource2.addBuildType("bt125");
-        resourceManager.addResource(resource2);
-
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
-        when(buildConfigurationInfo.getId()).thenReturn("bt125");
+        when(buildConfigurationInfo.getId()).thenReturn("bt124");
 
-        precondition.buildStarted(build); // start build linked to first resource
+        // use resource build limit
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
 
+        precondition.buildFinished(build);
+        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        assertNull(waitReason);
+    }
+
+    @Test
+    public void shouldReturnNullWaitReasonAfterBuildIsInterrupted() {
+        resource.setBuildLimit(1);
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt124");
+
+        // use resource build limit
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+
+        precondition.buildInterrupted(build);
         WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
         assertNull(waitReason);
     }
@@ -92,48 +115,9 @@ public class ResourceBuildLimitStartPreconditionTest {
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt124");
 
-        precondition.buildStarted(build);
         WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
         assertNull(waitReason);
-    }
-
-    @Test
-    public void shouldReturnNullWaitReasonAfterBuildFinishes() {
-        resource.setBuildLimit(1);
-        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
-        when(buildConfigurationInfo.getId()).thenReturn("bt124");
-
-        precondition.buildStarted(build);
-        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
-        assertNotNull(waitReason);
-
-        precondition.buildFinished(build);
         waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
-        assertNull(waitReason);
-    }
-
-    @Test
-    public void shouldReturnNullWaitReasonAfterBuildIsInterrupted() {
-        resource.setBuildLimit(1);
-        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
-        when(buildConfigurationInfo.getId()).thenReturn("bt124");
-
-        precondition.buildStarted(build);
-        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
-        assertNotNull(waitReason);
-
-        precondition.buildInterrupted(build);
-        waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
-        assertNull(waitReason);
-    }
-
-    @Test
-    public void shouldReturnNullWaitReasonWhenResourceIsUnavailable() {
-        resource.setBuildLimit(1);
-        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
-        when(buildConfigurationInfo.getId()).thenReturn("bt124");
-
-        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
         assertNull(waitReason);
     }
 }
