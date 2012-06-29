@@ -7,10 +7,7 @@ import jetbrains.buildServer.web.openapi.SimpleCustomTab;
 import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ResourceConfigExtension extends SimpleCustomTab {
 
@@ -72,6 +69,11 @@ public class ResourceConfigExtension extends SimpleCustomTab {
             boolean enabled = isEnabled(resource);
             resources.add(new ResourceState(resource, available, enabled));
         }
+        Collections.sort(resources, new Comparator<ResourceState>() {
+            public int compare(ResourceState o1, ResourceState o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
         return resources;
     }
 
