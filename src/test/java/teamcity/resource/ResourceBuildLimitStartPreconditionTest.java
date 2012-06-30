@@ -10,7 +10,9 @@ import jetbrains.buildServer.serverSide.buildDistribution.WaitReason;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import static org.junit.Assert.*;
@@ -18,7 +20,11 @@ import static org.mockito.Mockito.*;
 
 public class ResourceBuildLimitStartPreconditionTest {
 
-    private Resource resource = new Resource("1", "test", "localhost", 1234);
+    private static final String RESOURCE_ID = "1";
+
+    private Resource resource = new Resource(RESOURCE_ID, "test", "localhost", 1234);
+
+    private SBuildServer buildServer;
     private ResourceManager resourceManager;
     private ResourceBuildLimitStartPrecondition precondition;
     private QueuedBuildInfo queuedBuildInfo = mock(QueuedBuildInfo.class);
@@ -29,7 +35,7 @@ public class ResourceBuildLimitStartPreconditionTest {
 
     @Before
     public void setup() {
-        SBuildServer buildServer = mock(SBuildServer.class);
+        buildServer = mock(SBuildServer.class);
         resourceManager = new ResourceManager(null);
         precondition = new ResourceBuildLimitStartPrecondition(buildServer, resourceManager);
 
@@ -119,5 +125,16 @@ public class ResourceBuildLimitStartPreconditionTest {
         assertNull(waitReason);
         waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
         assertNull(waitReason);
+    }
+
+    @Test
+    public void shouldUpdateBuildCountAtStartupForRunningBuilds() {
+        List<SRunningBuild> runningBuilds = new ArrayList<SRunningBuild>();
+        runningBuilds.add(build);
+        when(buildServer.getRunningBuilds()).thenReturn(runningBuilds);
+
+        precondition.serverStartup();
+
+        assertEquals(1, precondition.getBuildCount(RESOURCE_ID));
     }
 }

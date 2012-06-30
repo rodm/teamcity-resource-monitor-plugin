@@ -13,13 +13,16 @@ import java.util.Map;
 
 public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter implements StartBuildPrecondition {
 
+    private SBuildServer buildServer;
+
     private ResourceManager manager;
 
     private Map<String, ResourceBuildCount> resourceBuildCounts = new HashMap<String, ResourceBuildCount>();
 
     ResourceBuildLimitStartPrecondition(SBuildServer buildServer, final ResourceManager manager) {
-        buildServer.addListener(this);
+        this.buildServer = buildServer;
         this.manager = manager;
+        buildServer.addListener(this);
     }
 
     public WaitReason canStart(@NotNull QueuedBuildInfo queuedBuildInfo,
@@ -52,6 +55,18 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter impl
     }
 
     @Override
+    public void serverStartup() {
+        for (SRunningBuild build : buildServer.getRunningBuilds()) {
+            Resource resource = manager.findResourceByBuildTypeId(build.getBuildTypeId());
+            if (resource != null) {
+                ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
+                resourceBuildCount.increment();
+                Loggers.SERVER.info("Incremented resource usage for running build: " + build.getFullName());
+            }
+        }
+    }
+
+    @Override
     public void buildFinished(SRunningBuild build) {
         buildCompleted(build);
     }
@@ -59,6 +74,10 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter impl
     @Override
     public void buildInterrupted(SRunningBuild build) {
         buildCompleted(build);
+    }
+
+    public int getBuildCount(String id) {
+        return getResourceBuildCount(id).getValue();
     }
 
     private void buildCompleted(SRunningBuild build) {
