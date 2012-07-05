@@ -11,7 +11,9 @@ import org.jetbrains.annotations.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
-public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter implements StartBuildPrecondition {
+public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
+        implements StartBuildPrecondition, ResourceManagerListener
+{
 
     private SBuildServer buildServer;
 
@@ -74,6 +76,16 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter impl
     @Override
     public void buildInterrupted(SRunningBuild build) {
         buildCompleted(build);
+    }
+
+    public void resourceAdded(Resource resource) {
+    }
+
+    public void resourceUpdated(Resource resource) {
+    }
+
+    public void resourceRemoved(Resource resource) {
+        resourceBuildCounts.remove(resource.getId());
     }
 
     public int getBuildCount(String id) {

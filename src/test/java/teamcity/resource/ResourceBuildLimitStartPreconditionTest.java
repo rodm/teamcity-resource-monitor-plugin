@@ -137,4 +137,17 @@ public class ResourceBuildLimitStartPreconditionTest {
 
         assertEquals(1, precondition.getBuildCount(RESOURCE_ID));
     }
+
+    @Test
+    public void shouldReturnZeroBuildCountAfterRemovingResource() {
+        resource.setBuildLimit(1);
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt124");
+
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        assertEquals(1, precondition.getBuildCount(resource.getId()));
+
+        precondition.resourceRemoved(resource);
+        assertEquals(0, precondition.getBuildCount(resource.getId()));
+    }
 }
