@@ -9,9 +9,9 @@ public class ResourceManager {
 
     private static final int DEFAULT_INTERVAL = 30;
 
-    private Set<String> ids = new HashSet<String>();
-
     private Map<String, Resource> resources = new HashMap<String, Resource>();
+
+    private Set<String> names = new HashSet<String>();
 
     private int interval = DEFAULT_INTERVAL;
 
@@ -40,14 +40,14 @@ public class ResourceManager {
     }
 
     public void addResource(Resource resource) {
-        if (ids.contains(resource.getId())) {
+        if (resources.containsKey(resource.getId())) {
             throw new IllegalArgumentException("resource with id " + resource.getId() + " already exists");
         }
-        if (resources.containsKey(resource.getName())) {
+        if (names.contains(resource.getName())) {
             throw new IllegalArgumentException("resource with name " + resource.getName() + " already exists");
         }
-        ids.add(resource.getId());
-        resources.put(resource.getName(), resource);
+        names.add(resource.getName());
+        resources.put(resource.getId(), resource);
         notifyListeners(ResourceEvent.Added, resource);
     }
 
@@ -63,8 +63,8 @@ public class ResourceManager {
 
     public void removeResource(String id) {
         Resource resource = getResource(id);
-        ids.remove(resource.getId());
-        resources.remove(resource.getName());
+        names.remove(resource.getName());
+        resources.remove(resource.getId());
         notifyListeners(ResourceEvent.Removed, resource);
     }
 
@@ -87,17 +87,17 @@ public class ResourceManager {
     }
 
     public void setResources(Collection<Resource> resources) {
-        this.ids.clear();
+        this.names.clear();
         this.resources.clear();
         for (Resource resource : resources) {
-            if (this.ids.contains(resource.getId())) {
+            if (this.resources.containsKey(resource.getId())) {
                 continue;
             }
-            if (this.resources.containsKey(resource.getName())) {
+            if (this.names.contains(resource.getName())) {
                 continue;
             }
-            this.ids.add(resource.getId());
-            this.resources.put(resource.getName(), resource);
+            this.names.add(resource.getName());
+            this.resources.put(resource.getId(), resource);
             removeInvalidBuildTypes(resource);
         }
     }
@@ -145,7 +145,7 @@ public class ResourceManager {
     }
 
     private void validResource(String id) {
-        if (!ids.contains(id)) {
+        if (!resources.containsKey(id)) {
             throw new IllegalArgumentException("resource with id " + id + " does not exist");
         }
     }
