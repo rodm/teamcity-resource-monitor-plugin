@@ -55,9 +55,13 @@ public class ResourceManager {
         Integer portNumber = parsePort(port);
 
         Resource resource = getResource(id);
+        String oldName = resource.getName();
         resource.setName(name);
         resource.setHost(host);
         resource.setPort(portNumber);
+
+        names.remove(oldName);
+        names.add(name);
         notifyListeners(ResourceEvent.Updated, resource);
     }
 

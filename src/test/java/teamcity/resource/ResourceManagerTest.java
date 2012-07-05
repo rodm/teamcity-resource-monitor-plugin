@@ -136,6 +136,26 @@ public class ResourceManagerTest {
     }
 
     @Test
+    public void shouldAllowPreviousNameAfterUpdate() {
+        Resource resource = new Resource(ID, NAME, HOST, PORT);
+        manager.addResource(resource);
+        manager.updateResource(ID, "new name", "newhost", "" + PORT);
+
+        manager.addResource(new Resource("2", NAME, HOST, PORT));
+        assertEquals(2, manager.getResources().size());
+    }
+
+    @Test
+    public void shouldAllowPreviousNameAfterRemove() {
+        Resource resource = new Resource(ID, NAME, HOST, PORT);
+        manager.addResource(resource);
+        manager.removeResource(ID);
+
+        manager.addResource(new Resource("2", NAME, HOST, PORT));
+        assertEquals(1, manager.getResources().size());
+    }
+
+    @Test
     public void shouldThrowExceptionUpdatingResourceWithNullPort() {
         thrown.expect(InvalidPortException.class);
         manager.updateResource(ID, NAME, HOST, null);
