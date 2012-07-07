@@ -3,6 +3,7 @@ package teamcity.resource;
 import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SBuildType;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -51,7 +52,7 @@ public class ResourceManagerTest {
     @Test
     public void addingResourceObjects() {
         manager.addResource(new Resource(ID, NAME + "1", HOST, PORT));
-        manager.addResource(new Resource("2", NAME + "2", HOST, PORT));
+        manager.addResource(new Resource("2", NAME + "2", HOST + "2", PORT));
         assertEquals(2, manager.getResources().size());
     }
 
@@ -65,7 +66,7 @@ public class ResourceManagerTest {
     @Test
     public void addingResources() {
         manager.addResource(NAME + "1", HOST, "" + PORT);
-        manager.addResource(NAME + "2", HOST, "" + PORT);
+        manager.addResource(NAME + "2", HOST + "2", "" + PORT);
         assertEquals(2, manager.getResources().size());
         assertNotNull(manager.getResourceById("2"));
     }
@@ -348,6 +349,43 @@ public class ResourceManagerTest {
         Collection<Resource> newResources = new ArrayList<Resource>();
         newResources.add(new Resource(ID + "1", NAME, HOST, PORT));
         newResources.add(new Resource(ID + "2", NAME, HOST, PORT));
+
+        manager.setResources(newResources);
+        assertEquals(1, manager.getResources().size());
+        assertNotNull(manager.getResourceById(ID + "1"));
+    }
+
+    @Test
+    public void shouldNotAllowResourcesWithSameHostAndPort() {
+        manager.addResource(new Resource(ID, NAME + "1", HOST, PORT));
+
+        thrown.expect(IllegalArgumentException.class);
+        manager.addResource(new Resource("5", NAME + "2", HOST, PORT));
+    }
+
+    @Test
+    public void shouldNotAllowHostUpdateToDuplicateHostAndPort() {
+        manager.addResource(new Resource(ID, NAME + "1", HOST, PORT));
+        manager.addResource(new Resource("2", NAME + "2", HOST + "2", PORT));
+
+        thrown.expect(IllegalArgumentException.class);
+        manager.updateResource("2", NAME + "2", HOST, "" + PORT);
+    }
+
+    @Test
+    public void shouldNotAllowPortUpdateToDuplicateHostAndPort() {
+        manager.addResource(new Resource(ID, NAME + "1", HOST, PORT));
+        manager.addResource(new Resource("2", NAME + "2", HOST, 1235));
+
+        thrown.expect(IllegalArgumentException.class);
+        manager.updateResource("2", NAME + "2", HOST, "" + PORT);
+    }
+
+    @Test
+    public void shouldIgnoreResourceWithSameHostAndPort() throws Exception {
+        Collection<Resource> newResources = new ArrayList<Resource>();
+        newResources.add(new Resource(ID + "1", NAME + "1", HOST, PORT));
+        newResources.add(new Resource(ID + "2", NAME + "2", HOST, PORT));
 
         manager.setResources(newResources);
         assertEquals(1, manager.getResources().size());

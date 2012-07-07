@@ -13,6 +13,8 @@ public class ResourceManager {
 
     private Set<String> names = new HashSet<String>();
 
+    private Set<String> hostsAndPorts = new HashSet<String>();
+
     private int interval = DEFAULT_INTERVAL;
 
     private ProjectManager projectManager;
@@ -46,28 +48,41 @@ public class ResourceManager {
         if (names.contains(resource.getName())) {
             throw new IllegalArgumentException("resource with name " + resource.getName() + " already exists");
         }
+        String hostAndPort = makeHostAndPortKey(resource);
+        if (hostsAndPorts.contains(hostAndPort)) {
+            throw new IllegalArgumentException("resource with host " + resource.getHost() + " and port " + resource.getPort() + " already exists");
+        }
         names.add(resource.getName());
+        hostsAndPorts.add(hostAndPort);
         resources.put(resource.getId(), resource);
         notifyListeners(ResourceEvent.Added, resource);
     }
 
     public void updateResource(String id, String name, String host, String port) {
+        String hostAndPort = host + ":" + port;
+        if (hostsAndPorts.contains(hostAndPort)) {
+            throw new IllegalArgumentException("resource with host " + host + " and port " + port + " already exists");
+        }
         Integer portNumber = parsePort(port);
 
         Resource resource = getResource(id);
         String oldName = resource.getName();
+        String oldHostAndPort = makeHostAndPortKey(resource);
         resource.setName(name);
         resource.setHost(host);
         resource.setPort(portNumber);
 
         names.remove(oldName);
         names.add(name);
+        hostsAndPorts.remove(oldHostAndPort);
+        hostsAndPorts.add(hostAndPort);
         notifyListeners(ResourceEvent.Updated, resource);
     }
 
     public void removeResource(String id) {
         Resource resource = getResource(id);
         names.remove(resource.getName());
+        hostsAndPorts.remove(makeHostAndPortKey(resource));
         resources.remove(resource.getId());
         notifyListeners(ResourceEvent.Removed, resource);
     }
@@ -100,7 +115,12 @@ public class ResourceManager {
             if (this.names.contains(resource.getName())) {
                 continue;
             }
+            String hostAndPort = makeHostAndPortKey(resource);
+            if (this.hostsAndPorts.contains(hostAndPort)) {
+                continue;
+            }
             this.names.add(resource.getName());
+            this.hostsAndPorts.add(hostAndPort);
             this.resources.put(resource.getId(), resource);
             removeInvalidBuildTypes(resource);
         }
@@ -200,5 +220,9 @@ public class ResourceManager {
         for (String buildTypeId : invalidBuildTypeIds) {
             resource.removeBuildType(buildTypeId);
         }
+    }
+
+    private String makeHostAndPortKey(Resource resource) {
+        return resource.getHost() + ":" + resource.getPort();
     }
 }
