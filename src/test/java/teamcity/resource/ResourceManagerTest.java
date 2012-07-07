@@ -3,7 +3,6 @@ package teamcity.resource;
 import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SBuildType;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -20,6 +19,7 @@ public class ResourceManagerTest {
     private static final String NAME = "Test Resource";
     private static final String HOST = "test";
     private static final int PORT = 1234;
+    private static final int INVALID_PORT = 65550;
     private static final String BUILD_TYPE_ID = "bt123";
     private static final String INVALID_BUILD_TYPE_ID = "bt124";
 
@@ -130,6 +130,66 @@ public class ResourceManagerTest {
     }
 
     @Test
+    public void updateResourceName() {
+        manager.addResource(new Resource(ID, NAME + "1", HOST, PORT));
+        manager.updateResource(ID, "new name", HOST, "" + PORT);
+    }
+
+    @Test
+    public void updateResourceHost() {
+        manager.addResource(new Resource(ID, NAME + "1", HOST, PORT));
+        manager.updateResource(ID, NAME, "newhost", "" + PORT);
+    }
+
+    @Test
+    public void updateResourcePort() {
+        manager.addResource(new Resource(ID, NAME + "1", HOST, PORT));
+        manager.updateResource(ID, NAME, HOST, "4321");
+    }
+
+    @Test
+    public void shouldNotChangeHostOrPortWhenNameIsInvalid() {
+        Resource resource = new Resource(ID, NAME, HOST, PORT);
+        manager.addResource(resource);
+
+        try {
+            manager.updateResource(ID, "", "newhost", "4321");
+        }
+        catch (InvalidNameException expected) {
+        }
+        assertEquals("host should not be changed", HOST, resource.getHost());
+        assertEquals("port should not be changed", PORT, resource.getPort());
+    }
+
+    @Test
+    public void shouldNotChangeNameOrPortWhenHostIsInvalid() {
+        Resource resource = new Resource(ID, NAME, HOST, PORT);
+        manager.addResource(resource);
+
+        try {
+            manager.updateResource(ID, "new name", "", "4321");
+        }
+        catch (InvalidHostException expected) {
+        }
+        assertEquals("name should not be changed", NAME, resource.getName());
+        assertEquals("port should not be changed", PORT, resource.getPort());
+    }
+
+    @Test
+    public void shouldNotChangeNameOrHostWhenPortIsInvalid() {
+        Resource resource = new Resource(ID, NAME, HOST, PORT);
+        manager.addResource(resource);
+
+        try {
+            manager.updateResource(ID, "new name", "newhost", "" + INVALID_PORT);
+        }
+        catch (InvalidPortException expected) {
+        }
+        assertEquals("name should not be changed", NAME, resource.getName());
+        assertEquals("host should not be changed", HOST, resource.getHost());
+    }
+
+    @Test
     public void updateResourceThatDoesNotExist() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("resource with id " + ID + " does not exist");
@@ -158,18 +218,24 @@ public class ResourceManagerTest {
 
     @Test
     public void shouldThrowExceptionUpdatingResourceWithNullPort() {
+        manager.addResource(new Resource(ID, NAME, HOST, PORT));
+
         thrown.expect(InvalidPortException.class);
         manager.updateResource(ID, NAME, HOST, null);
     }
 
     @Test
     public void shouldThrowExceptionUpdatingResourceWithEmptyPort() {
+        manager.addResource(new Resource(ID, NAME, HOST, PORT));
+
         thrown.expect(InvalidPortException.class);
         manager.updateResource(ID, NAME, HOST, "");
     }
 
     @Test
     public void shouldThrowExceptionUpdatingResourceWithInvalidPort() {
+        manager.addResource(new Resource(ID, NAME, HOST, PORT));
+
         thrown.expect(InvalidPortException.class);
         manager.updateResource(ID, NAME, HOST, "invalid");
     }

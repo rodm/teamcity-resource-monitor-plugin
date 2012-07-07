@@ -59,15 +59,22 @@ public class ResourceManager {
     }
 
     public void updateResource(String id, String name, String host, String port) {
+        Resource resource = getResource(id);
+
+        String oldName = resource.getName();
+        if (!name.equals(oldName) && names.contains(name)) {
+            throw new IllegalArgumentException("resource with name " + name + " already exists");
+        }
+
+        String oldHostAndPort = makeHostAndPortKey(resource);
         String hostAndPort = host + ":" + port;
-        if (hostsAndPorts.contains(hostAndPort)) {
+        if (!hostAndPort.equals(oldHostAndPort) && hostsAndPorts.contains(hostAndPort)) {
             throw new IllegalArgumentException("resource with host " + host + " and port " + port + " already exists");
         }
-        Integer portNumber = parsePort(port);
 
-        Resource resource = getResource(id);
-        String oldName = resource.getName();
-        String oldHostAndPort = makeHostAndPortKey(resource);
+        Integer portNumber = parsePort(port);
+        validResource(id, name, host, portNumber);
+
         resource.setName(name);
         resource.setHost(host);
         resource.setPort(portNumber);
@@ -185,6 +192,10 @@ public class ResourceManager {
             throw new InvalidPortException("invalid port number");
         }
         return port;
+    }
+
+    private void validResource(String id, String name, String host, int port) {
+        new Resource(id, name, host, port);
     }
 
     private void validBuildType(String buildTypeId) {
