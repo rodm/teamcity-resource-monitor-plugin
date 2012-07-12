@@ -23,8 +23,13 @@
 
 <div id="container">
     <div class="editResourcesPage">
-        <h3 class="title">Resources</h3>
+        <h3 class="resourceHeader">Resources</h3>
         <c:if test="${not empty resources}">
+            <p class="addNew">
+                <a href="javascript://" onclick="BS.EditResourceDialog.showDialog('', '', '', '')">
+                    Create resource
+                </a>
+            </p>
             <c:forEach items="${resources}" var="resource">
                 <table id="resource" class="resourceTable">
                     <tbody>
@@ -89,7 +94,7 @@
 
 <p class="addNew">
   <a href="javascript://" onclick="BS.EditResourceDialog.showDialog('', '', '', '')">
-    Create new resource
+    Create resource
   </a>
 </p>
 

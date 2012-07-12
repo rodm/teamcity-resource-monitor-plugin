@@ -1,4 +1,12 @@
 
+h3.resourceHeader {
+  width: 75%;
+  padding: 0 0 0 .3em;
+  background-color:#f0f0f0;
+  border-bottom: 1px dotted #ccc;
+  border-top: 1px dotted #ccc;
+}
+
 table.resourceTable {
   width: 75%;
   border-collapse: collapse;
