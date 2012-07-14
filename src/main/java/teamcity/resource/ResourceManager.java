@@ -114,6 +114,7 @@ public class ResourceManager {
 
     public void setResources(Collection<Resource> resources) {
         this.names.clear();
+        this.hostsAndPorts.clear();
         this.resources.clear();
         for (Resource resource : resources) {
             if (this.resources.containsKey(resource.getId())) {

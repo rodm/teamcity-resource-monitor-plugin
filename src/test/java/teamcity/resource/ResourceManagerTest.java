@@ -459,6 +459,16 @@ public class ResourceManagerTest {
     }
 
     @Test
+    public void shouldAllowAddingResourceAfterReplacingResourcesCollection() {
+        manager.addResource(new Resource(ID, NAME, HOST, PORT));
+        Collection<Resource> newResources = new ArrayList<Resource>();
+
+        manager.setResources(newResources);
+        assertEquals(0, manager.getResources().size());
+        manager.addResource(new Resource(ID, NAME, HOST, PORT));
+    }
+
+    @Test
     public void unlinkUnregisteredBuildType() {
         SBuildType buildType = mock(SBuildType.class);
         when(buildType.getBuildTypeId()).thenReturn(BUILD_TYPE_ID);
