@@ -143,4 +143,15 @@ public class ResourceStatusControllerTest {
         controller.doHandle(request, response);
         assertEquals("<response />", responseMessage.toString());
     }
+
+    @Test
+    public void shouldReturnResourceUsage() throws Exception {
+        ResourceStatusController controller = new ResourceStatusController(controllerManager, monitor);
+
+        controller.resourceUsageChanged(resource1, 3);
+        controller.doHandle(request, response);
+        assertXpathEvaluatesTo("1", "count(//resource)", responseMessage.toString());
+        assertXpathEvaluatesTo("123", "//resource/@id", responseMessage.toString());
+        assertXpathEvaluatesTo("3", "//resource/@count", responseMessage.toString());
+    }
 }
