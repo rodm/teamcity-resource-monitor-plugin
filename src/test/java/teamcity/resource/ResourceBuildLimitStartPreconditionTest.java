@@ -150,4 +150,47 @@ public class ResourceBuildLimitStartPreconditionTest {
         precondition.resourceRemoved(resource);
         assertEquals(0, precondition.getBuildCount(resource.getId()));
     }
+
+    @Test
+    public void shouldSendUsageChangedEventOnBuildAllocation() {
+        resource.setBuildLimit(1);
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt124");
+
+        ResourceUsageListener listener = mock(ResourceUsageListener.class);
+        precondition.addListener(listener);
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+
+        verify(listener).resourceUsageChanged(same(resource), eq(1));
+    }
+
+    @Test
+    public void shouldSendUsageChangedEventOnBuildFinished() {
+        resource.setBuildLimit(1);
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt124");
+
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+
+        ResourceUsageListener listener = mock(ResourceUsageListener.class);
+        precondition.addListener(listener);
+        precondition.buildFinished(build);
+
+        verify(listener).resourceUsageChanged(same(resource), eq(0));
+    }
+
+    @Test
+    public void shouldSendUsageChangedEventOnBuildInterrupted() {
+        resource.setBuildLimit(1);
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt124");
+
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+
+        ResourceUsageListener listener = mock(ResourceUsageListener.class);
+        precondition.addListener(listener);
+        precondition.buildInterrupted(build);
+
+        verify(listener).resourceUsageChanged(same(resource), eq(0));
+    }
 }

@@ -8,7 +8,9 @@ import jetbrains.buildServer.serverSide.SRunningBuild;
 import jetbrains.buildServer.serverSide.buildDistribution.*;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
@@ -21,10 +23,16 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
 
     private Map<String, ResourceBuildCount> resourceBuildCounts = new HashMap<String, ResourceBuildCount>();
 
+    private List<ResourceUsageListener> listeners = new ArrayList<ResourceUsageListener>();
+
     ResourceBuildLimitStartPrecondition(SBuildServer buildServer, final ResourceManager manager) {
         this.buildServer = buildServer;
         this.manager = manager;
         buildServer.addListener(this);
+    }
+
+    public void addListener(ResourceUsageListener listener) {
+        listeners.add(listener);
     }
 
     public WaitReason canStart(@NotNull QueuedBuildInfo queuedBuildInfo,
@@ -49,6 +57,7 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
                 } else {
                     ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
                     resourceBuildCount.increment();
+                    notifyListeners(resource, resourceBuildCount.getValue());
                     Loggers.SERVER.info("Running builds using resource " + resource.getName() + " - " + resourceBuildCount.getValue());
                 }
             }
@@ -98,6 +107,7 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
         if (resource != null) {
             ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
             resourceBuildCount.decrement();
+            notifyListeners(resource, resourceBuildCount.getValue());
             Loggers.SERVER.info("Running builds using resource " + resource.getName() + " - " + resourceBuildCount.getValue());
         }
     }
@@ -109,6 +119,12 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
             resourceBuildCounts.put(id, buildCount);
         }
         return buildCount;
+    }
+
+    private void notifyListeners(Resource resource, int count) {
+        for (ResourceUsageListener listener : listeners) {
+            listener.resourceUsageChanged(resource, count);
+        }
     }
 }
 
