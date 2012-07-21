@@ -56,7 +56,7 @@ public class ResourceBuildLimitStartPreconditionTest {
     }
 
     @Test
-    public void shouldReturnNullWaitReasonWhenBuildIsNotLinkedToResource () {
+    public void shouldReturnNullWaitReasonWhenBuildIsNotLinkedToResource() {
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt125");
 
@@ -152,7 +152,7 @@ public class ResourceBuildLimitStartPreconditionTest {
     }
 
     @Test
-    public void shouldSendUsageChangedEventOnBuildAllocation() {
+    public void shouldSendUsageChangedEventOnBuildAllocationForMonitoredResourceWithLimit() {
         resource.setBuildLimit(1);
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt124");
@@ -162,6 +162,31 @@ public class ResourceBuildLimitStartPreconditionTest {
         precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
 
         verify(listener).resourceUsageChanged(same(resource), eq(1));
+    }
+
+    @Test
+    public void shouldSendUsageChangedEventOnBuildAllocationForMonitoredResourceWithoutLimit() {
+        resource.setBuildLimit(0);
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt124");
+
+        ResourceUsageListener listener = mock(ResourceUsageListener.class);
+        precondition.addListener(listener);
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+
+        verify(listener).resourceUsageChanged(same(resource), eq(1));
+    }
+
+    @Test
+    public void shouldNotSendUsageChangedEventWhenBuildIsNotLinkedToResource() {
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt125");
+
+        ResourceUsageListener listener = mock(ResourceUsageListener.class);
+        precondition.addListener(listener);
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+
+        verifyZeroInteractions(listener);
     }
 
     @Test
