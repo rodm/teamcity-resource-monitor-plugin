@@ -50,6 +50,7 @@
                                     <c:otherwise>Unavailable</c:otherwise>
                                 </c:choose>
                             </td>
+                            <td id="resourceUsage_${resource.id}" class="edit highlight">0</td>
                             <td class="host highlight">${resource.host}</td>
                             <td class="port highlight">${resource.port}</td>
                             <td class="edit highlight"
@@ -66,7 +67,7 @@
                         </tr>
                         <c:forEach items="${resource.buildTypes}" var="buildType">
                             <tr class="buildConfigurationRow">
-                                <td class="buildConfiguration" colspan="6">
+                                <td class="buildConfiguration" colspan="7">
                                     <a href="<c:url value='/viewType.html?buildTypeId=${buildType}&tab=buildTypeStatusDiv'/>">
                                         <c:out value="${buildTypes[buildType].fullName}"/>
                                     </a>

@@ -19,6 +19,9 @@ public class ResourceStatusControllerTest {
 
     private WebControllerManager controllerManager;
     private ResourceMonitor monitor;
+    private ResourceStatusController controller;
+    private ResourceBuildLimitStartPrecondition precondition;
+
     private Resource resource1;
     private Resource resource2;
 
@@ -31,6 +34,10 @@ public class ResourceStatusControllerTest {
         controllerManager = mock(WebControllerManager.class);
         SBuildServer buildServer = mock(SBuildServer.class);
         monitor = new ResourceMonitor(buildServer, null, null);
+        ResourceManager manager = mock(ResourceManager.class);
+        precondition = new ResourceBuildLimitStartPrecondition(buildServer, manager);
+        controller = new ResourceStatusController(controllerManager, monitor, precondition);
+
         resource1 = new Resource("123", "Test resource", "localhost", 1234);
         resource2 = new Resource("124", "Test resource", "localhost", 1234);
 
@@ -49,20 +56,27 @@ public class ResourceStatusControllerTest {
     @Test
     public void shouldRegisterWithResourceMonitor() {
         ResourceMonitor resourceMonitor = spy(monitor);
-
-        ResourceStatusController controller = new ResourceStatusController(controllerManager, resourceMonitor);
+        ResourceStatusController controller = new ResourceStatusController(controllerManager, resourceMonitor, precondition);
         verify(resourceMonitor).addListener(same(controller));
     }
 
     @Test
     public void shouldRegisterWithWebControllerManager() {
-        ResourceStatusController controller = new ResourceStatusController(controllerManager, monitor);
         verify(controllerManager).registerController(eq("/resourceStatus.html"), eq(controller));
     }
 
     @Test
+    public void shouldRegisterWithBuildStartPrecondition() {
+        SBuildServer buildServer = mock(SBuildServer.class);
+        ResourceManager manager = mock(ResourceManager.class);
+        ResourceBuildLimitStartPrecondition precondition = spy(new ResourceBuildLimitStartPrecondition(buildServer, manager));
+
+        ResourceStatusController controller = new ResourceStatusController(controllerManager, monitor, precondition);
+        verify(precondition).addListener(same(controller));
+    }
+
+    @Test
     public void shouldReturnEmptyResponseWithNoMonitoredResources() throws Exception {
-        ResourceStatusController controller = new ResourceStatusController(controllerManager, monitor);
         controller.doHandle(request, response);
 
         assertEquals("<response />", responseMessage.toString());
@@ -70,7 +84,6 @@ public class ResourceStatusControllerTest {
 
     @Test
     public void shouldReturnResponseWithMonitoredResource() throws Exception {
-        ResourceStatusController controller = new ResourceStatusController(controllerManager, monitor);
         controller.resourceUnavailable(resource1);
 
         controller.doHandle(request, response);
@@ -81,7 +94,6 @@ public class ResourceStatusControllerTest {
 
     @Test
     public void shouldReturnResponseWithUnavailableResource() throws Exception {
-        ResourceStatusController controller = new ResourceStatusController(controllerManager, monitor);
         controller.resourceUnavailable(resource1);
 
         controller.doHandle(request, response);
@@ -92,7 +104,6 @@ public class ResourceStatusControllerTest {
 
     @Test
     public void shouldReturnResponseWithAvailableResource() throws Exception {
-        ResourceStatusController controller = new ResourceStatusController(controllerManager, monitor);
         controller.resourceAvailable(resource1);
 
         controller.doHandle(request, response);
@@ -103,7 +114,6 @@ public class ResourceStatusControllerTest {
 
     @Test
     public void shouldReturnResponseWithMultipleResources() throws Exception {
-        ResourceStatusController controller = new ResourceStatusController(controllerManager, monitor);
         controller.resourceAvailable(resource1);
         controller.resourceUnavailable(resource2);
 
@@ -119,7 +129,6 @@ public class ResourceStatusControllerTest {
 
     @Test
     public void shouldReturnResponseWithOneResourceAfterAvailabilityChange() throws Exception {
-        ResourceStatusController controller = new ResourceStatusController(controllerManager, monitor);
         controller.resourceAvailable(resource1);
         controller.resourceUnavailable(resource1);
 
@@ -133,7 +142,6 @@ public class ResourceStatusControllerTest {
 
     @Test
     public void shouldReturnResourceStatusChangeOnce() throws Exception {
-        ResourceStatusController controller = new ResourceStatusController(controllerManager, monitor);
         controller.resourceAvailable(resource1);
 
         controller.doHandle(request, response);
@@ -146,8 +154,6 @@ public class ResourceStatusControllerTest {
 
     @Test
     public void shouldReturnResourceUsage() throws Exception {
-        ResourceStatusController controller = new ResourceStatusController(controllerManager, monitor);
-
         controller.resourceUsageChanged(resource1, 3);
         controller.doHandle(request, response);
         assertXpathEvaluatesTo("1", "count(//resource)", responseMessage.toString());

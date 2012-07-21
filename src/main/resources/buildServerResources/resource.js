@@ -135,6 +135,11 @@ BS.ResourceMonitor = {
                     if (container) {
                         container.innerHTML = (available == 'true') ? "Available" : "Unavailable";
                     }
+                    var count = resources[i].getAttribute("count");
+                    container = $('resourceUsage_' + id);
+                    if (container) {
+                        container.innerHTML = count;
+                    }
                 }
             }
         });

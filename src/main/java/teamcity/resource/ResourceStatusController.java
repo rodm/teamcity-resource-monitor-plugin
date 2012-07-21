@@ -21,9 +21,10 @@ public class ResourceStatusController extends BaseController
 
     private Map<String, Integer> usage = new HashMap<String, Integer>();
 
-    public ResourceStatusController(WebControllerManager controllerManager, ResourceMonitor resourceMonitor) {
+    public ResourceStatusController(WebControllerManager controllerManager, ResourceMonitor resourceMonitor, ResourceBuildLimitStartPrecondition precondition) {
         controllerManager.registerController("/resourceStatus.html", this);
         resourceMonitor.addListener(this);
+        precondition.addListener(this);
     }
 
     public void resourceAvailable(Resource resource) {
