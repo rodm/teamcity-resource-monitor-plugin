@@ -65,6 +65,9 @@ public class Resource {
     }
 
     public void setBuildLimit(int buildLimit) {
+        if (buildLimit < 0) {
+            throw new InvalidLimitException("invalid build limit");
+        }
         this.buildLimit = buildLimit;
     }
 

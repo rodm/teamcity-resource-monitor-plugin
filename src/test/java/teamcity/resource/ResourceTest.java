@@ -143,6 +143,15 @@ public class ResourceTest {
     }
 
     @Test
+    public void buildLimitCannotBeNegative() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+
+        thrown.expect(InvalidLimitException.class);
+        thrown.expectMessage("invalid build limit");
+        resource.setBuildLimit(-1);
+    }
+
+    @Test
     public void addBuildToResource() {
         Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
         resource.addBuildType("bt123");
