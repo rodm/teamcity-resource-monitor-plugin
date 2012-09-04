@@ -3,6 +3,7 @@ package teamcity.resource;
 import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.web.openapi.PagePlaces;
+import jetbrains.buildServer.web.openapi.PlaceId;
 import jetbrains.buildServer.web.openapi.SimpleCustomTab;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,6 +12,11 @@ import java.util.*;
 
 public class ResourceConfigExtension extends SimpleCustomTab {
 
+    private static final PlaceId PLACE_ID = PlaceId.ADMIN_SERVER_CONFIGURATION_TAB;
+    private static final String PLUGIN_NAME = "resourceMonitorPlugin";
+    private static final String INCLUDE_URL = "resource.jsp";
+    private static final String TITLE = "Resources";
+
     private ProjectManager projectManager;
 
     private ResourceManager resourceManager;
@@ -18,20 +24,10 @@ public class ResourceConfigExtension extends SimpleCustomTab {
     private ResourceMonitor resourceMonitor;
 
     public ResourceConfigExtension(PagePlaces pagePlaces, ProjectManager projectManager, ResourceManager resourceManager, ResourceMonitor resourceMonitor) {
-        super(pagePlaces);
+        super(pagePlaces, PLACE_ID, PLUGIN_NAME, INCLUDE_URL, TITLE);
         this.projectManager = projectManager;
         this.resourceManager = resourceManager;
         this.resourceMonitor = resourceMonitor;
-    }
-
-    @NotNull
-    public String getTabId() {
-        return "resourceConfig";
-    }
-
-    @NotNull
-    public String getTabTitle() {
-        return "Resources";
     }
 
     @NotNull

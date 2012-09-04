@@ -18,11 +18,7 @@
 
     <bean id="resourceMonitorConfigTab"
           class="teamcity.resource.ResourceConfigExtension"
-          init-method="register">
-        <property name="placeId" value="ADMIN_SERVER_CONFIGURATION_TAB"/>
-        <property name="pluginName" value="resourceMonitorPlugin"/>
-        <property name="includeUrl" value="resource.jsp"/>
-    </bean>
+          init-method="register"/>
 
     <bean id="resourceController"
           class="teamcity.resource.ResourceController"
