@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <ivysettings>
-    <settings defaultResolver="${ivy.default.resolver}"/>
-
     <property name="local.repo.dir" value="${ivy.default.ivy.user.dir}/local" override="false"/>
     <property name="default.pattern" value="[organisation]/[module]/[revision]/[type]s/[artifact].[ext]" override="false"/>
 
@@ -9,6 +7,9 @@
     <property name="repo.port" value="80" override="false"/>
     <property name="repo.path" value="maven2" override="false"/>
     <property name="repo.url" value="http://${repo.host}:${repo.port}/${repo.path}" override="false"/>
+
+    <property name="default.resolver" value="chained" override="false"/>
+    <settings defaultResolver="${default.resolver}"/>
 
     <resolvers>
         <filesystem name="local">
