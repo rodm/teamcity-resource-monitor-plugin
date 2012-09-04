@@ -36,12 +36,20 @@ public class ResourceUser implements User {
         return "ResourceUser";
     }
 
+    public String getExtendedName() {
+        return "ResourceUser";
+    }
+
     public Date getLastLoginTimestamp() {
         return new Date();
     }
 
     public String getPropertyValue(PropertyKey propertyKey) {
         return "";
+    }
+
+    public boolean getBooleanProperty(PropertyKey propertyKey) {
+        return false;
     }
 
     public Map<PropertyKey, String> getProperties() {
