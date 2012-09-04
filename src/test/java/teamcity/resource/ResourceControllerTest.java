@@ -4,6 +4,7 @@ import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import jetbrains.buildServer.serverSide.SBuildServer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,6 +24,7 @@ public class ResourceControllerTest {
     private static final String RESOURCE_HOST = "resourceHost";
     private static final String RESOURCE_PORT = "resourcePort";
 
+    private SBuildServer buildServer;
     private ResourceManager manager;
     private ResourceMonitor monitor;
     private ResourceMonitorPlugin plugin;
@@ -34,6 +36,7 @@ public class ResourceControllerTest {
 
     @Before
     public void setup() throws IOException {
+        buildServer = mock(SBuildServer.class);
         manager = new ResourceManager(null);
         monitor = mock(ResourceMonitor.class);
         plugin = mock(ResourceMonitorPlugin.class);
@@ -58,7 +61,7 @@ public class ResourceControllerTest {
         manager = mock(ResourceManager.class);
         when(request.getParameter(SUBMIT_ACTION)).thenReturn("invalidAction");
 
-        ResourceController controller = new ResourceController(null, null, manager, plugin, monitor);
+        ResourceController controller = new ResourceController(buildServer, null, manager, plugin, monitor);
         controller.doHandle(request, response);
 
         assertThat(responseMessage.toString(), containsString("errors"));
@@ -71,7 +74,7 @@ public class ResourceControllerTest {
         manager = new ResourceManager(null);
         setupRequest("addResource", "test", "localhost", "1234");
 
-        ResourceController controller = new ResourceController(null, null, manager, plugin, monitor);
+        ResourceController controller = new ResourceController(buildServer, null, manager, plugin, monitor);
         controller.doHandle(request, response);
 
         Resource resource = manager.getResourceById("1");
@@ -91,7 +94,7 @@ public class ResourceControllerTest {
         when(request.getParameter(RESOURCE_HOST)).thenReturn("newhost");
         when(request.getParameter(RESOURCE_PORT)).thenReturn("4321");
 
-        ResourceController controller = new ResourceController(null, null, manager, plugin, monitor);
+        ResourceController controller = new ResourceController(buildServer, null, manager, plugin, monitor);
         controller.doHandle(request, response);
 
         Resource resource = manager.getResourceById("123");
@@ -108,7 +111,7 @@ public class ResourceControllerTest {
         when(request.getParameter(SUBMIT_ACTION)).thenReturn("removeResource");
         when(request.getParameter(RESOURCE_ID)).thenReturn("123");
 
-        ResourceController controller = new ResourceController(null, null, manager, plugin, monitor);
+        ResourceController controller = new ResourceController(buildServer, null, manager, plugin, monitor);
         controller.doHandle(request, response);
 
         Resource resource = manager.getResourceById("123");
@@ -124,7 +127,7 @@ public class ResourceControllerTest {
         when(request.getParameter(RESOURCE_ID)).thenReturn("123");
         when(request.getParameter("buildTypeId")).thenReturn("bt123");
 
-        ResourceController controller = new ResourceController(null, null, manager, plugin, monitor);
+        ResourceController controller = new ResourceController(buildServer, null, manager, plugin, monitor);
         controller.doHandle(request, response);
 
         verify(manager).linkBuildToResource("123", "bt123");
@@ -138,7 +141,7 @@ public class ResourceControllerTest {
         when(request.getParameter(RESOURCE_ID)).thenReturn("123");
         when(request.getParameter("buildTypeId")).thenReturn("bt123");
 
-        ResourceController controller = new ResourceController(null, null, manager, plugin, monitor);
+        ResourceController controller = new ResourceController(buildServer, null, manager, plugin, monitor);
         controller.doHandle(request, response);
 
         verify(manager).unlinkBuildFromResource("123", "bt123");
@@ -150,7 +153,7 @@ public class ResourceControllerTest {
         when(request.getParameter(SUBMIT_ACTION)).thenReturn("enableResource");
         when(request.getParameter(RESOURCE_ID)).thenReturn("123");
 
-        ResourceController controller = new ResourceController(null, null, manager, null, monitor);
+        ResourceController controller = new ResourceController(buildServer, null, manager, null, monitor);
         controller.doHandle(request, response);
 
         verify(monitor).enableResource(same(resource));
@@ -161,7 +164,7 @@ public class ResourceControllerTest {
         when(request.getParameter(SUBMIT_ACTION)).thenReturn("disableResource");
         when(request.getParameter(RESOURCE_ID)).thenReturn("123");
 
-        ResourceController controller = new ResourceController(null, null, manager, null, monitor);
+        ResourceController controller = new ResourceController(buildServer, null, manager, null, monitor);
         controller.doHandle(request, response);
 
         verify(monitor).disableResource(same(resource));
@@ -171,7 +174,7 @@ public class ResourceControllerTest {
     public void invalidName() throws Exception {
         setupRequest("addResource", "", "localhost", "1234");
 
-        ResourceController controller = new ResourceController(null, null, manager, plugin, monitor);
+        ResourceController controller = new ResourceController(buildServer, null, manager, plugin, monitor);
         controller.doHandle(request, response);
 
         assertXpathEvaluatesTo("invalidName", "//response/errors/error/@id", responseMessage.toString());
@@ -182,7 +185,7 @@ public class ResourceControllerTest {
     public void invalidHost() throws Exception {
         setupRequest("addResource", "test", "", "1234");
 
-        ResourceController controller = new ResourceController(null, null, manager, plugin, monitor);
+        ResourceController controller = new ResourceController(buildServer, null, manager, plugin, monitor);
         controller.doHandle(request, response);
 
         assertXpathEvaluatesTo("invalidHost", "//response/errors/error/@id", responseMessage.toString());
@@ -193,7 +196,7 @@ public class ResourceControllerTest {
     public void invalidPort() throws Exception {
         setupRequest("addResource", "test", "localhost", "");
 
-        ResourceController controller = new ResourceController(null, null, manager, plugin, monitor);
+        ResourceController controller = new ResourceController(buildServer, null, manager, plugin, monitor);
         controller.doHandle(request, response);
 
         assertXpathEvaluatesTo("invalidPort", "//response/errors/error/@id", responseMessage.toString());
