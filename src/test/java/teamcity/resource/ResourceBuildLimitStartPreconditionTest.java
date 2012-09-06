@@ -21,6 +21,8 @@ import static org.mockito.Mockito.*;
 public class ResourceBuildLimitStartPreconditionTest {
 
     private static final String RESOURCE_ID = "1";
+    private static final boolean EMULATION_MODE_OFF = false;
+    private static final boolean EMULATION_MODE_ON = true;
 
     private Resource resource = new Resource(RESOURCE_ID, "test", "localhost", 1234);
 
@@ -60,7 +62,7 @@ public class ResourceBuildLimitStartPreconditionTest {
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt125");
 
-        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
         assertNull(waitReason);
     }
 
@@ -70,7 +72,7 @@ public class ResourceBuildLimitStartPreconditionTest {
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt124");
 
-        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
         assertNull(waitReason);
     }
 
@@ -83,7 +85,7 @@ public class ResourceBuildLimitStartPreconditionTest {
         // use resource build limit
         precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
 
-        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
         assertNotNull(waitReason);
     }
 
@@ -94,10 +96,10 @@ public class ResourceBuildLimitStartPreconditionTest {
         when(buildConfigurationInfo.getId()).thenReturn("bt124");
 
         // use resource build limit
-        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
 
         precondition.buildFinished(build);
-        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
         assertNull(waitReason);
     }
 
@@ -111,7 +113,7 @@ public class ResourceBuildLimitStartPreconditionTest {
         precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
 
         precondition.buildInterrupted(build);
-        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
         assertNull(waitReason);
     }
 
@@ -121,9 +123,9 @@ public class ResourceBuildLimitStartPreconditionTest {
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt124");
 
-        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
         assertNull(waitReason);
-        waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
         assertNull(waitReason);
     }
 
@@ -144,7 +146,7 @@ public class ResourceBuildLimitStartPreconditionTest {
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt124");
 
-        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
         assertEquals(1, precondition.getBuildCount(resource.getId()));
 
         precondition.resourceRemoved(resource);
@@ -159,9 +161,32 @@ public class ResourceBuildLimitStartPreconditionTest {
 
         ResourceUsageListener listener = mock(ResourceUsageListener.class);
         precondition.addListener(listener);
-        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
 
         verify(listener).resourceUsageChanged(same(resource), eq(1));
+    }
+
+    @Test
+    public void shouldNotIncrementBuildCountWhenEmulationModeIsOn() {
+        resource.setBuildLimit(1);
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt124");
+
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_ON);
+        assertEquals(0, precondition.getBuildCount(resource.getId()));
+    }
+
+    @Test
+    public void shouldNotSendUsageChangedEventOnBuildAllocationWhenEmulationModeIsOn() {
+        resource.setBuildLimit(1);
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt124");
+
+        ResourceUsageListener listener = mock(ResourceUsageListener.class);
+        precondition.addListener(listener);
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_ON);
+
+        verifyZeroInteractions(listener);
     }
 
     @Test
@@ -172,7 +197,7 @@ public class ResourceBuildLimitStartPreconditionTest {
 
         ResourceUsageListener listener = mock(ResourceUsageListener.class);
         precondition.addListener(listener);
-        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
 
         verify(listener).resourceUsageChanged(same(resource), eq(1));
     }
@@ -184,7 +209,7 @@ public class ResourceBuildLimitStartPreconditionTest {
 
         ResourceUsageListener listener = mock(ResourceUsageListener.class);
         precondition.addListener(listener);
-        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
 
         verifyZeroInteractions(listener);
     }
@@ -195,7 +220,7 @@ public class ResourceBuildLimitStartPreconditionTest {
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt124");
 
-        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
 
         ResourceUsageListener listener = mock(ResourceUsageListener.class);
         precondition.addListener(listener);
@@ -210,7 +235,7 @@ public class ResourceBuildLimitStartPreconditionTest {
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt124");
 
-        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
 
         ResourceUsageListener listener = mock(ResourceUsageListener.class);
         precondition.addListener(listener);

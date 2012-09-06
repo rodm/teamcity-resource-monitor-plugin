@@ -36,7 +36,7 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
     }
 
     public WaitReason canStart(@NotNull QueuedBuildInfo queuedBuildInfo,
-                               @NotNull Map<QueuedBuildInfo, BuildAgent> queuedBuildInfoBuildAgentMap,
+                               @NotNull Map<QueuedBuildInfo, BuildAgent> canBeStarted,
                                @NotNull BuildDistributorInput buildDistributorInput,
                                boolean emulationMode)
     {
@@ -58,7 +58,7 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
                     Loggers.SERVER.debug(waitReason.getDescription());
                 }
             }
-            if (waitReason == null) {
+            if (!emulationMode && waitReason == null) {
                 resourceBuildCount.increment();
                 Loggers.SERVER.info("Running builds using resource " + resource.getName() + " - " + resourceBuildCount.getValue());
                 notifyListeners(resource, resourceBuildCount.getValue());
