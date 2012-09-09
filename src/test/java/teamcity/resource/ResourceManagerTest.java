@@ -20,6 +20,8 @@ public class ResourceManagerTest {
     private static final String HOST = "test";
     private static final int PORT = 1234;
     private static final int INVALID_PORT = 65550;
+    private static final int LIMIT = 1;
+    private static final int INVALID_LIMIT = -1;
     private static final String BUILD_TYPE_ID = "bt123";
     private static final String INVALID_BUILD_TYPE_ID = "bt124";
 
@@ -58,15 +60,15 @@ public class ResourceManagerTest {
 
     @Test
     public void addResource() {
-        manager.addResource(NAME, HOST, "" + PORT);
+        manager.addResource(NAME, HOST, "" + PORT, "" + LIMIT);
         assertEquals(1, manager.getResources().size());
         assertNotNull(manager.getResourceById(ID));
     }
 
     @Test
     public void addingResources() {
-        manager.addResource(NAME + "1", HOST, "" + PORT);
-        manager.addResource(NAME + "2", HOST + "2", "" + PORT);
+        manager.addResource(NAME + "1", HOST, "" + PORT, "" + LIMIT);
+        manager.addResource(NAME + "2", HOST + "2", "" + PORT, "" + LIMIT);
         assertEquals(2, manager.getResources().size());
         assertNotNull(manager.getResourceById("2"));
     }
@@ -100,19 +102,25 @@ public class ResourceManagerTest {
     @Test
     public void shouldThrowExceptionAddingResourceWithNullPort() {
         thrown.expect(InvalidPortException.class);
-        manager.addResource(NAME, HOST, null);
+        manager.addResource(NAME, HOST, null, String.valueOf(LIMIT));
     }
 
     @Test
     public void shouldThrowExceptionAddingResourceWithEmptyPort() {
         thrown.expect(InvalidPortException.class);
-        manager.addResource(NAME, HOST, "");
+        manager.addResource(NAME, HOST, "", String.valueOf(LIMIT));
     }
 
     @Test
     public void shouldThrowExceptionAddingResourceWithInvalidPort() {
         thrown.expect(InvalidPortException.class);
-        manager.addResource(NAME, HOST, "invalid");
+        manager.addResource(NAME, HOST, "invalid", String.valueOf(LIMIT));
+    }
+
+    @Test
+    public void shouldThrowExceptionAddingResourceWithInvalidBuildLimit() {
+        thrown.expect(InvalidLimitException.class);
+        manager.addResource(NAME, HOST, "" + PORT, String.valueOf(INVALID_LIMIT));
     }
 
     @Test
@@ -145,6 +153,17 @@ public class ResourceManagerTest {
     public void updateResourcePort() {
         manager.addResource(new Resource(ID, NAME + "1", HOST, PORT));
         manager.updateResource(ID, NAME, HOST, "4321");
+    }
+
+    @Test
+    public void updateResourceBuildLimit() {
+        final int INITIAL_LIMIT = 12;
+        final int UPDATED_LIMIT = 24;
+        manager.addResource(new Resource(ID, NAME + "1", HOST, PORT, INITIAL_LIMIT));
+        manager.updateResource(ID, NAME, HOST, String.valueOf(PORT), String.valueOf(UPDATED_LIMIT));
+
+        Resource resource = manager.getResourceById(ID);
+        assertEquals(UPDATED_LIMIT, resource.getBuildLimit());
     }
 
     @Test

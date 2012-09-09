@@ -20,6 +20,7 @@ public class ResourceController extends BaseController {
     private static final String NAME_PARAMETER = "resourceName";
     private static final String HOST_PARAMETER = "resourceHost";
     private static final String PORT_PARAMETER = "resourcePort";
+    private static final String LIMIT_PARAMETER = "resourceLimit";
     private static final String BUILD_TYPE_ID_PARAMETER = "buildTypeId";
 
     private static final String ADD_ACTION = "addResource";
@@ -66,6 +67,8 @@ public class ResourceController extends BaseController {
                     buildExceptionResponse("invalidHost", e, xmlResponse);
                 } catch (InvalidPortException e) {
                     buildExceptionResponse("invalidPort", e, xmlResponse);
+                } catch (InvalidLimitException e) {
+                    buildExceptionResponse("invalidLimit", e, xmlResponse);
                 } catch (Exception e) {
                     Loggers.SERVER.warn(e);
                     buildExceptionResponse("resource", e, xmlResponse);
@@ -89,14 +92,16 @@ public class ResourceController extends BaseController {
             String name = request.getParameter(NAME_PARAMETER);
             String host = request.getParameter(HOST_PARAMETER);
             String port = request.getParameter(PORT_PARAMETER);
-            resourceManager.addResource(name, host, port);
+            String limit = request.getParameter(LIMIT_PARAMETER);
+            resourceManager.addResource(name, host, port, limit);
             plugin.saveConfiguration();
         } else if (UPDATE_ACTION.equals(action)) {
             String id = request.getParameter(ID_PARAMETER);
             String name = request.getParameter(NAME_PARAMETER);
             String host = request.getParameter(HOST_PARAMETER);
             String port = request.getParameter(PORT_PARAMETER);
-            resourceManager.updateResource(id, name, host, port);
+            String limit = request.getParameter(LIMIT_PARAMETER);
+            resourceManager.updateResource(id, name, host, port, limit);
             plugin.saveConfiguration();
         } else if (REMOVE_ACTION.equals(action)) {
             String id = request.getParameter(ID_PARAMETER);

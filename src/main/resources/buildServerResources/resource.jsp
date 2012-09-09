@@ -26,7 +26,7 @@
         <h3 class="resourceHeader">Resources</h3>
         <c:if test="${not empty resources}">
             <p class="addNew">
-                <a href="javascript://" onclick="BS.EditResourceDialog.showDialog('', '', '', '')">
+                <a href="javascript://" onclick="BS.EditResourceDialog.showDialog('','','','','')">
                     Create resource
                 </a>
             </p>
@@ -54,10 +54,10 @@
                             <td class="host highlight">${resource.host}</td>
                             <td class="port highlight">${resource.port}</td>
                             <td class="edit highlight"
-                                onclick="BS.EditResourceDialog.showDialog('${resource.id}', '${resource.name}', '${resource.host}', '${resource.port}');"
+                                onclick="BS.EditResourceDialog.showDialog('${resource.id}', '${resource.name}', '${resource.host}', '${resource.port}', '${resource.buildLimit}');"
                                 title="Click to edit resource">
                                 <a href="javascript://"
-                                   onclick="BS.EditResourceDialog.showDialog('${resource.id}', '${resource.name}', '${resource.host}', '${resource.port}');">
+                                   onclick="BS.EditResourceDialog.showDialog('${resource.id}', '${resource.name}', '${resource.host}', '${resource.port}', '${resource.buildLimit}');">
                                     edit
                                 </a>
                             </td>
@@ -94,7 +94,7 @@
 </div>
 
 <p class="addNew">
-  <a href="javascript://" onclick="BS.EditResourceDialog.showDialog('', '', '', '')">
+  <a href="javascript://" onclick="BS.EditResourceDialog.showDialog('','','','','')">
     Create resource
   </a>
 </p>
@@ -123,6 +123,10 @@
             <label for="resourcePort">Port: <l:star/></label>
             <forms:textField name="resourcePort" maxlength="5" style="width: 5em;" onchange=""/>
             <span class="error" id="error_resourcePort" style="margin-left: 5.5em;"></span>
+
+            <div class="clr" style="height:3px;"></div>
+            <label for="resourceLimit">Build limit (0 - unlimited):</label>
+            <forms:textField name="resourceLimit" maxlength="5" style="width: 5em;" onchange=""/>
 
             <div class="popupSaveButtonsBlock">
                 <a href="javascript://" onclick="BS.EditResourceDialog.cancelDialog()" class="cancel">Cancel</a>

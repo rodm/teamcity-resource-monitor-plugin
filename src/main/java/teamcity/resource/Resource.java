@@ -19,14 +19,20 @@ public class Resource {
     private List<String> buildTypes = new ArrayList<String>();
 
     public Resource(String id, String name, String host, int port) {
+        this(id, name, host, port, 0);
+    }
+
+    public Resource(String id, String name, String host, int port, int limit) {
         checkId(id);
         checkName(name);
         checkHost(host);
         checkPort(port);
+        checkBuildLimit(limit);
         this.id = id;
         this.name = name;
         this.host = host;
         this.port = port;
+        this.buildLimit = limit;
     }
 
     public String getId() {
@@ -65,9 +71,7 @@ public class Resource {
     }
 
     public void setBuildLimit(int buildLimit) {
-        if (buildLimit < 0) {
-            throw new InvalidLimitException("invalid build limit");
-        }
+        checkBuildLimit(buildLimit);
         this.buildLimit = buildLimit;
     }
 
@@ -104,6 +108,12 @@ public class Resource {
     private void checkPort(int port) {
         if (port < 1 || port > 65535) {
             throw new InvalidPortException("invalid port number");
+        }
+    }
+
+    private void checkBuildLimit(int buildLimit) {
+        if (buildLimit < 0) {
+            throw new InvalidLimitException("invalid limit number");
         }
     }
 }

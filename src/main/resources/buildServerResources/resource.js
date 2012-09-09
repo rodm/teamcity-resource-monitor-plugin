@@ -57,11 +57,12 @@ BS.EditResourceDialog = OO.extend(BS.AbstractModalDialog, {
         return $('editResourceDialog');
     },
 
-    showDialog : function(id, name, host, port) {
+    showDialog : function (id, name, host, port, limit) {
         $('resourceId').value = id;
         $('resourceName').value = name;
         $('resourceHost').value = host;
         $('resourcePort').value = port;
+        $('resourceLimit').value = limit;
 
         var title = name.length == 0 ? 'Add New Resource' : 'Edit Resource';
         $('resourceDialogTitle').innerHTML = title;

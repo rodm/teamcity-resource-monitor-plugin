@@ -23,6 +23,7 @@ public class ResourceControllerTest {
     private static final String RESOURCE_NAME = "resourceName";
     private static final String RESOURCE_HOST = "resourceHost";
     private static final String RESOURCE_PORT = "resourcePort";
+    private static final String RESOURCE_LIMIT = "resourceLimit";
 
     private SBuildServer buildServer;
     private ResourceManager manager;
@@ -74,7 +75,7 @@ public class ResourceControllerTest {
     @Test
     public void addResource() throws Exception {
         manager = new ResourceManager(null);
-        setupRequest("addResource", "test", "localhost", "1234");
+        setupRequest("addResource", "test", "localhost", "1234", "123");
 
         ResourceController controller = new ResourceController(buildServer, null, manager, plugin, monitor);
         controller.doHandle(request, response);
@@ -84,6 +85,7 @@ public class ResourceControllerTest {
         assertEquals("test", resource.getName());
         assertEquals("localhost", resource.getHost());
         assertEquals(1234, resource.getPort());
+        assertEquals(123, resource.getBuildLimit());
         assertEquals("<response />", responseMessage.toString());
         verify(plugin).saveConfiguration();
     }
@@ -95,6 +97,7 @@ public class ResourceControllerTest {
         when(request.getParameter(RESOURCE_NAME)).thenReturn("newname");
         when(request.getParameter(RESOURCE_HOST)).thenReturn("newhost");
         when(request.getParameter(RESOURCE_PORT)).thenReturn("4321");
+        when(request.getParameter(RESOURCE_LIMIT)).thenReturn("321");
 
         controller.doHandle(request, response);
 
@@ -103,6 +106,7 @@ public class ResourceControllerTest {
         assertEquals("newname", resource.getName());
         assertEquals("newhost", resource.getHost());
         assertEquals(4321, resource.getPort());
+        assertEquals(321, resource.getBuildLimit());
         assertEquals("<response />", responseMessage.toString());
         verify(plugin).saveConfiguration();
     }
@@ -196,6 +200,21 @@ public class ResourceControllerTest {
 
         assertXpathEvaluatesTo("invalidPort", "//response/errors/error/@id", responseMessage.toString());
         assertXpathEvaluatesTo("invalid port number", "//response/errors/error", responseMessage.toString());
+    }
+
+    @Test
+    public void invalidBuildLimitReturnsErrorMessage() throws Exception {
+        setupRequest("addResource", "limitTest", "limithost", "1234", "-1");
+
+        controller.doHandle(request, response);
+
+        assertXpathEvaluatesTo("invalidLimit", "//response/errors/error/@id", responseMessage.toString());
+        assertXpathEvaluatesTo("invalid limit number", "//response/errors/error", responseMessage.toString());
+    }
+
+    private void setupRequest(String action, String name, String host, String port, String limit) {
+        setupRequest(action, name, host, port);
+        when(request.getParameter(RESOURCE_LIMIT)).thenReturn(limit);
     }
 
     private void setupRequest(String action, String name, String host, String port) {

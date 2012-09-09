@@ -17,6 +17,7 @@ public class ResourceTest {
     private static final String VALID_NAME = "name";
     private static final String VALID_HOST = "localhost";
     private static final int VALID_PORT = 1234;
+    private static final int VALID_LIMIT = 12;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -28,6 +29,12 @@ public class ResourceTest {
         assertEquals(VALID_NAME, resource.getName());
         assertEquals(VALID_HOST, resource.getHost());
         assertEquals(VALID_PORT, resource.getPort());
+    }
+
+    @Test
+    public void createWithBuildLimit() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT, VALID_LIMIT);
+        assertEquals(VALID_LIMIT, resource.getBuildLimit());
     }
 
     @Test
@@ -144,10 +151,16 @@ public class ResourceTest {
 
     @Test
     public void buildLimitCannotBeNegative() {
-        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+        thrown.expect(InvalidLimitException.class);
+        new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT, -1);
+    }
+
+    @Test
+    public void buildLimitCannotBeSetToNegativeValue() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT, VALID_LIMIT);
 
         thrown.expect(InvalidLimitException.class);
-        thrown.expectMessage("invalid build limit");
+        thrown.expectMessage("invalid limit number");
         resource.setBuildLimit(-1);
     }
 

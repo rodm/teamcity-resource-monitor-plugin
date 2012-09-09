@@ -36,8 +36,12 @@ public class ResourceManager {
     }
 
     public void addResource(String name, String host, String port) {
+        addResource(name, host, port, "0");
+    }
+
+    public void addResource(String name, String host, String port, String buildLimit) {
         String id = Integer.toString(nextId());
-        Resource resource = new Resource(id, name, host, parsePort(port));
+        Resource resource = new Resource(id, name, host, parsePort(port), parseBuildLimit(buildLimit));
         addResource(resource);
     }
 
@@ -59,6 +63,10 @@ public class ResourceManager {
     }
 
     public void updateResource(String id, String name, String host, String port) {
+        updateResource(id, name, host, port, "");
+    }
+
+    public void updateResource(String id, String name, String host, String port, String buildLimit) {
         Resource resource = getResource(id);
 
         String oldName = resource.getName();
@@ -73,11 +81,13 @@ public class ResourceManager {
         }
 
         Integer portNumber = parsePort(port);
-        validResource(id, name, host, portNumber);
+        int limitNumber = parseBuildLimit(buildLimit);
+        validResource(id, name, host, portNumber, limitNumber);
 
         resource.setName(name);
         resource.setHost(host);
         resource.setPort(portNumber);
+        resource.setBuildLimit(limitNumber);
 
         names.remove(oldName);
         names.add(name);
@@ -195,8 +205,18 @@ public class ResourceManager {
         return port;
     }
 
-    private void validResource(String id, String name, String host, int port) {
-        new Resource(id, name, host, port);
+    private int parseBuildLimit(String value) {
+        int limit = 0;
+        try {
+            limit = Integer.valueOf(value);
+        } catch (NumberFormatException e) {
+            // default to 0
+        }
+        return limit;
+    }
+
+    private void validResource(String id, String name, String host, int port, int limit) {
+        new Resource(id, name, host, port, limit);
     }
 
     private void validBuildType(String buildTypeId) {
