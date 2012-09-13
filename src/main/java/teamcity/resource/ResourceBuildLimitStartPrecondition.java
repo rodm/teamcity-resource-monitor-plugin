@@ -4,6 +4,7 @@ import jetbrains.buildServer.BuildAgent;
 import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.serverSide.buildDistribution.*;
+import jetbrains.buildServer.users.User;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.*;
@@ -88,6 +89,19 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
                 resourceBuildCount.allocate(build.getBuildId());
                 Loggers.SERVER.info("Running builds using resource " + resource.getName() + ": " + resourceBuildCount.size());
             }
+        }
+    }
+
+    @Override
+    public void buildRemovedFromQueue(@NotNull SQueuedBuild queued, User user, String comment) {
+        String buildTypeId = queued.getBuildTypeId();
+        Resource resource = manager.findResourceByBuildTypeId(buildTypeId);
+        if (resource != null) {
+            long buildPromotionId = queued.getBuildPromotion().getId();
+            ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
+            resourceBuildCount.release(buildPromotionId);
+            notifyListeners(resource, resourceBuildCount.size());
+            Loggers.SERVER.info("Running builds using resource " + resource.getName() + ": " + resourceBuildCount.size());
         }
     }
 
