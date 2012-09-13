@@ -2,16 +2,11 @@ package teamcity.resource;
 
 import jetbrains.buildServer.BuildAgent;
 import jetbrains.buildServer.log.Loggers;
-import jetbrains.buildServer.serverSide.BuildServerAdapter;
-import jetbrains.buildServer.serverSide.SBuildServer;
-import jetbrains.buildServer.serverSide.SRunningBuild;
+import jetbrains.buildServer.serverSide.*;
 import jetbrains.buildServer.serverSide.buildDistribution.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
         implements StartBuildPrecondition, ResourceManagerListener
@@ -46,25 +41,42 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
         WaitReason waitReason = null;
         Resource resource = manager.findResourceByBuildTypeId(buildTypeId);
         if (resource != null) {
+            long buildPromotionId = queuedBuildInfo.getBuildPromotionInfo().getId();
             ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
 
-            int buildLimit = resource.getBuildLimit();
-            if (buildLimit > 0) {
-                int currentBuilds = resourceBuildCount.getValue();
+            if (!resourceBuildCount.contains(buildPromotionId)) {
+                int buildLimit = resource.getBuildLimit();
+                if (buildLimit > 0) {
+                    int currentBuilds = resourceBuildCount.size();
 
-                if (currentBuilds >= buildLimit) {
-                    waitReason = new SimpleWaitReason("Build cannot start until the number of builds using the resource "
-                            + resource.getName() + " is below the limit of " + buildLimit);
-                    Loggers.SERVER.debug(waitReason.getDescription());
+                    if (currentBuilds >= buildLimit) {
+                        waitReason = new SimpleWaitReason("Build cannot start until the number of builds using the resource "
+                                + resource.getName() + " is below the limit of " + buildLimit);
+                        Loggers.SERVER.debug(waitReason.getDescription());
+                    }
                 }
-            }
-            if (!emulationMode && waitReason == null) {
-                resourceBuildCount.increment();
-                Loggers.SERVER.info("Running builds using resource " + resource.getName() + " - " + resourceBuildCount.getValue());
-                notifyListeners(resource, resourceBuildCount.getValue());
+                if (!emulationMode && waitReason == null) {
+                    resourceBuildCount.allocate(buildPromotionId);
+                    Loggers.SERVER.info("Running builds using resource " + resource.getName() + ": " + resourceBuildCount.size());
+                    Loggers.SERVER.debug("Build " + getBuildTypeFullName(buildTypeId)
+                            + " (id: " + buildPromotionId + ") allocated to resource " + resource.getName());
+                    notifyListeners(resource, resourceBuildCount.size());
+                }
             }
         }
         return waitReason;
+    }
+
+    private String getBuildTypeFullName(String buildTypeId) {
+        String fullName = "";
+        ProjectManager projectManager = buildServer.getProjectManager();
+        if (projectManager != null) {
+            SBuildType buildType = projectManager.findBuildTypeById(buildTypeId);
+            if (buildType != null) {
+                fullName = buildType.getFullName();
+            }
+        }
+        return fullName;
     }
 
     @Override
@@ -73,9 +85,18 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
             Resource resource = manager.findResourceByBuildTypeId(build.getBuildTypeId());
             if (resource != null) {
                 ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
-                resourceBuildCount.increment();
-                Loggers.SERVER.info("Incremented resource usage for running build: " + build.getFullName());
+                resourceBuildCount.allocate(build.getBuildId());
+                Loggers.SERVER.info("Running builds using resource " + resource.getName() + ": " + resourceBuildCount.size());
             }
+        }
+    }
+
+    @Override
+    public void buildStarted(SRunningBuild build) {
+        Resource resource = manager.findResourceByBuildTypeId(build.getBuildTypeId());
+        if (resource != null) {
+            Loggers.SERVER.debug("Build " + build.getFullName() + " #" + build.getBuildNumber()
+                    + " (id: " + build.getBuildPromotion().getId() + ") started using resource " + resource.getName());
         }
     }
 
@@ -100,17 +121,20 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
     }
 
     public int getBuildCount(String id) {
-        return getResourceBuildCount(id).getValue();
+        return getResourceBuildCount(id).size();
     }
 
     private void buildCompleted(SRunningBuild build) {
         String buildTypeId = build.getBuildTypeId();
         Resource resource = manager.findResourceByBuildTypeId(buildTypeId);
         if (resource != null) {
+            long buildPromotionId = build.getBuildPromotion().getId();
             ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
-            resourceBuildCount.decrement();
-            notifyListeners(resource, resourceBuildCount.getValue());
-            Loggers.SERVER.info("Running builds using resource " + resource.getName() + " - " + resourceBuildCount.getValue());
+            resourceBuildCount.release(buildPromotionId);
+            notifyListeners(resource, resourceBuildCount.size());
+            Loggers.SERVER.info("Running builds using resource " + resource.getName() + ": " + resourceBuildCount.size());
+            Loggers.SERVER.debug("Build " + build.getFullName() + " #" + build.getBuildNumber()
+                    + " (id: " + buildPromotionId + ") finished using resource " + resource.getName());
         }
     }
 
@@ -131,17 +155,22 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
 }
 
 class ResourceBuildCount {
-    private int value = 0;
 
-    public synchronized int getValue() {
-        return value;
+    private Set<Long> builds = new HashSet<Long>();
+
+    public int size() {
+        return builds.size();
     }
 
-    public synchronized void increment() {
-        value++;
+    public boolean contains(long buildId) {
+        return builds.contains(buildId);
     }
 
-    public synchronized void decrement() {
-        if (value > 0) value--;
+    public void allocate(long buildId) {
+        builds.add(buildId);
+    }
+
+    public void release(long buildId) {
+        builds.remove(buildId);
     }
 }

@@ -1,19 +1,14 @@
 package teamcity.resource;
 
 import jetbrains.buildServer.BuildAgent;
+import jetbrains.buildServer.serverSide.BuildPromotion;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SRunningBuild;
-import jetbrains.buildServer.serverSide.buildDistribution.BuildConfigurationInfo;
-import jetbrains.buildServer.serverSide.buildDistribution.BuildDistributorInput;
-import jetbrains.buildServer.serverSide.buildDistribution.QueuedBuildInfo;
-import jetbrains.buildServer.serverSide.buildDistribution.WaitReason;
+import jetbrains.buildServer.serverSide.buildDistribution.*;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
@@ -21,6 +16,8 @@ import static org.mockito.Mockito.*;
 public class ResourceBuildLimitStartPreconditionTest {
 
     private static final String RESOURCE_ID = "1";
+    private static final long BUILD_ID_1 = 12345L;
+    private static final long BUILD_ID_2 = 12346L;
     private static final boolean EMULATION_MODE_OFF = false;
     private static final boolean EMULATION_MODE_ON = true;
 
@@ -31,9 +28,10 @@ public class ResourceBuildLimitStartPreconditionTest {
     private ResourceBuildLimitStartPrecondition precondition;
     private QueuedBuildInfo queuedBuildInfo = mock(QueuedBuildInfo.class);
     private BuildConfigurationInfo buildConfigurationInfo = mock(BuildConfigurationInfo.class);
+    private BuildPromotionInfo buildPromotionInfo = mock(BuildPromotionInfo.class);
     private Map<QueuedBuildInfo, BuildAgent> agentMap = Collections.emptyMap();
     private BuildDistributorInput buildDistributorInput = mock(BuildDistributorInput.class);
-    private SRunningBuild build;
+    private SRunningBuild build = mock(SRunningBuild.class);
 
     @Before
     public void setup() {
@@ -45,8 +43,9 @@ public class ResourceBuildLimitStartPreconditionTest {
         resource.addBuildType("bt124");
         resourceManager.addResource(resource);
 
-        build = mock(SRunningBuild.class);
         when(build.getBuildTypeId()).thenReturn("bt123");
+        when(buildPromotionInfo.getId()).thenReturn(BUILD_ID_1);
+        when(queuedBuildInfo.getBuildPromotionInfo()).thenReturn(buildPromotionInfo);
     }
 
     @Test
@@ -85,7 +84,12 @@ public class ResourceBuildLimitStartPreconditionTest {
         // use resource build limit
         precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
 
-        WaitReason waitReason = precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
+        QueuedBuildInfo queuedBuildInfo2 = mock(QueuedBuildInfo.class);
+        BuildPromotionInfo buildPromotionInfo2 = mock(BuildPromotionInfo.class);
+        when(buildPromotionInfo2.getId()).thenReturn(BUILD_ID_2);
+        when(queuedBuildInfo2.getBuildPromotionInfo()).thenReturn(buildPromotionInfo2);
+        when(queuedBuildInfo2.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        WaitReason waitReason = precondition.canStart(queuedBuildInfo2, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
         assertNotNull(waitReason);
     }
 
@@ -94,6 +98,9 @@ public class ResourceBuildLimitStartPreconditionTest {
         resource.setBuildLimit(1);
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt124");
+        BuildPromotion buildPromotion = mock(BuildPromotion.class);
+        when(buildPromotion.getId()).thenReturn(BUILD_ID_1);
+        when(build.getBuildPromotion()).thenReturn(buildPromotion);
 
         // use resource build limit
         precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
@@ -108,6 +115,9 @@ public class ResourceBuildLimitStartPreconditionTest {
         resource.setBuildLimit(1);
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt124");
+        BuildPromotion buildPromotion = mock(BuildPromotion.class);
+        when(buildPromotion.getId()).thenReturn(BUILD_ID_1);
+        when(build.getBuildPromotion()).thenReturn(buildPromotion);
 
         // use resource build limit
         precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
@@ -219,6 +229,9 @@ public class ResourceBuildLimitStartPreconditionTest {
         resource.setBuildLimit(1);
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt124");
+        BuildPromotion buildPromotion = mock(BuildPromotion.class);
+        when(buildPromotion.getId()).thenReturn(BUILD_ID_1);
+        when(build.getBuildPromotion()).thenReturn(buildPromotion);
 
         precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
 
@@ -234,6 +247,9 @@ public class ResourceBuildLimitStartPreconditionTest {
         resource.setBuildLimit(1);
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt124");
+        BuildPromotion buildPromotion = mock(BuildPromotion.class);
+        when(buildPromotion.getId()).thenReturn(BUILD_ID_1);
+        when(build.getBuildPromotion()).thenReturn(buildPromotion);
 
         precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
 
