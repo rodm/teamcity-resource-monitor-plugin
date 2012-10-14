@@ -6,8 +6,7 @@
         <display-name>Resource Monitor Plugin</display-name>
         <version>@VERSION@</version>
         <description>
-            The Resource Monitor plugin monitors resources used by build configurations and allows or disallows the
-            build configurations to run based on the availability of the resource.
+            Monitors resources allowing or disallowing builds to run based on resource availability.
         </description>
         <email>rod.n.mackenzie@gmail.com</email>
         <vendor>
