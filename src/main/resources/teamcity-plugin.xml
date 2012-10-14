@@ -4,7 +4,7 @@
     <info>
         <name>resourceMonitorPlugin</name>
         <display-name>Resource Monitor Plugin</display-name>
-        <version>1.0</version>
+        <version>@VERSION@</version>
         <description>
             The Resource Monitor plugin monitors resources used by build configurations and allows or disallows the
             build configurations to run based on the availability of the resource.
