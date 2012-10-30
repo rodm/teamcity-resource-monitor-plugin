@@ -144,7 +144,7 @@ public class ResourceBuildLimitStartPreconditionTest {
     }
 
     @Test
-    public void shouldReturnZeroUsageForResourceAfterBuildRemovedFromQueue() {
+    public void shouldReturnZeroUsageForResourceAfterBuildRemovedFromQueueByUser() {
         resource.setBuildLimit(1);
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt124");
@@ -165,6 +165,27 @@ public class ResourceBuildLimitStartPreconditionTest {
         assertEquals(0, precondition.getBuildCount(RESOURCE_ID));
     }
 
+    @Test
+    public void shouldNotReduceUsageForResourceAfterBuildRemovedFromQueueByServer() {
+        resource.setBuildLimit(1);
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt124");
+        BuildPromotion buildPromotion = mock(BuildPromotion.class);
+        when(buildPromotion.getId()).thenReturn(BUILD_ID_1);
+        when(build.getBuildPromotion()).thenReturn(buildPromotion);
+
+        SQueuedBuild queuedBuild = mock(SQueuedBuild.class);
+        when(queuedBuild.getBuildTypeId()).thenReturn("bt124");
+        when(queuedBuild.getBuildPromotion()).thenReturn(buildPromotion);
+        User nullUser = null;
+
+        // use resource build limit
+        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+
+        precondition.buildRemovedFromQueue(queuedBuild, nullUser, null);
+
+        assertEquals(1, precondition.getBuildCount(RESOURCE_ID));
+    }
 
     @Test
     public void shouldReturnNullWaitReasonWhenResourceBuildLimitIsZero() {

@@ -94,14 +94,16 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
 
     @Override
     public void buildRemovedFromQueue(@NotNull SQueuedBuild queued, User user, String comment) {
-        String buildTypeId = queued.getBuildTypeId();
-        Resource resource = manager.findResourceByBuildTypeId(buildTypeId);
-        if (resource != null) {
-            long buildPromotionId = queued.getBuildPromotion().getId();
-            ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
-            resourceBuildCount.release(buildPromotionId);
-            notifyListeners(resource, resourceBuildCount.size());
-            Loggers.SERVER.info("Running builds using resource " + resource.getName() + ": " + resourceBuildCount.size());
+        if (user != null) {
+            String buildTypeId = queued.getBuildTypeId();
+            Resource resource = manager.findResourceByBuildTypeId(buildTypeId);
+            if (resource != null) {
+                long buildPromotionId = queued.getBuildPromotion().getId();
+                ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
+                resourceBuildCount.release(buildPromotionId);
+                notifyListeners(resource, resourceBuildCount.size());
+                Loggers.SERVER.info("Running builds using resource " + resource.getName() + ": " + resourceBuildCount.size());
+            }
         }
     }
 
