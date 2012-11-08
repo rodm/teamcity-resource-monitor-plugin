@@ -60,14 +60,6 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
 
     @Override
     public void buildTypeUnregistered(SBuildType buildType) {
-        String buildTypeId = buildType.getBuildTypeId();
-        Loggers.SERVER.debug("Unregistering build type: " + buildTypeId);
-        resourceManager.unregisterBuild(buildTypeId);
-        try {
-            saveConfiguration();
-        } catch (IOException e) {
-            Loggers.SERVER.error("Error saving resources configuration file", e);
-        }
     }
 
     public void changeOccured(String requestor) {

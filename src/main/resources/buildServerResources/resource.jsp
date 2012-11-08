@@ -66,16 +66,18 @@
                             </td>
                         </tr>
                         <c:forEach items="${resource.buildTypes}" var="buildType">
-                            <tr class="buildConfigurationRow">
-                                <td class="buildConfiguration" colspan="7">
-                                    <a href="<c:url value='/viewType.html?buildTypeId=${buildType}&tab=buildTypeStatusDiv'/>">
-                                        <c:out value="${buildTypes[buildType].fullName}"/>
-                                    </a>
-                                </td>
-                                <td class="edit">
-                                    <a href="javascript://" onclick="BS.Resource.unlinkBuildType('${resource.id}', '${buildType}');">delete</a>
-                                </td>
-                            </tr>
+                            <c:if test="${not empty buildTypes[buildType]}">
+                                <tr class="buildConfigurationRow">
+                                    <td class="buildConfiguration" colspan="7">
+                                        <a href="<c:url value='/viewType.html?buildTypeId=${buildType}&tab=buildTypeStatusDiv'/>">
+                                            <c:out value="${buildTypes[buildType].fullName}"/>
+                                        </a>
+                                    </td>
+                                    <td class="edit">
+                                        <a href="javascript://" onclick="BS.Resource.unlinkBuildType('${resource.id}', '${buildType}');">delete</a>
+                                    </td>
+                                </tr>
+                            </c:if>
                         </c:forEach>
                     </tbody>
                 </table>
