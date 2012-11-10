@@ -82,8 +82,15 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
     }
 
     public void saveConfiguration() throws IOException {
-        ResourceMonitorConfigProcessor configProcessor = new ResourceMonitorConfigProcessor(resourceManager);
-        configProcessor.writeTo(new FileWriter(getConfigurationFile()));
+        try {
+            fileWatcher.setSkipListenersNotification(true);
+            ResourceMonitorConfigProcessor configProcessor = new ResourceMonitorConfigProcessor(resourceManager);
+            configProcessor.writeTo(new FileWriter(getConfigurationFile()));
+        }
+        finally {
+            fileWatcher.resetChanged();
+            fileWatcher.setSkipListenersNotification(false);
+        }
     }
 
     private File getConfigurationFile() {
