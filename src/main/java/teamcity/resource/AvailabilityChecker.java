@@ -4,6 +4,7 @@ import jetbrains.buildServer.log.Loggers;
 
 import java.io.IOException;
 import java.net.ConnectException;
+import java.net.NoRouteToHostException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
@@ -15,6 +16,9 @@ class AvailabilityChecker {
             Socket socket = new Socket(resource.getHost(), resource.getPort());
             socket.close();
             result = true;
+        }
+        catch (NoRouteToHostException e) {
+            Loggers.SERVER.warn("Error connecting to " + resource.getHost() + ":" + resource.getPort(), e);
         }
         catch (UnknownHostException e) {
             Loggers.SERVER.warn("Error connecting to " + resource.getHost() + ":" + resource.getPort(), e);
