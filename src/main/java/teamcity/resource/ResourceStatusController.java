@@ -67,7 +67,6 @@ public class ResourceStatusController extends BaseController
             for (Map.Entry<String, Boolean> entry : availability.entrySet()) {
                 addAvailabilityStatusTo(resources, entry.getKey(), entry.getValue());
             }
-            availability.clear();
             for (Map.Entry<String, Integer> entry : usage.entrySet()) {
                 addUsageStatusTo(resources, entry.getKey(), entry.getValue());
             }

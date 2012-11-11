@@ -141,15 +141,15 @@ public class ResourceStatusControllerTest {
     }
 
     @Test
-    public void shouldReturnResourceStatusChangeOnce() throws Exception {
+    public void shouldAlwaysReturnResourceStatus() throws Exception {
         controller.resourceAvailable(resource1);
 
         controller.doHandle(request, response);
-        assertXpathEvaluatesTo("1", "count(//resource)", responseMessage.toString()); // returns available status
+        assertXpathEvaluatesTo("1", "count(//resource)", responseMessage.toString());
 
         responseMessage.setLength(0);
         controller.doHandle(request, response);
-        assertEquals("<response />", responseMessage.toString());
+        assertXpathEvaluatesTo("1", "count(//resource)", responseMessage.toString());
     }
 
     @Test
