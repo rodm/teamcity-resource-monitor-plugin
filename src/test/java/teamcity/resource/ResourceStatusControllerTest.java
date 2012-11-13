@@ -160,4 +160,16 @@ public class ResourceStatusControllerTest {
         assertXpathEvaluatesTo("123", "//resource/@id", responseMessage.toString());
         assertXpathEvaluatesTo("3", "//resource/@count", responseMessage.toString());
     }
+
+    @Test
+    public void shouldReturnOneMessageForMultipleStatusChanges() throws Exception {
+        controller.resourceAvailable(resource1);
+        controller.resourceUsageChanged(resource1, 3);
+
+        controller.doHandle(request, response);
+
+        assertXpathEvaluatesTo("1", "count(//resource)", responseMessage.toString());
+        assertXpathEvaluatesTo("123", "//resource/@id", responseMessage.toString());
+        assertXpathEvaluatesTo("3", "//resource/@count", responseMessage.toString());
+    }
 }

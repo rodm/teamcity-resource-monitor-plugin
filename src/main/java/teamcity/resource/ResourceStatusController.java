@@ -17,9 +17,7 @@ public class ResourceStatusController extends BaseController
         implements ResourceMonitorListener, ResourceUsageListener
 {
 
-    private Map<String, Boolean> availability = new HashMap<String, Boolean>();
-
-    private Map<String, Integer> usage = new HashMap<String, Integer>();
+    private Map<String, Status> status = new HashMap<String, Status>();
 
     public ResourceStatusController(WebControllerManager controllerManager, ResourceMonitor resourceMonitor, ResourceBuildLimitStartPrecondition precondition) {
         controllerManager.registerController("/resourceStatus.html", this);
@@ -28,11 +26,11 @@ public class ResourceStatusController extends BaseController
     }
 
     public void resourceAvailable(Resource resource) {
-        availability.put(resource.getId(), Boolean.TRUE);
+        getStatus(resource.getId()).available = true;
     }
 
     public void resourceUnavailable(Resource resource) {
-        availability.put(resource.getId(), Boolean.FALSE);
+        getStatus(resource.getId()).available = false;
     }
 
     public void resourceEnabled(Resource resource) {
@@ -42,7 +40,7 @@ public class ResourceStatusController extends BaseController
     }
 
     public void resourceUsageChanged(Resource resource, int count) {
-        usage.put(resource.getId(), count);
+        getStatus(resource.getId()).count = count;
     }
 
     @Override
@@ -54,7 +52,8 @@ public class ResourceStatusController extends BaseController
             {
                 try {
                     doAction(xmlResponse);
-                } catch (Exception e) {
+                }
+                catch (Exception ignored) {
                 }
             }
         });
@@ -62,29 +61,30 @@ public class ResourceStatusController extends BaseController
     }
 
     private void doAction(Element xmlResponse) {
-        if (availability.size() > 0 || usage.size() > 0) {
+        if (status.size() > 0) {
             Element resources = new Element("resources");
-            for (Map.Entry<String, Boolean> entry : availability.entrySet()) {
-                addAvailabilityStatusTo(resources, entry.getKey(), entry.getValue());
-            }
-            for (Map.Entry<String, Integer> entry : usage.entrySet()) {
-                addUsageStatusTo(resources, entry.getKey(), entry.getValue());
+            for (Map.Entry<String, Status> entry : status.entrySet()) {
+                Element resource = new Element("resource");
+                resource.setAttribute("id", entry.getKey());
+                resource.setAttribute("available", Boolean.toString(entry.getValue().available));
+                resource.setAttribute("count", Integer.toString(entry.getValue().count));
+                resources.addContent(resource);
             }
             xmlResponse.addContent(resources);
         }
     }
 
-    private void addAvailabilityStatusTo(Element resources, String id, boolean available) {
-        Element resource = new Element("resource");
-        resource.setAttribute("id", id);
-        resource.setAttribute("available", Boolean.toString(available));
-        resources.addContent(resource);
+    private Status getStatus(String id) {
+        Status resourceStatus = status.get(id);
+        if (resourceStatus == null) {
+            resourceStatus = new Status();
+            status.put(id, resourceStatus);
+        }
+        return resourceStatus;
     }
 
-    private void addUsageStatusTo(Element resources, String id, int count) {
-        Element resource = new Element("resource");
-        resource.setAttribute("id", id);
-        resource.setAttribute("count", Integer.toString(count));
-        resources.addContent(resource);
+    private static class Status {
+        boolean available = true;
+        int count = 0;
     }
 }
