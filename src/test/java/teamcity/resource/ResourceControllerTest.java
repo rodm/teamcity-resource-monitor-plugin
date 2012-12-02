@@ -24,9 +24,11 @@ public class ResourceControllerTest {
     private static final String RESOURCE_HOST = "resourceHost";
     private static final String RESOURCE_PORT = "resourcePort";
     private static final String RESOURCE_LIMIT = "resourceLimit";
+    private static final String BUILD_TYPE_ID = "buildTypeId";
 
     private SBuildServer buildServer;
     private ResourceManager manager;
+    private ResourceManager managerSpy;
     private ResourceMonitor monitor;
     private ResourceMonitorPlugin plugin;
     private ResourceController controller;
@@ -41,9 +43,10 @@ public class ResourceControllerTest {
     public void setup() throws IOException {
         buildServer = mock(SBuildServer.class);
         manager = new ResourceManager(null);
+        managerSpy = spy(manager);
         monitor = mock(ResourceMonitor.class);
         plugin = mock(ResourceMonitorPlugin.class);
-        controller = new ResourceController(buildServer, null, manager, plugin, monitor);
+        controller = new ResourceController(buildServer, null, managerSpy, plugin, monitor);
 
         resource = new Resource("123", "test", "localhost", 1234);
         manager.addResource(resource);
@@ -74,40 +77,43 @@ public class ResourceControllerTest {
 
     @Test
     public void addResource() throws Exception {
-        manager = new ResourceManager(null);
         setupRequest("addResource", "test", "localhost", "1234", "123");
+        manager = new ResourceManager(null);
+        managerSpy = spy(manager);
+        ResourceController controller = new ResourceController(buildServer, null, managerSpy, plugin, monitor);
+        controller.doHandle(request, response);
 
+        assertEquals("<response />", responseMessage.toString());
+        verify(managerSpy).addResource(eq("test"), eq("localhost"), eq("1234"), eq("123"));
+    }
+
+    @Test
+    public void shouldSaveConfigurationOnAddingResource() throws Exception {
+        setupRequest("addResource", "test", "localhost", "1234", "123");
+        manager = new ResourceManager(null);
         ResourceController controller = new ResourceController(buildServer, null, manager, plugin, monitor);
         controller.doHandle(request, response);
 
-        Resource resource = manager.getResourceById("1");
-        assertNotNull(resource);
-        assertEquals("test", resource.getName());
-        assertEquals("localhost", resource.getHost());
-        assertEquals(1234, resource.getPort());
-        assertEquals(123, resource.getBuildLimit());
-        assertEquals("<response />", responseMessage.toString());
         verify(plugin).saveConfiguration();
     }
 
     @Test
     public void updateResource() throws Exception {
-        when(request.getParameter(SUBMIT_ACTION)).thenReturn("updateResource");
+        setupRequest("updateResource", "newname", "newhost", "4321", "321");
         when(request.getParameter(RESOURCE_ID)).thenReturn("123");
-        when(request.getParameter(RESOURCE_NAME)).thenReturn("newname");
-        when(request.getParameter(RESOURCE_HOST)).thenReturn("newhost");
-        when(request.getParameter(RESOURCE_PORT)).thenReturn("4321");
-        when(request.getParameter(RESOURCE_LIMIT)).thenReturn("321");
 
         controller.doHandle(request, response);
 
-        Resource resource = manager.getResourceById("123");
-        assertNotNull(resource);
-        assertEquals("newname", resource.getName());
-        assertEquals("newhost", resource.getHost());
-        assertEquals(4321, resource.getPort());
-        assertEquals(321, resource.getBuildLimit());
         assertEquals("<response />", responseMessage.toString());
+        verify(managerSpy).updateResource(eq("123"), eq("newname"), eq("newhost"), eq("4321"), eq("321"));
+    }
+
+    @Test
+    public void shouldSaveConfigurationOnUpdatingResource() throws Exception {
+        setupRequest("updateResource", "newname", "newhost", "4321", "321");
+        when(request.getParameter(RESOURCE_ID)).thenReturn("123");
+
+        controller.doHandle(request, response);
         verify(plugin).saveConfiguration();
     }
 
@@ -118,37 +124,56 @@ public class ResourceControllerTest {
 
         controller.doHandle(request, response);
 
-        Resource resource = manager.getResourceById("123");
-        assertNull(resource);
         assertEquals("<response />", responseMessage.toString());
+        verify(managerSpy).removeResource(eq("123"));
+    }
+
+    @Test
+    public void shouldSaveConfigurationOnRemovingResource() throws Exception {
+        when(request.getParameter(SUBMIT_ACTION)).thenReturn("removeResource");
+        when(request.getParameter(RESOURCE_ID)).thenReturn("123");
+
+        controller.doHandle(request, response);
         verify(plugin).saveConfiguration();
     }
 
     @Test
     public void linkBuildType() throws Exception {
+        setupRequest("linkBuildType", "123", "bt123");
         manager = mock(ResourceManager.class);
-        when(request.getParameter(SUBMIT_ACTION)).thenReturn("linkBuildType");
-        when(request.getParameter(RESOURCE_ID)).thenReturn("123");
-        when(request.getParameter("buildTypeId")).thenReturn("bt123");
-
         ResourceController controller = new ResourceController(buildServer, null, manager, plugin, monitor);
         controller.doHandle(request, response);
 
         verify(manager).linkBuildToResource("123", "bt123");
+    }
+
+    @Test
+    public void shouldSaveConfigurationOnLinkingBuildType() throws Exception {
+        setupRequest("linkBuildType", "123", "bt123");
+        manager = mock(ResourceManager.class);
+        ResourceController controller = new ResourceController(buildServer, null, manager, plugin, monitor);
+        controller.doHandle(request, response);
+
         verify(plugin).saveConfiguration();
     }
 
     @Test
     public void unlinkBuildType() throws Exception {
+        setupRequest("unlinkBuildType", "123", "bt123");
         manager = mock(ResourceManager.class);
-        when(request.getParameter(SUBMIT_ACTION)).thenReturn("unlinkBuildType");
-        when(request.getParameter(RESOURCE_ID)).thenReturn("123");
-        when(request.getParameter("buildTypeId")).thenReturn("bt123");
-
         ResourceController controller = new ResourceController(buildServer, null, manager, plugin, monitor);
         controller.doHandle(request, response);
 
         verify(manager).unlinkBuildFromResource("123", "bt123");
+    }
+
+    @Test
+    public void shouldSaveConfigurationOnUnlinkingBuildType() throws Exception {
+        setupRequest("unlinkBuildType", "123", "bt123");
+        manager = mock(ResourceManager.class);
+        ResourceController controller = new ResourceController(buildServer, null, manager, plugin, monitor);
+        controller.doHandle(request, response);
+
         verify(plugin).saveConfiguration();
     }
 
@@ -222,5 +247,11 @@ public class ResourceControllerTest {
         when(request.getParameter(RESOURCE_NAME)).thenReturn(name);
         when(request.getParameter(RESOURCE_HOST)).thenReturn(host);
         when(request.getParameter(RESOURCE_PORT)).thenReturn(port);
+    }
+
+    private void setupRequest(String action, String resourceId, String buildTypeId) {
+        when(request.getParameter(SUBMIT_ACTION)).thenReturn(action);
+        when(request.getParameter(RESOURCE_ID)).thenReturn(resourceId);
+        when(request.getParameter(BUILD_TYPE_ID)).thenReturn(buildTypeId);
     }
 }
