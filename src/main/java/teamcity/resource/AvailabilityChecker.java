@@ -1,6 +1,6 @@
 package teamcity.resource;
 
-import jetbrains.buildServer.log.Loggers;
+import static teamcity.resource.ResourceMonitorPlugin.log;
 
 import java.io.IOException;
 import java.net.ConnectException;
@@ -16,18 +16,19 @@ class AvailabilityChecker {
             Socket socket = new Socket(resource.getHost(), resource.getPort());
             socket.close();
             result = true;
+            log.debug("Successfully connected to " + resource.getHost() + ":" + resource.getPort());
         }
         catch (NoRouteToHostException e) {
-            Loggers.SERVER.warn("Error connecting to " + resource.getHost() + ":" + resource.getPort(), e);
+            log.warn("Error connecting to " + resource.getHost() + ":" + resource.getPort(), e);
         }
         catch (UnknownHostException e) {
-            Loggers.SERVER.warn("Error connecting to " + resource.getHost() + ":" + resource.getPort(), e);
+            log.warn("Error connecting to " + resource.getHost() + ":" + resource.getPort(), e);
         }
         catch (ConnectException e) {
-            Loggers.SERVER.debug("Failed to connect to " + resource.getHost() + ":" + resource.getPort());
+            log.debug("Failed to connect to " + resource.getHost() + ":" + resource.getPort());
         }
         catch (IOException e) {
-            Loggers.SERVER.warn("Error connecting to " + resource.getHost() + ":" + resource.getPort(), e);
+            log.warn("Error connecting to " + resource.getHost() + ":" + resource.getPort(), e);
         }
         return result;
     }

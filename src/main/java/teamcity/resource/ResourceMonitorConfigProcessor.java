@@ -1,7 +1,7 @@
 package teamcity.resource;
 
-import com.intellij.openapi.diagnostic.Logger;
-import jetbrains.buildServer.log.Loggers;
+import static teamcity.resource.ResourceMonitorPlugin.log;
+
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -28,8 +28,6 @@ public class ResourceMonitorConfigProcessor {
     private static final String CONFIG_BUILD_TYPE_ID = "id";
 
     private static final int DEFAULT_CHECK_INTERVAL = 30;
-
-    private static final Logger log = Loggers.SERVER;
 
     private final ResourceManager resourceManager;
 
@@ -126,6 +124,7 @@ public class ResourceMonitorConfigProcessor {
 
         XMLOutputter xmlWriter = new XMLOutputter(Format.getPrettyFormat());
         xmlWriter.output(root, writer);
+        log.info("ResourceMonitor config saved");
     }
 
     private void writeResourceTo(Resource resource, Element parentElement) {

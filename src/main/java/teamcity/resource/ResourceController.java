@@ -1,9 +1,10 @@
 package teamcity.resource;
 
+import static teamcity.resource.ResourceMonitorPlugin.log;
+
 import jetbrains.buildServer.controllers.ActionErrors;
 import jetbrains.buildServer.controllers.AjaxRequestProcessor;
 import jetbrains.buildServer.controllers.BaseController;
-import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.web.openapi.WebControllerManager;
 import org.jdom.Element;
@@ -70,7 +71,7 @@ public class ResourceController extends BaseController {
                 } catch (InvalidLimitException e) {
                     buildExceptionResponse("invalidLimit", e, xmlResponse);
                 } catch (Exception e) {
-                    Loggers.SERVER.warn(e);
+                    log.warn(e);
                     buildExceptionResponse("resource", e, xmlResponse);
                 }
             }
@@ -79,13 +80,13 @@ public class ResourceController extends BaseController {
     }
 
     private void doAction(final HttpServletRequest request) throws Exception {
-        Loggers.SERVER.debug("       method: [" + request.getMethod() + "]");
-        Loggers.SERVER.debug("submit action: [" + request.getParameter(ACTION_PARAMETER) + "]");
-        Loggers.SERVER.debug("  resource id: [" + request.getParameter(ID_PARAMETER) + "]");
-        Loggers.SERVER.debug("resource name: [" + request.getParameter(NAME_PARAMETER) + "]");
-        Loggers.SERVER.debug("resource host: [" + request.getParameter(HOST_PARAMETER) + "]");
-        Loggers.SERVER.debug("resource port: [" + request.getParameter(PORT_PARAMETER) + "]");
-        Loggers.SERVER.debug("build type id: [" + request.getParameter(BUILD_TYPE_ID_PARAMETER) + "]");
+        log.debug("       method: [" + request.getMethod() + "]");
+        log.debug("submit action: [" + request.getParameter(ACTION_PARAMETER) + "]");
+        log.debug("  resource id: [" + request.getParameter(ID_PARAMETER) + "]");
+        log.debug("resource name: [" + request.getParameter(NAME_PARAMETER) + "]");
+        log.debug("resource host: [" + request.getParameter(HOST_PARAMETER) + "]");
+        log.debug("resource port: [" + request.getParameter(PORT_PARAMETER) + "]");
+        log.debug("build type id: [" + request.getParameter(BUILD_TYPE_ID_PARAMETER) + "]");
 
         String action = request.getParameter(ACTION_PARAMETER);
         if (ADD_ACTION.equals(action)) {

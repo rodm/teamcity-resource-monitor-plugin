@@ -1,11 +1,11 @@
 package teamcity.resource;
 
+import static teamcity.resource.ResourceMonitorPlugin.log;
+
 import jetbrains.buildServer.BuildAgent;
-import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.buildDistribution.*;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -29,18 +29,17 @@ public class ResourceStartBuildPrecondition implements StartBuildPrecondition, R
                                boolean emulationMode)
     {
         String buildTypeId = queuedBuildInfo.getBuildConfiguration().getId();
-        Loggers.SERVER.debug("Build canStart check for '" + buildTypeId + "'");
 
         WaitReason waitReason = null;
         Resource resource = manager.findResourceByBuildTypeId(buildTypeId);
         if (resource != null) {
             boolean available = isAvailable(resource);
             boolean enabled = isEnabled(resource);
-            Loggers.SERVER.debug("Resource: '" + resource.getName() + "', enabled: '" + enabled + "', available: '" + available + "'");
+            log.trace("Resource: '" + resource.getName() + "', enabled: '" + enabled + "', available: '" + available + "'");
             if (!available || !enabled) {
                 String state = enabled ? "available" : "enabled";
                 waitReason = new SimpleWaitReason("Build cannot start until the required resource " + resource.getName() + " is " + state);
-                Loggers.SERVER.debug(waitReason.getDescription());
+                log.trace(waitReason.getDescription());
             }
         }
         return waitReason;

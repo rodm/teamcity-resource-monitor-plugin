@@ -2,14 +2,17 @@ package teamcity.resource;
 
 import jetbrains.buildServer.configuration.ChangeListener;
 import jetbrains.buildServer.configuration.FileWatcher;
-import jetbrains.buildServer.log.Loggers;
 import jetbrains.buildServer.serverSide.*;
+import org.apache.log4j.FileAppender;
+import org.apache.log4j.Level;
+import org.apache.log4j.PatternLayout;
 import org.jdom.JDOMException;
 
 import java.io.*;
-import java.util.List;
 
 public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeListener {
+
+    public static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ResourceMonitorPlugin.class.getCanonicalName());
 
     private SBuildServer server;
 
@@ -27,24 +30,23 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
         this.name = this.getClass().getSimpleName();
         this.monitor = monitor;
         server.addListener(this);
+
+        ServerPaths serverPaths = new ServerPaths(server.getServerRootPath());
+        File logDir = serverPaths.getLogsPath();
+        FileAppender appender = new FileAppender();
+        appender.setName("ResourceMonitorLogger");
+        appender.setFile(logDir + File.separator + "resource-monitor.log");
+        appender.setLayout(new PatternLayout("%d %-5p [%c{1}] %m%n"));
+        appender.setThreshold(Level.ALL);
+        appender.setAppend(true);
+        appender.activateOptions();
+        log.addAppender(appender);
+        log.setLevel(Level.DEBUG);
     }
 
     @Override
     public void serverStartup() {
-        Loggers.SERVER.info(name + " started");
-
-        ProjectManager projectManager = server.getProjectManager();
-        List<SBuildType> buildTypes = projectManager.getAllBuildTypes();
-        System.out.println(">> BuildTypes: " + buildTypes.size());
-        for (SBuildType buildType : buildTypes) {
-            System.out.println("    id: " + buildType.getBuildTypeId());
-            System.out.println("  name: " + buildType.getName());
-            System.out.println("  desc: " + buildType.getDescription());
-            System.out.println("paused: " + buildType.isPaused());
-            System.out.println("        " + buildType.getPauseComment());
-            System.out.println("      : " + buildType.toString());
-        }
-
+        log.info(name + " started");
         loadConfiguration();
 
         fileWatcher = new FileWatcher(getConfigurationFile());
@@ -55,7 +57,7 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
     @Override
     public void serverShutdown() {
         fileWatcher.stop();
-        Loggers.SERVER.info(name + " stopped");
+        log.info(name + " stopped");
     }
 
     @Override
@@ -63,7 +65,7 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
     }
 
     public void changeOccured(String requestor) {
-        Loggers.SERVER.debug("Reloading configuration");
+        log.debug("Reloading configuration");
         loadConfiguration();
     }
 
@@ -73,11 +75,11 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
             configProcessor.readFrom(new FileReader(getConfigurationFile()));
             monitor.scheduleMonitor();
         } catch (JDOMException e) {
-            Loggers.SERVER.error("Error loading resources configuration file", e);
+            log.error("Error loading resources configuration file", e);
         } catch (FileNotFoundException e) {
-            Loggers.SERVER.warn("Resource configuration file not found");
+            log.warn("Resource configuration file not found");
         } catch (IOException e) {
-            Loggers.SERVER.error("Error loading resources configuration file", e);
+            log.error("Error loading resources configuration file", e);
         }
     }
 

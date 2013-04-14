@@ -1,7 +1,7 @@
 package teamcity.resource;
 
-import com.intellij.openapi.diagnostic.Logger;
-import jetbrains.buildServer.log.Loggers;
+import static teamcity.resource.ResourceMonitorPlugin.log;
+
 import jetbrains.buildServer.serverSide.SBuildServer;
 import org.jetbrains.annotations.NotNull;
 
@@ -15,8 +15,6 @@ public class ResourceMonitor implements Runnable {
     private static final String PLUGIN_NAME = "ResourceMonitorPlugin";
 
     private static final int INITIAL_DELAY = 1;
-
-    private static final Logger log = Loggers.SERVER;
 
     private SBuildServer server;
 
@@ -35,7 +33,6 @@ public class ResourceMonitor implements Runnable {
     private enum ResourceEvent { Available, Unavailable, Enabled, Disabled }
 
     public ResourceMonitor(@NotNull SBuildServer server, ResourceManager resourceManager, AvailabilityChecker checker) {
-        log.info("ResourceMonitor(SBuildServer, ProjectManager, ResourceManager) constructor");
         this.server = server;
         this.resourceManager = resourceManager;
         this.checker = checker;
