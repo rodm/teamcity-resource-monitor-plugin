@@ -133,7 +133,9 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
     }
 
     public void resourceRemoved(Resource resource) {
-        resourceBuildCounts.remove(resource.getId());
+        synchronized (resourceBuildCounts) {
+            resourceBuildCounts.remove(resource.getId());
+        }
     }
 
     public int getBuildCount(String id) {
@@ -146,7 +148,10 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
         if (resource != null) {
             long buildPromotionId = build.getBuildPromotion().getId();
             ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
-            resourceBuildCount.release(buildPromotionId);
+            boolean removed = resourceBuildCount.release(buildPromotionId);
+            if (!removed) {
+                log.warn("Failed to release build " + buildPromotionId + " from using resource " + resource.getName());
+            }
             notifyListeners(resource, resourceBuildCount.size());
             log.info("Running builds using resource " + resource.getName() + ": " + resourceBuildCount.size());
             log.debug("Build " + build.getFullName() + " #" + build.getBuildNumber()
@@ -155,12 +160,14 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
     }
 
     private ResourceBuildCount getResourceBuildCount(String id) {
-        ResourceBuildCount buildCount = resourceBuildCounts.get(id);
-        if (buildCount == null) {
-            buildCount = new ResourceBuildCount();
-            resourceBuildCounts.put(id, buildCount);
+        synchronized (resourceBuildCounts) {
+            ResourceBuildCount buildCount = resourceBuildCounts.get(id);
+            if (buildCount == null) {
+                buildCount = new ResourceBuildCount();
+                resourceBuildCounts.put(id, buildCount);
+            }
+            return buildCount;
         }
-        return buildCount;
     }
 
     private void notifyListeners(Resource resource, int count) {
@@ -186,7 +193,7 @@ class ResourceBuildCount {
         builds.add(buildId);
     }
 
-    public void release(long buildId) {
-        builds.remove(buildId);
+    public boolean release(long buildId) {
+        return builds.remove(buildId);
     }
 }
