@@ -203,11 +203,18 @@ public class ResourceBuildLimitStartPreconditionTest {
     public void shouldUpdateBuildCountAtStartupForRunningBuilds() {
         List<SRunningBuild> runningBuilds = new ArrayList<SRunningBuild>();
         runningBuilds.add(build);
+
+        BuildPromotion buildPromotion = mock(BuildPromotion.class);
+        when(buildPromotion.getId()).thenReturn(BUILD_ID_1);
+        when(build.getBuildPromotion()).thenReturn(buildPromotion);
         when(buildServer.getRunningBuilds()).thenReturn(runningBuilds);
 
         precondition.serverStartup();
 
         assertEquals(1, precondition.getBuildCount(RESOURCE_ID));
+
+        precondition.buildFinished(build);
+        assertEquals("finished build should return count to zero", 0, precondition.getBuildCount(RESOURCE_ID));
     }
 
     @Test

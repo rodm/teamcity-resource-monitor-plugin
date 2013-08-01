@@ -86,7 +86,7 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
             Resource resource = manager.findResourceByBuildTypeId(build.getBuildTypeId());
             if (resource != null) {
                 ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
-                resourceBuildCount.allocate(build.getBuildId());
+                resourceBuildCount.allocate(build.getBuildPromotion().getId());
                 log.info("Running builds using resource " + resource.getName() + ": " + resourceBuildCount.size());
             }
         }
