@@ -8,6 +8,7 @@ import jetbrains.buildServer.serverSide.SRunningBuild;
 import jetbrains.buildServer.serverSide.buildDistribution.*;
 import jetbrains.buildServer.users.User;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.*;
@@ -144,7 +145,7 @@ public class ResourceBuildLimitStartPreconditionTest {
     }
 
     @Test
-    public void shouldReturnZeroUsageForResourceAfterBuildRemovedFromQueueByUser() {
+    public void shouldReturnZeroUsageForResourceAfterBuildRemovedFromQueue() {
         resource.setBuildLimit(1);
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt124");
@@ -165,6 +166,7 @@ public class ResourceBuildLimitStartPreconditionTest {
         assertEquals(0, precondition.getBuildCount(RESOURCE_ID));
     }
 
+    @Ignore
     @Test
     public void shouldNotReduceUsageForResourceAfterBuildRemovedFromQueueByServer() {
         resource.setBuildLimit(1);
@@ -183,6 +185,17 @@ public class ResourceBuildLimitStartPreconditionTest {
         precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
 
         precondition.buildRemovedFromQueue(queuedBuild, nullUser, null);
+
+        assertEquals(1, precondition.getBuildCount(RESOURCE_ID));
+    }
+
+    @Test
+    public void shouldUpdateResourceUsageWhenBuildStarts() {
+        BuildPromotion buildPromotion = mock(BuildPromotion.class);
+        when(buildPromotion.getId()).thenReturn(BUILD_ID_1);
+        when(build.getBuildPromotion()).thenReturn(buildPromotion);
+
+        precondition.buildStarted(build);
 
         assertEquals(1, precondition.getBuildCount(RESOURCE_ID));
     }

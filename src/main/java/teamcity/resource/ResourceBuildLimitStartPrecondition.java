@@ -94,16 +94,14 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
 
     @Override
     public void buildRemovedFromQueue(@NotNull SQueuedBuild queued, User user, String comment) {
-        if (user != null) {
-            String buildTypeId = queued.getBuildTypeId();
-            Resource resource = manager.findResourceByBuildTypeId(buildTypeId);
-            if (resource != null) {
-                long buildPromotionId = queued.getBuildPromotion().getId();
-                ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
-                resourceBuildCount.release(buildPromotionId);
-                notifyListeners(resource, resourceBuildCount.size());
-                log.info("Running builds using resource " + resource.getName() + ": " + resourceBuildCount.size());
-            }
+        String buildTypeId = queued.getBuildTypeId();
+        Resource resource = manager.findResourceByBuildTypeId(buildTypeId);
+        if (resource != null) {
+            long buildPromotionId = queued.getBuildPromotion().getId();
+            ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
+            resourceBuildCount.release(buildPromotionId);
+            notifyListeners(resource, resourceBuildCount.size());
+            log.info("Running builds using resource " + resource.getName() + ": " + resourceBuildCount.size());
         }
     }
 
@@ -111,6 +109,11 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
     public void buildStarted(SRunningBuild build) {
         Resource resource = manager.findResourceByBuildTypeId(build.getBuildTypeId());
         if (resource != null) {
+            long buildPromotionId = build.getBuildPromotion().getId();
+            ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
+            resourceBuildCount.allocate(buildPromotionId);
+            notifyListeners(resource, resourceBuildCount.size());
+            log.info("Running builds using resource " + resource.getName() + ": " + resourceBuildCount.size());
             log.debug("Build " + build.getFullName() + " #" + build.getBuildNumber()
                     + " (id: " + build.getBuildPromotion().getId() + ") started using resource " + resource.getName());
         }
