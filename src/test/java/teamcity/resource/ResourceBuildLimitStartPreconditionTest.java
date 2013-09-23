@@ -84,30 +84,16 @@ public class ResourceBuildLimitStartPreconditionTest {
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
         when(buildConfigurationInfo.getId()).thenReturn("bt124");
 
-        // use resource build limit
-        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
+        Map<QueuedBuildInfo, BuildAgent> allocatedBuilds = new HashMap<QueuedBuildInfo, BuildAgent>();
+        allocatedBuilds.put(queuedBuildInfo, null);
 
         QueuedBuildInfo queuedBuildInfo2 = mock(QueuedBuildInfo.class);
         BuildPromotionInfo buildPromotionInfo2 = mock(BuildPromotionInfo.class);
         when(buildPromotionInfo2.getId()).thenReturn(BUILD_ID_2);
         when(queuedBuildInfo2.getBuildPromotionInfo()).thenReturn(buildPromotionInfo2);
         when(queuedBuildInfo2.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
-        WaitReason waitReason = precondition.canStart(queuedBuildInfo2, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
+        WaitReason waitReason = precondition.canStart(queuedBuildInfo2, allocatedBuilds, buildDistributorInput, EMULATION_MODE_OFF);
         assertNotNull(waitReason);
-    }
-
-
-    @Test
-    public void shouldIncreaseUsageCountForBuildAllocatedToResource() {
-        resource.setBuildLimit(1);
-        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
-        when(buildConfigurationInfo.getId()).thenReturn("bt124");
-        BuildPromotion buildPromotion = mock(BuildPromotion.class);
-        when(buildPromotion.getId()).thenReturn(BUILD_ID_1);
-        when(build.getBuildPromotion()).thenReturn(buildPromotion);
-
-        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
-        assertEquals(1, precondition.getBuildCount(RESOURCE_ID));
     }
 
     @Test
@@ -166,29 +152,6 @@ public class ResourceBuildLimitStartPreconditionTest {
         assertEquals(0, precondition.getBuildCount(RESOURCE_ID));
     }
 
-    @Ignore
-    @Test
-    public void shouldNotReduceUsageForResourceAfterBuildRemovedFromQueueByServer() {
-        resource.setBuildLimit(1);
-        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
-        when(buildConfigurationInfo.getId()).thenReturn("bt124");
-        BuildPromotion buildPromotion = mock(BuildPromotion.class);
-        when(buildPromotion.getId()).thenReturn(BUILD_ID_1);
-        when(build.getBuildPromotion()).thenReturn(buildPromotion);
-
-        SQueuedBuild queuedBuild = mock(SQueuedBuild.class);
-        when(queuedBuild.getBuildTypeId()).thenReturn("bt124");
-        when(queuedBuild.getBuildPromotion()).thenReturn(buildPromotion);
-        User nullUser = null;
-
-        // use resource build limit
-        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, false);
-
-        precondition.buildRemovedFromQueue(queuedBuild, nullUser, null);
-
-        assertEquals(1, precondition.getBuildCount(RESOURCE_ID));
-    }
-
     @Test
     public void shouldUpdateResourceUsageWhenBuildStarts() {
         BuildPromotion buildPromotion = mock(BuildPromotion.class);
@@ -231,32 +194,6 @@ public class ResourceBuildLimitStartPreconditionTest {
     }
 
     @Test
-    public void shouldReturnZeroBuildCountAfterRemovingResource() {
-        resource.setBuildLimit(1);
-        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
-        when(buildConfigurationInfo.getId()).thenReturn("bt124");
-
-        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
-        assertEquals(1, precondition.getBuildCount(resource.getId()));
-
-        precondition.resourceRemoved(resource);
-        assertEquals(0, precondition.getBuildCount(resource.getId()));
-    }
-
-    @Test
-    public void shouldSendUsageChangedEventOnBuildAllocationForMonitoredResourceWithLimit() {
-        resource.setBuildLimit(1);
-        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
-        when(buildConfigurationInfo.getId()).thenReturn("bt124");
-
-        ResourceUsageListener listener = mock(ResourceUsageListener.class);
-        precondition.addListener(listener);
-        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
-
-        verify(listener).resourceUsageChanged(same(resource), eq(1));
-    }
-
-    @Test
     public void shouldNotIncrementBuildCountWhenEmulationModeIsOn() {
         resource.setBuildLimit(1);
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
@@ -277,19 +214,6 @@ public class ResourceBuildLimitStartPreconditionTest {
         precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_ON);
 
         verifyZeroInteractions(listener);
-    }
-
-    @Test
-    public void shouldSendUsageChangedEventOnBuildAllocationForMonitoredResourceWithoutLimit() {
-        resource.setBuildLimit(0);
-        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
-        when(buildConfigurationInfo.getId()).thenReturn("bt124");
-
-        ResourceUsageListener listener = mock(ResourceUsageListener.class);
-        precondition.addListener(listener);
-        precondition.canStart(queuedBuildInfo, agentMap, buildDistributorInput, EMULATION_MODE_OFF);
-
-        verify(listener).resourceUsageChanged(same(resource), eq(1));
     }
 
     @Test
@@ -338,5 +262,52 @@ public class ResourceBuildLimitStartPreconditionTest {
         precondition.buildInterrupted(build);
 
         verify(listener).resourceUsageChanged(same(resource), eq(0));
+    }
+
+    @Test
+    public void allocatedBuildsReturnsZeroForEmptyCanStartMap() {
+        assertEquals(0, precondition.calculateAllocatedBuilds(RESOURCE_ID, agentMap));
+    }
+
+    @Test
+    public void shouldReturnCountOfBuildsAllocated() {
+        agentMap = new HashMap<QueuedBuildInfo, BuildAgent>();
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt124");
+        agentMap.put(queuedBuildInfo, null);
+
+        assertEquals(1, precondition.calculateAllocatedBuilds(RESOURCE_ID, agentMap));
+    }
+
+    @Test
+    public void shouldReturnCountWithMultipleBuildsAllocated() {
+        agentMap = new HashMap<QueuedBuildInfo, BuildAgent>();
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt123");
+        agentMap.put(queuedBuildInfo, null);
+
+        BuildConfigurationInfo buildInfo = mock(BuildConfigurationInfo.class);
+        when(buildInfo.getId()).thenReturn("bt124");
+        QueuedBuildInfo queuedBuildInfo2 = mock(QueuedBuildInfo.class);
+        when(queuedBuildInfo2.getBuildConfiguration()).thenReturn(buildInfo);
+        agentMap.put(queuedBuildInfo2, null);
+
+        assertEquals(2, precondition.calculateAllocatedBuilds(RESOURCE_ID, agentMap));
+    }
+
+    @Test
+    public void shouldReturnCountOfBuildsAllocatedToResource() {
+        agentMap = new HashMap<QueuedBuildInfo, BuildAgent>();
+        when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
+        when(buildConfigurationInfo.getId()).thenReturn("bt123");
+        agentMap.put(queuedBuildInfo, null);
+
+        BuildConfigurationInfo buildInfo = mock(BuildConfigurationInfo.class);
+        when(buildInfo.getId()).thenReturn("bt125");
+        QueuedBuildInfo queuedBuildInfo2 = mock(QueuedBuildInfo.class);
+        when(queuedBuildInfo2.getBuildConfiguration()).thenReturn(buildInfo);
+        agentMap.put(queuedBuildInfo2, null);
+
+        assertEquals(1, precondition.calculateAllocatedBuilds(RESOURCE_ID, agentMap));
     }
 }
