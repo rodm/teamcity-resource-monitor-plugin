@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="reports" default="default"
+         xmlns:ivy="antlib:org.apache.ivy.ant">
+
+    <import file="build.xml"/>
+
+    <target name="init-jacoco" depends="resolve-dependencies">
+        <property name="execution.file" location="${build.dir}/jacoco.exec"/>
+        <property name="jacoco.version" value="0.6.3.201306030806"/>
+
+        <ivy:cachepath pathid="jacoco.classpath"
+                       inline="true"
+                       organisation="org.jacoco"
+                       module="org.jacoco.ant"
+                       revision="${jacoco.version}"
+                       conf="*->default"/>
+
+        <taskdef uri="antlib:org.jacoco.ant"
+                 resource="org/jacoco/ant/antlib.xml"
+                 classpathref="jacoco.classpath"/>
+    </target>
+
+    <target name="prepare-tests" depends="init-jacoco" xmlns:jacoco="antlib:org.jacoco.ant">
+        <jacoco:agent property="test.vmparam"
+                      destfile="${execution.file}"/>
+    </target>
+
+    <target name="tests-coverage-report" depends="init-jacoco, run-tests" xmlns:jacoco="antlib:org.jacoco.ant">
+        <property name="report.dir" location="${build.dir}/report"/>
+        <mkdir dir="${report.dir}"/>
+
+        <jacoco:report>
+            <executiondata>
+                <file file="${execution.file}"/>
+            </executiondata>
+            <structure name="TeamCity Resource Monitor plugin">
+                <classfiles>
+                    <fileset dir="${classes.dir}"/>
+                </classfiles>
+                <sourcefiles encoding="UTF-8">
+                    <fileset dir="${java.src.dir}"/>
+                </sourcefiles>
+            </structure>
+            <html destdir="${report.dir}"/>
+            <xml destfile="${report.dir}/coverage.xml"/>
+        </jacoco:report>
+    </target>
+</project>

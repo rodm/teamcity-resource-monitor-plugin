@@ -143,7 +143,11 @@
         </javac>
     </target>
 
-    <target name="run-tests" depends="compile-tests">
+    <target name="prepare-tests"/>
+
+    <target name="run-tests" depends="compile-tests,prepare-tests">
+        <property name="test.vmparam" value="-Ddefault"/>
+
         <mkdir dir="${test.report.dir}"/>
 
         <junit fork="yes"
@@ -152,6 +156,7 @@
                errorproperty="tests.failed"
                failureproperty="tests.failed"
                showoutput="true">
+            <jvmarg value="${test.vmparam}"/>
             <!--<sysproperty key="java.awt.headless" value="${java.awt.headless}"/>-->
             <classpath refid="compile.classpath"/>
             <classpath refid="test.classpath"/>
