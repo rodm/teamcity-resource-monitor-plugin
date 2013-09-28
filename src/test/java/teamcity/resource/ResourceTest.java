@@ -116,6 +116,16 @@ public class ResourceTest {
     }
 
     @Test
+    public void portCanBeSetToLowestValue() {
+        new Resource(VALID_ID, VALID_NAME, VALID_HOST, 1);
+    }
+
+    @Test
+    public void portCanBeSetToHighestValue() {
+        new Resource(VALID_ID, VALID_NAME, VALID_HOST, 65535);
+    }
+
+    @Test
     public void portCannotBeNegative() {
         thrown.expect(InvalidPortException.class);
         new Resource(VALID_ID, VALID_NAME, VALID_HOST, -1);
