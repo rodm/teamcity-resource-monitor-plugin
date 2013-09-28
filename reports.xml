@@ -45,4 +45,31 @@
             <xml destfile="${report.dir}/coverage.xml"/>
         </jacoco:report>
     </target>
+
+    <target name="init-checkstyle" depends="resolve-dependencies">
+        <property name="checkstyle.version" value="5.6"/>
+
+        <ivy:cachepath pathid="checkstyle.classpath"
+                       inline="true"
+                       organisation="com.puppycrawl.tools"
+                       module="checkstyle"
+                       revision="${checkstyle.version}"
+                       conf="*->default"/>
+
+        <taskdef uri="antlib:com.puppycrawl.tools.checkstyle"
+                 resource="checkstyletask.properties"
+                 classpathref="checkstyle.classpath"/>
+    </target>
+
+    <target name="report-checkstyle" depends="init-checkstyle" xmlns:cs="antlib:com.puppycrawl.tools.checkstyle">
+        <property name="report.dir" location="${build.dir}/report"/>
+        <mkdir dir="${report.dir}"/>
+
+        <cs:checkstyle config="${basedir}/sun_checks.xml"
+                       failureProperty="checkstyle.failure"
+                       failOnViolation="false">
+            <formatter type="xml" tofile="${report.dir}/checkstyle.xml"/>
+            <fileset dir="${java.src.dir}" includes="**/*.java"/>
+        </cs:checkstyle>
+    </target>
 </project>
