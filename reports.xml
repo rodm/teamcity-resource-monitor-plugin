@@ -72,4 +72,33 @@
             <fileset dir="${java.src.dir}" includes="**/*.java"/>
         </cs:checkstyle>
     </target>
+
+    <target name="init-pitest" depends="resolve-dependencies">
+        <property name="pit.version" value="0.31"/>
+
+        <ivy:cachepath pathid="pitest.classpath"
+                       inline="true" organisation="org.pitest" module="pitest-ant" revision="${pit.version}"
+                       conf="*->default"/>
+
+        <taskdef name="pitest"
+                 classname="org.pitest.ant.PitestTask"
+                 classpathref="pitest.classpath"/>
+    </target>
+
+    <target name="report-mutation-tests" depends="init-pitest, run-tests">
+        <path id="mutation.classpath">
+            <path refid="compile.classpath"/>
+            <path refid="test.classpath"/>
+            <pathelement location="${classes.dir}"/>
+            <pathelement location="${test.classes.dir}"/>
+            <path refid="pitest.classpath"/>
+        </path>
+
+        <pitest sourceDir="${java.src.dir}"
+                classPath="mutation.classpath"
+                targetTests="teamcity.resource.*"
+                targetClasses="teamcity.resource.*"
+                timestampedReports="false"
+                reportDir="${test.report.dir}"/>
+    </target>
 </project>
