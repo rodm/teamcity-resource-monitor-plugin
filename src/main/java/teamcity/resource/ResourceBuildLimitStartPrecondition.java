@@ -13,8 +13,6 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
         implements StartBuildPrecondition, ResourceManagerListener
 {
 
-    private SBuildServer buildServer;
-
     private ResourceManager manager;
 
     private Map<String, ResourceBuildCount> resourceBuildCounts = new HashMap<String, ResourceBuildCount>();
@@ -22,7 +20,6 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
     private List<ResourceUsageListener> listeners = new ArrayList<ResourceUsageListener>();
 
     ResourceBuildLimitStartPrecondition(SBuildServer buildServer, final ResourceManager manager) {
-        this.buildServer = buildServer;
         this.manager = manager;
         buildServer.addListener(this);
     }
@@ -72,12 +69,26 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
     }
 
     @Override
-    public void serverStartup() {
-        for (SRunningBuild build : buildServer.getRunningBuilds()) {
+    public void agentRegistered(SBuildAgent agent, long currentlyRunningBuildId) {
+        SRunningBuild build = agent.getRunningBuild();
+        if (build != null) {
             Resource resource = manager.findResourceByBuildTypeId(build.getBuildTypeId());
             if (resource != null) {
                 ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
                 resourceBuildCount.allocate(build.getBuildPromotion().getId());
+                log.info("Running builds using resource " + resource.getName() + ": " + resourceBuildCount.size());
+            }
+        }
+    }
+
+    @Override
+    public void beforeAgentUnregistered(SBuildAgent agent) {
+        SRunningBuild build = agent.getRunningBuild();
+        if (build != null) {
+            Resource resource = manager.findResourceByBuildTypeId(build.getBuildTypeId());
+            if (resource != null) {
+                ResourceBuildCount resourceBuildCount = getResourceBuildCount(resource.getId());
+                resourceBuildCount.release(build.getBuildPromotion().getId());
                 log.info("Running builds using resource " + resource.getName() + ": " + resourceBuildCount.size());
             }
         }
@@ -140,7 +151,7 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
         return getResourceBuildCount(id).size();
     }
 
-    private ResourceBuildCount getResourceBuildCount(String id) {
+    ResourceBuildCount getResourceBuildCount(String id) {
         synchronized (resourceBuildCounts) {
             ResourceBuildCount buildCount = resourceBuildCounts.get(id);
             if (buildCount == null) {

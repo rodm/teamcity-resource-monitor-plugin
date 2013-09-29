@@ -2,13 +2,13 @@ package teamcity.resource;
 
 import jetbrains.buildServer.BuildAgent;
 import jetbrains.buildServer.serverSide.BuildPromotion;
+import jetbrains.buildServer.serverSide.SBuildAgent;
 import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SQueuedBuild;
 import jetbrains.buildServer.serverSide.SRunningBuild;
 import jetbrains.buildServer.serverSide.buildDistribution.*;
 import jetbrains.buildServer.users.User;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.util.*;
@@ -26,7 +26,6 @@ public class ResourceBuildLimitStartPreconditionTest {
 
     private Resource resource = new Resource(RESOURCE_ID, "test", "localhost", 1234);
 
-    private SBuildServer buildServer;
     private ResourceManager resourceManager;
     private ResourceBuildLimitStartPrecondition precondition;
     private QueuedBuildInfo queuedBuildInfo = mock(QueuedBuildInfo.class);
@@ -38,7 +37,7 @@ public class ResourceBuildLimitStartPreconditionTest {
 
     @Before
     public void setup() {
-        buildServer = mock(SBuildServer.class);
+        SBuildServer buildServer = mock(SBuildServer.class);
         resourceManager = new ResourceManager(null);
         precondition = new ResourceBuildLimitStartPrecondition(buildServer, resourceManager);
 
@@ -176,24 +175,6 @@ public class ResourceBuildLimitStartPreconditionTest {
     }
 
     @Test
-    public void shouldUpdateBuildCountAtStartupForRunningBuilds() {
-        List<SRunningBuild> runningBuilds = new ArrayList<SRunningBuild>();
-        runningBuilds.add(build);
-
-        BuildPromotion buildPromotion = mock(BuildPromotion.class);
-        when(buildPromotion.getId()).thenReturn(BUILD_ID_1);
-        when(build.getBuildPromotion()).thenReturn(buildPromotion);
-        when(buildServer.getRunningBuilds()).thenReturn(runningBuilds);
-
-        precondition.serverStartup();
-
-        assertEquals(1, precondition.getBuildCount(RESOURCE_ID));
-
-        precondition.buildFinished(build);
-        assertEquals("finished build should return count to zero", 0, precondition.getBuildCount(RESOURCE_ID));
-    }
-
-    @Test
     public void shouldNotIncrementBuildCountWhenEmulationModeIsOn() {
         resource.setBuildLimit(1);
         when(queuedBuildInfo.getBuildConfiguration()).thenReturn(buildConfigurationInfo);
@@ -309,5 +290,85 @@ public class ResourceBuildLimitStartPreconditionTest {
         agentMap.put(queuedBuildInfo2, null);
 
         assertEquals(1, precondition.calculateAllocatedBuilds(RESOURCE_ID, agentMap));
+    }
+
+    @Test
+    public void registeringAgentWithRunningBuildUsingResourceIncreasesCount() {
+        BuildPromotion buildPromotion = mock(BuildPromotion.class);
+        when(buildPromotion.getId()).thenReturn(BUILD_ID_1);
+        SRunningBuild build = mock(SRunningBuild.class);
+        when(build.getBuildTypeId()).thenReturn("bt123");
+        when(build.getBuildPromotion()).thenReturn(buildPromotion);
+        SBuildAgent agent = mock(SBuildAgent.class);
+        when(agent.getRunningBuild()).thenReturn(build);
+
+        precondition.agentRegistered(agent, 0);
+
+        assertEquals(1, precondition.getBuildCount(RESOURCE_ID));
+    }
+
+    @Test
+    public void registeringAgentWithRunningBuildNotUsingResourceDoesntIncreaseCount() {
+        SRunningBuild build = mock(SRunningBuild.class);
+        when(build.getBuildTypeId()).thenReturn("bt125");
+        SBuildAgent agent = mock(SBuildAgent.class);
+        when(agent.getRunningBuild()).thenReturn(build);
+
+        precondition.agentRegistered(agent, 0);
+
+        assertEquals(0, precondition.getBuildCount(RESOURCE_ID));
+    }
+
+    @Test
+    public void registeringAgentWithoutRunningBuildDoesntIncreaseCount() {
+        SBuildAgent agent = mock(SBuildAgent.class);
+        when(agent.getRunningBuild()).thenReturn(null);
+
+        precondition.agentRegistered(agent, 0);
+
+        assertEquals(0, precondition.getBuildCount(RESOURCE_ID));
+    }
+
+    @Test
+    public void unregisteringAgentWithRunningBuildUsingResourceDecreasesCount() {
+        BuildPromotion buildPromotion = mock(BuildPromotion.class);
+        when(buildPromotion.getId()).thenReturn(BUILD_ID_1);
+        SRunningBuild build = mock(SRunningBuild.class);
+        when(build.getBuildTypeId()).thenReturn("bt123");
+        when(build.getBuildPromotion()).thenReturn(buildPromotion);
+        SBuildAgent agent = mock(SBuildAgent.class);
+        when(agent.getRunningBuild()).thenReturn(build);
+        ResourceBuildCount resourceCount = precondition.getResourceBuildCount(RESOURCE_ID);
+        resourceCount.allocate(BUILD_ID_1);
+
+        precondition.beforeAgentUnregistered(agent);
+
+        assertEquals(0, precondition.getBuildCount(RESOURCE_ID));
+    }
+
+    @Test
+    public void unregisteringAgentWithRunningBuildNotUsingResourceDoesntDecreaseCount() {
+        SRunningBuild build = mock(SRunningBuild.class);
+        when(build.getBuildTypeId()).thenReturn("bt125");
+        SBuildAgent agent = mock(SBuildAgent.class);
+        when(agent.getRunningBuild()).thenReturn(build);
+        ResourceBuildCount resourceCount = precondition.getResourceBuildCount(RESOURCE_ID);
+        resourceCount.allocate(BUILD_ID_1);
+
+        precondition.beforeAgentUnregistered(agent);
+
+        assertEquals(1, precondition.getBuildCount(RESOURCE_ID));
+    }
+
+    @Test
+    public void unregisteringAgentWithoutRunningBuildDoesntDecreaseCount() {
+        SBuildAgent agent = mock(SBuildAgent.class);
+        when(agent.getRunningBuild()).thenReturn(null);
+        ResourceBuildCount resourceCount = precondition.getResourceBuildCount(RESOURCE_ID);
+        resourceCount.allocate(BUILD_ID_1);
+
+        precondition.beforeAgentUnregistered(agent);
+
+        assertEquals(1, precondition.getBuildCount(RESOURCE_ID));
     }
 }
