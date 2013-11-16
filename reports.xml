@@ -46,6 +46,43 @@
         </jacoco:report>
     </target>
 
+    <target name="report-test-coverage" depends="tests-coverage-report"/>
+
+    <target name="report-test-coverage-stats" depends="report-test-coverage">
+        <property name="report.file" location="${report.dir}/coverage.xml"/>
+        <property name="groovy.version" value="2.1.9"/>
+
+        <ivy:cachepath pathid="groovy.classpath"
+                       inline="true"
+                       organisation="org.codehaus.groovy"
+                       module="groovy-ant"
+                       revision="${groovy.version}"
+                       conf="default"/>
+
+        <taskdef name="groovy"
+                 classname="org.codehaus.groovy.ant.Groovy"
+                 classpathref="groovy.classpath"/>
+
+        <groovy>
+            def reportFile = properties.'report.file' as File
+            def report = new XmlSlurper().parse(reportFile)
+            def counters = report.counter
+
+            def lineNode = counters.find { it.@type == 'LINE' }
+            def methodNode = counters.find { it.@type == 'METHOD' }
+            def classNode = counters.find { it.@type == 'CLASS' }
+
+            def buildStatistics = [:]
+            buildStatistics.put("CodeCoverageAbsLCovered", lineNode.@covered)
+            buildStatistics.put("CodeCoverageAbsLTotal", lineNode.@missed.toLong() + lineNode.@covered.toLong())
+            buildStatistics.put("CodeCoverageAbsMCovered", methodNode.@covered)
+            buildStatistics.put("CodeCoverageAbsMTotal", methodNode.@missed.toLong() + methodNode.@covered.toLong())
+            buildStatistics.put("CodeCoverageAbsCCovered", classNode.@covered)
+            buildStatistics.put("CodeCoverageAbsCTotal", classNode.@missed.toLong() + classNode.@covered.toLong())
+            buildStatistics.each { ant.echo(message: "##teamcity[buildStatisticValue key='${it.key}' value='${it.value}']") }
+        </groovy>
+    </target>
+
     <target name="init-checkstyle" depends="resolve-dependencies">
         <property name="checkstyle.version" value="5.6"/>
 
