@@ -6,7 +6,7 @@ configurations to run based on the availability of the resource.
 
 ## How to install
 
-Copy the `resource-monitor.zip` file to the `.BuildServer/plugins` directory and restart the TeamCity server.
+Download the plugin archive from [Bintray](https://bintray.com/rodm/teamcity-plugins/teamcity-resource-monitor-plugin) and copy the `teamcity-resource-monitor-plugin.zip` file to the `.BuildServer/plugins` directory and restart the TeamCity server.
 
 ## How to configure and use the plugin
 
