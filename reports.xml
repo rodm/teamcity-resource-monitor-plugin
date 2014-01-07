@@ -176,4 +176,39 @@
         </findbugs>
         <fail if="findbugs.error" message="findbugs task failed - possibly a timeout"/>
     </target>
+
+
+    <target name="init-pmd" depends="resolve-dependencies">
+        <property name="pmd.version" value="5.0.5"/>
+
+        <ivy:cachepath pathid="pmd.classpath"
+                       inline="true" organisation="net.sourceforge.pmd" module="pmd" revision="${pmd.version}"
+                       conf="*->default"/>
+
+        <taskdef name="pmd"
+                 classname="net.sourceforge.pmd.ant.PMDTask"
+                 classpathref="pmd.classpath"/>
+    </target>
+
+    <target name="report-pmd" depends="init-pmd">
+        <property name="report.dir" location="${build.dir}/report"/>
+        <mkdir dir="${report.dir}"/>
+
+        <pmd>
+            <sourceLanguage name="java" version="1.6"/>
+            <ruleset>java-basic</ruleset>
+            <ruleset>java-braces</ruleset>
+            <ruleset>java-codesize</ruleset>
+            <ruleset>java-controversial</ruleset>
+            <ruleset>java-coupling</ruleset>
+            <ruleset>java-design</ruleset>
+            <ruleset>java-naming</ruleset>
+            <ruleset>java-unnecessary</ruleset>
+            <ruleset>java-unusedcode</ruleset>
+            <formatter type="xml" toFile="${report.dir}/pmd.xml"/>
+            <fileset dir="${java.src.dir}">
+                <include name="**/*.java"/>
+            </fileset>
+        </pmd>
+    </target>
 </project>
