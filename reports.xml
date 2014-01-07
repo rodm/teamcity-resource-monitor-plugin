@@ -138,4 +138,42 @@
                 timestampedReports="false"
                 reportDir="${test.report.dir}"/>
     </target>
+
+    <target name="init-findbugs" depends="compile">
+        <fail unless="findbugs.home" message="findbugs.home property needs to be set"/>
+
+        <path id="findbugs.classpath">
+            <fileset dir="${findbugs.home}/lib" includes="*.jar"/>
+        </path>
+
+        <taskdef name="findbugs"
+                 classname="edu.umd.cs.findbugs.anttask.FindBugsTask"
+                 classpathref="findbugs.classpath"/>
+
+        <property name="findbugs.report.level" value="medium"/> <!-- report levels: low, medium and high -->
+        <property name="findbugs.timeout" value="60000"/>
+        <property name="findbugs.debug" value="false"/>
+    </target>
+
+    <target name="report-findbugs" depends="init-findbugs">
+        <property name="report.dir" location="${build.dir}/report"/>
+        <mkdir dir="${report.dir}"/>
+
+        <path id="findbugs.aux.classpath">
+            <path refid="compile.classpath"/>
+        </path>
+
+        <findbugs home="${findbugs.home}"
+                  debug="${findbugs.debug}"
+                  output="xml"
+                  outputFile="${report.dir}/findbugs.xml"
+                  reportLevel="${findbugs.report.level}"
+                  timeout="${findbugs.timeout}"
+                  errorProperty="findbugs.error">
+            <auxClasspath refid="findbugs.aux.classpath"/>
+            <sourcePath path="${java.src.dir}"/>
+            <class location="${classes.dir}"/>
+        </findbugs>
+        <fail if="findbugs.error" message="findbugs task failed - possibly a timeout"/>
+    </target>
 </project>
