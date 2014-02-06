@@ -1,18 +1,18 @@
 package teamcity.resource;
 
+import jetbrains.buildServer.controllers.admin.AdminPage;
 import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SBuildType;
+import jetbrains.buildServer.serverSide.auth.Permission;
 import jetbrains.buildServer.web.openapi.PagePlaces;
-import jetbrains.buildServer.web.openapi.PlaceId;
-import jetbrains.buildServer.web.openapi.SimpleCustomTab;
+import jetbrains.buildServer.web.openapi.PositionConstraint;
 import org.jetbrains.annotations.NotNull;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
 
-public class ResourceConfigExtension extends SimpleCustomTab {
+public class ResourceConfigExtension extends AdminPage {
 
-    private static final PlaceId PLACE_ID = PlaceId.ADMIN_SERVER_CONFIGURATION_TAB;
     private static final String PLUGIN_NAME = "resourceMonitorPlugin";
     private static final String INCLUDE_URL = "resource.jsp";
     private static final String TITLE = "Resources";
@@ -24,7 +24,11 @@ public class ResourceConfigExtension extends SimpleCustomTab {
     private ResourceMonitor resourceMonitor;
 
     public ResourceConfigExtension(PagePlaces pagePlaces, ProjectManager projectManager, ResourceManager resourceManager, ResourceMonitor resourceMonitor) {
-        super(pagePlaces, PLACE_ID, PLUGIN_NAME, INCLUDE_URL, TITLE);
+        super(pagePlaces);
+        setPluginName(PLUGIN_NAME);
+        setIncludeUrl(INCLUDE_URL);
+        setTabTitle(TITLE);
+        setPosition(PositionConstraint.last());
         this.projectManager = projectManager;
         this.resourceManager = resourceManager;
         this.resourceMonitor = resourceMonitor;
@@ -44,12 +48,13 @@ public class ResourceConfigExtension extends SimpleCustomTab {
         return jsPaths;
     }
 
-    public boolean isVisible() {
-        return true;
+    @NotNull
+    public String getGroup() {
+        return INTEGRATIONS_GROUP;
     }
 
     public boolean isAvailable(@NotNull HttpServletRequest request) {
-        return true;
+        return super.isAvailable(request) && checkHasGlobalPermission(request, Permission.EDIT_PROJECT);
     }
 
     public void fillModel(@NotNull Map<String, Object> model, @NotNull HttpServletRequest request) {
