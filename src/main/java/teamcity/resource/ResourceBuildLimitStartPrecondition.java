@@ -19,7 +19,7 @@ public class ResourceBuildLimitStartPrecondition extends BuildServerAdapter
 
     private List<ResourceUsageListener> listeners = new ArrayList<ResourceUsageListener>();
 
-    ResourceBuildLimitStartPrecondition(SBuildServer buildServer, final ResourceManager manager) {
+    public ResourceBuildLimitStartPrecondition(SBuildServer buildServer, final ResourceManager manager) {
         this.manager = manager;
         buildServer.addListener(this);
     }

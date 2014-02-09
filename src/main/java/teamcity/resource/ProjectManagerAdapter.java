@@ -12,7 +12,7 @@ public class ProjectManagerAdapter implements ProjectManager {
 
     private jetbrains.buildServer.serverSide.ProjectManager projectManager;
 
-    ProjectManagerAdapter(SBuildServer server, jetbrains.buildServer.serverSide.ProjectManager projectManager) {
+    public ProjectManagerAdapter(SBuildServer server, jetbrains.buildServer.serverSide.ProjectManager projectManager) {
         this.server = server;
         this.projectManager = projectManager;
     }

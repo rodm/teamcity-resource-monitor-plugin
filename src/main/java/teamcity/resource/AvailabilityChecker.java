@@ -8,7 +8,7 @@ import java.net.NoRouteToHostException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 
-class AvailabilityChecker {
+public class AvailabilityChecker {
 
     public boolean isAvailable(Resource resource) {
         boolean result = false;

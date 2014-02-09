@@ -18,7 +18,7 @@ public class ResourceStartBuildPrecondition implements StartBuildPrecondition, R
 
     private Set<String> disabledResources = new HashSet<String>();
 
-    ResourceStartBuildPrecondition(final ResourceManager manager, final ResourceMonitor monitor) {
+    public ResourceStartBuildPrecondition(final ResourceManager manager, final ResourceMonitor monitor) {
         this.manager = manager;
         monitor.addListener(this);
     }
