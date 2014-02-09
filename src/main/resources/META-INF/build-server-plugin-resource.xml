@@ -16,6 +16,8 @@
 
     <bean id="resourceMonitorPlugin" class="teamcity.resource.ResourceMonitorPlugin"/>
 
+    <bean id="resourceProjectManagerAdapter" class="teamcity.resource.ProjectManagerAdapter"/>
+
     <bean id="resourceMonitorConfigTab"
           class="teamcity.resource.ResourceConfigExtension"
           init-method="register"/>

@@ -1,6 +1,5 @@
 package teamcity.resource;
 
-import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SBuildType;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,7 +11,6 @@ import java.io.StringWriter;
 import static junit.framework.Assert.assertEquals;
 import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class ResourceMonitorConfigProcessorTest {
 
@@ -23,12 +21,12 @@ public class ResourceMonitorConfigProcessorTest {
 
     @Before
     public void setup() {
-        ProjectManager projectManager = mock(ProjectManager.class);
+        FakeProjectManager projectManager = new FakeProjectManager();
+        SBuildType buildType = mock(SBuildType.class);
+        projectManager.addBuildType(BUILD_TYPE_ID, buildType);
+
         manager = new ResourceManager(projectManager);
         configProcessor = new ResourceMonitorConfigProcessor(manager);
-
-        SBuildType buildType = mock(SBuildType.class);
-        when(projectManager.findBuildTypeById(BUILD_TYPE_ID)).thenReturn(buildType);
     }
 
     @Test

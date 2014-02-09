@@ -1,8 +1,6 @@
 package teamcity.resource;
 
 import jetbrains.buildServer.controllers.admin.AdminPage;
-import jetbrains.buildServer.serverSide.ProjectManager;
-import jetbrains.buildServer.serverSide.SBuildType;
 import jetbrains.buildServer.serverSide.auth.Permission;
 import jetbrains.buildServer.web.openapi.PagePlaces;
 import jetbrains.buildServer.web.openapi.PositionConstraint;
@@ -87,9 +85,9 @@ public class ResourceConfigExtension extends AdminPage {
     }
 
     private Map getBuildTypes() {
-        List<SBuildType> buildTypes = projectManager.getAllBuildTypes();
-        Map<String, SBuildType> buildTypesMap = new HashMap<String, SBuildType>();
-        for (SBuildType buildType : buildTypes) {
+        List<BuildType> buildTypes = projectManager.getAllBuildTypes();
+        Map<String, BuildType> buildTypesMap = new HashMap<String, BuildType>();
+        for (BuildType buildType : buildTypes) {
             buildTypesMap.put(buildType.getBuildTypeId(), buildType);
         }
         return buildTypesMap;
@@ -97,7 +95,7 @@ public class ResourceConfigExtension extends AdminPage {
 
     private List<String> getAvailableBuildTypes() {
         List<String> availableBuildTypes = new ArrayList<String>();
-        for (SBuildType buildType : projectManager.getAllBuildTypes()) {
+        for (BuildType buildType : projectManager.getAllBuildTypes()) {
             availableBuildTypes.add(buildType.getBuildTypeId());
         }
         for (Resource resource : resourceManager.getResources()) {

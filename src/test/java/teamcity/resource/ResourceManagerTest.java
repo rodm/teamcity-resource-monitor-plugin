@@ -1,6 +1,5 @@
 package teamcity.resource;
 
-import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SBuildType;
 import org.junit.Before;
 import org.junit.Rule;
@@ -27,15 +26,15 @@ public class ResourceManagerTest {
 
     private ResourceManager manager;
 
-    private ProjectManager mockProjectManager;
+    private FakeProjectManager fakeProjectManager;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Before
     public void setup() {
-        mockProjectManager = mock(ProjectManager.class);
-        manager = new ResourceManager(mockProjectManager);
+        fakeProjectManager = new FakeProjectManager();
+        manager = new ResourceManager(fakeProjectManager);
     }
 
     @Test
@@ -313,7 +312,7 @@ public class ResourceManagerTest {
     @Test
     public void linkBuildToResource() {
         SBuildType buildType = mock(SBuildType.class);
-        when(mockProjectManager.findBuildTypeById(eq(BUILD_TYPE_ID))).thenReturn(buildType);
+        fakeProjectManager.addBuildType(BUILD_TYPE_ID, buildType);
         manager.addResource(new Resource(ID, NAME, HOST, PORT));
 
         manager.linkBuildToResource(ID, BUILD_TYPE_ID);
@@ -326,7 +325,7 @@ public class ResourceManagerTest {
     @Test
     public void linkBuildToInvalidResource() {
         SBuildType buildType = mock(SBuildType.class);
-        when(mockProjectManager.findBuildTypeById(eq(BUILD_TYPE_ID))).thenReturn(buildType);
+        fakeProjectManager.addBuildType(BUILD_TYPE_ID, buildType);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("resource with id " + ID + " does not exist");
@@ -344,7 +343,7 @@ public class ResourceManagerTest {
     @Test
     public void unlinkBuildFromResource() {
         SBuildType buildType = mock(SBuildType.class);
-        when(mockProjectManager.findBuildTypeById(eq(BUILD_TYPE_ID))).thenReturn(buildType);
+        fakeProjectManager.addBuildType(BUILD_TYPE_ID, buildType);
         Resource resource = new Resource(ID, NAME, HOST, PORT);
         resource.addBuildType(BUILD_TYPE_ID);
         manager.addResource(resource);
@@ -358,7 +357,7 @@ public class ResourceManagerTest {
     @Test
     public void unlinkBuildFromInvalidResource() {
         SBuildType buildType = mock(SBuildType.class);
-        when(mockProjectManager.findBuildTypeById(eq(BUILD_TYPE_ID))).thenReturn(buildType);
+        fakeProjectManager.addBuildType(BUILD_TYPE_ID, buildType);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("resource with id " + ID + " does not exist");
@@ -411,7 +410,7 @@ public class ResourceManagerTest {
         newResources.add(resource);
 
         SBuildType buildType = mock(SBuildType.class);
-        when(mockProjectManager.findBuildTypeById(BUILD_TYPE_ID)).thenReturn(buildType);
+        fakeProjectManager.addBuildType(BUILD_TYPE_ID, buildType);
 
         manager.setResources(newResources);
         assertEquals(1, resource.getBuildTypes().size());

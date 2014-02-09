@@ -69,7 +69,7 @@
                             <c:if test="${not empty buildTypes[buildType]}">
                                 <tr class="buildConfigurationRow">
                                     <td class="buildConfiguration" colspan="7">
-                                        <a href="<c:url value='/viewType.html?buildTypeId=${buildType}&tab=buildTypeStatusDiv'/>">
+                                        <a href="<c:url value='/viewType.html?buildTypeId=${buildTypes[buildType].externalId}&tab=buildTypeStatusDiv'/>">
                                             <c:out value="${buildTypes[buildType].fullName}"/>
                                         </a>
                                     </td>

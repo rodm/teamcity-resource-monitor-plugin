@@ -1,6 +1,5 @@
 package teamcity.resource;
 
-import jetbrains.buildServer.serverSide.ProjectManager;
 import jetbrains.buildServer.serverSide.SBuildServer;
 
 import org.junit.Before;
@@ -26,9 +25,7 @@ public class ResourceMonitorTest {
     @Before
     public void setup() {
         server = mock(SBuildServer.class);
-        ProjectManager projectManager = mock(ProjectManager.class);
-        when(server.getProjectManager()).thenReturn(projectManager);
-        manager = new ResourceManager(projectManager);
+        manager = new ResourceManager(new FakeProjectManager());
         resource = new Resource("1", "test", "localhost", 1234);
         manager.addResource(resource);
     }

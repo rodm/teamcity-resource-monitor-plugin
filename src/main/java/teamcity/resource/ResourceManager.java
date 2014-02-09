@@ -1,8 +1,5 @@
 package teamcity.resource;
 
-import jetbrains.buildServer.serverSide.ProjectManager;
-import jetbrains.buildServer.serverSide.SBuildType;
-
 import java.util.*;
 
 public class ResourceManager {
@@ -220,7 +217,7 @@ public class ResourceManager {
     }
 
     private void validBuildType(String buildTypeId) {
-        SBuildType buildType = projectManager.findBuildTypeById(buildTypeId);
+        BuildType buildType = projectManager.findBuildTypeById(buildTypeId);
         if (buildType == null) {
             throw new IllegalArgumentException("build type id " + buildTypeId + " does not exist");
         }
