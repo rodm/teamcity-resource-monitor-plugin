@@ -2,19 +2,19 @@ package teamcity.resource;
 
 import jetbrains.buildServer.serverSide.SBuildType;
 
-public class BuildTypeAdapter implements BuildType {
+public abstract class BuildTypeAdapter implements BuildType {
 
     private SBuildType buildType;
 
-    BuildTypeAdapter(SBuildType buildType) {
+    public BuildTypeAdapter(SBuildType buildType) {
         this.buildType = buildType;
     }
 
-    public String getBuildTypeId() {
-        return buildType.getBuildTypeId();
+    protected SBuildType getBuildType() {
+        return buildType;
     }
 
-    public String getExternalId() {
+    public String getBuildTypeId() {
         return buildType.getBuildTypeId();
     }
 

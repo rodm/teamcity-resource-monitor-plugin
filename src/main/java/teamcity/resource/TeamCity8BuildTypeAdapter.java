@@ -5,22 +5,17 @@ import jetbrains.buildServer.serverSide.SBuildType;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
-public class TeamCity8BuildTypeAdapter implements BuildType {
-
-    private SBuildType buildType;
+public class TeamCity8BuildTypeAdapter extends BuildTypeAdapter {
 
     private String externalId;
 
     TeamCity8BuildTypeAdapter(SBuildType buildType) {
-        this.buildType = buildType;
-    }
-
-    public String getBuildTypeId() {
-        return buildType.getBuildTypeId();
+        super(buildType);
     }
 
     public String getExternalId() {
         if (externalId == null) {
+            SBuildType buildType = getBuildType();
             try {
                 Method method = buildType.getClass().getMethod("getExternalId", new Class[]{});
                 externalId = (String) method.invoke(buildType, null);
@@ -33,9 +28,5 @@ public class TeamCity8BuildTypeAdapter implements BuildType {
             }
         }
         return externalId;
-    }
-
-    public String getFullName() {
-        return buildType.getFullName();
     }
 }

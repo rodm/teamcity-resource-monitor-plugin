@@ -34,6 +34,6 @@ public class ProjectManagerAdapter implements ProjectManager {
         if (server.getServerMajorVersion() > 7) {
             return new TeamCity8BuildTypeAdapter(buildType);
         }
-        return new BuildTypeAdapter(buildType);
+        return new TeamCity7BuildTypeAdapter(buildType);
     }
 }
