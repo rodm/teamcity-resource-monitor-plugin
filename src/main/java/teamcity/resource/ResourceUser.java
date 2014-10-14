@@ -2,6 +2,7 @@ package teamcity.resource;
 
 import jetbrains.buildServer.users.PropertyKey;
 import jetbrains.buildServer.users.User;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Date;
 import java.util.List;
@@ -62,5 +63,10 @@ public class ResourceUser implements User {
 
     public List<String> getAllProjects() {
         return emptyList();
+    }
+
+    @NotNull
+    public String describe(boolean b) {
+        return null;
     }
 }
