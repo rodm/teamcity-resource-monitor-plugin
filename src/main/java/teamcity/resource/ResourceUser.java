@@ -1,8 +1,11 @@
 package teamcity.resource;
 
+import jetbrains.buildServer.serverSide.auth.Permission;
+import jetbrains.buildServer.serverSide.auth.Permissions;
 import jetbrains.buildServer.users.PropertyKey;
 import jetbrains.buildServer.users.User;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Date;
 import java.util.List;
@@ -67,6 +70,38 @@ public class ResourceUser implements User {
 
     @NotNull
     public String describe(boolean b) {
+        return null;
+    }
+
+    public boolean isPermissionGrantedGlobally(@NotNull Permission permission) {
+        return false;
+    }
+
+    @NotNull
+    public Permissions getGlobalPermissions() {
+        return null;
+    }
+
+    @NotNull
+    public Map<String, Permissions> getProjectsPermissions() {
+        return null;
+    }
+
+    public boolean isPermissionGrantedForProject(@NotNull String s, @NotNull Permission permission) {
+        return false;
+    }
+
+    public boolean isPermissionGrantedForAnyProject(@NotNull Permission permission) {
+        return false;
+    }
+
+    @NotNull
+    public Permissions getPermissionsGrantedForProject(@NotNull String s) {
+        return null;
+    }
+
+    @Nullable
+    public User getAssociatedUser() {
         return null;
     }
 }
