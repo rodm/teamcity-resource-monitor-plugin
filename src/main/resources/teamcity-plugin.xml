@@ -12,7 +12,7 @@
         <email>rod.n.mackenzie@gmail.com</email>
         <vendor>
             <name>rodm</name>
-            <url>http://bitbucket.org/rodm/teamcity-resource-monitor</url>
+            <url>https://github.com/rodm/teamcity-resource-monitor-plugin</url>
         </vendor>
     </info>
     <deployment use-separate-classloader="false"/>
