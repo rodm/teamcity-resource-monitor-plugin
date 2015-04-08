@@ -4,9 +4,12 @@
 Monitors various resources, such as database servers and web servers, and allows or disallows build
 configurations to run based on the availability of the resource.
 
+[![Build Status](https://travis-ci.org/rodm/teamcity-resource-monitor-plugin.svg)](https://travis-ci.org/rodm/teamcity-resource-monitor-plugin)
+[![Download](https://api.bintray.com/packages/rodm/teamcity-plugins/teamcity-resource-monitor-plugin/images/download.svg)](https://bintray.com/rodm/teamcity-plugins/teamcity-resource-monitor-plugin/_latestVersion)
+
 ## How to install
 
-Download the plugin archive from [Bintray](https://bintray.com/rodm/teamcity-plugins/teamcity-resource-monitor-plugin) and copy the `teamcity-resource-monitor-plugin.zip` file to the `.BuildServer/plugins` directory and restart the TeamCity server.
+Download the plugin using the link above and follow the instructions from the TeamCity documentation, [Installing Additional Plugins](https://confluence.jetbrains.com/display/TCD9/Installing+Additional+Plugins)
 
 ## How to configure and use the plugin
 
