@@ -3,6 +3,11 @@ apply plugin: 'java'
 
 project.ext.teamCityVersion = System.properties['teamcity.version'] ?: '8.1.5'
 
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+archivesBaseName = 'resource-monitor'
+
 repositories {
     mavenCentral()
     maven {
@@ -19,12 +24,10 @@ dependencies {
 }
 
 jar {
-    archiveName "resource-monitor.jar"
     exclude "**/teamcity-plugin.xml"
 }
 
 task packagePlugin(type: Zip, dependsOn: jar) {
-    archiveName = 'resource-monitor.zip'
     destinationDir = file('dist')
     from(jar.outputs.files) {
         into 'server'
