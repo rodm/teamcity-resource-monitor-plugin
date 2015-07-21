@@ -28,7 +28,6 @@
 
 <div id="container">
     <div class="editResourcesPage">
-        <h3 class="resourceHeader">Resources</h3>
         <c:if test="${not empty resources}">
             <p class="addNew">
                 <a href="javascript://" onclick="BS.EditResourceDialog.showDialog('','','','','')">
