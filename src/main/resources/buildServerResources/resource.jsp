@@ -20,6 +20,11 @@
         BS.Resource.linkBuildType(id, buildTypeId);
     }
 </script>
+<script type="text/javascript">
+    function toggleResourceBuildTypes(id) {
+        jQuery('.buildConfigurationRow.resource_' + id).toggle();
+    }
+</script>
 
 <div id="container">
     <div class="editResourcesPage">
@@ -34,7 +39,9 @@
                 <table id="resource" class="resourceTable">
                     <tbody>
                         <tr class="resource">
-                            <td class="name highlight">${resource.name}</td>
+                            <td class="name highlight" onclick="toggleResourceBuildTypes('${resource.id}')">
+                                ${resource.name}
+                            </td>
                             <td class="edit highlight">
                                 <a href="javascript://"
                                    onclick="BS.Resource.enableResource('${resource.id}', ${resource.enabled})">
@@ -67,7 +74,7 @@
                         </tr>
                         <c:forEach items="${resource.buildTypes}" var="buildType">
                             <c:if test="${not empty buildTypes[buildType]}">
-                                <tr class="buildConfigurationRow">
+                                <tr class="buildConfigurationRow resource_${resource.id}">
                                     <td class="buildConfiguration" colspan="7">
                                         <a href="<c:url value='/viewType.html?buildTypeId=${buildTypes[buildType].externalId}&tab=buildTypeStatusDiv'/>">
                                             <c:out value="${buildTypes[buildType].fullName}"/>
