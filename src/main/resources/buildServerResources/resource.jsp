@@ -27,13 +27,12 @@
 </script>
 
 <div id="container">
+    <a class="btn" href="javascript://" onclick="BS.EditResourceDialog.showDialog('','','','','')">
+        <span class="addNew">Create resource</span>
+    </a>
     <div class="editResourcesPage">
+        <div class="descr"></div>
         <c:if test="${not empty resources}">
-            <p class="addNew">
-                <a href="javascript://" onclick="BS.EditResourceDialog.showDialog('','','','','')">
-                    Create resource
-                </a>
-            </p>
             <div class="expand_collapse">
                 <bs:collapseExpand collapseAction="BS.ResourceUI.collapseAllBuildTypes()"
                                    expandAction="BS.ResourceUI.expandAllBuildTypes()"/>
@@ -104,12 +103,6 @@
         </c:if>
     </div>
 </div>
-
-<p class="addNew">
-  <a href="javascript://" onclick="BS.EditResourceDialog.showDialog('','','','','')">
-    Create resource
-  </a>
-</p>
 
 <div id="editResourceDialog" class="editResourceDialog modalDialog">
     <div class="dialogHeader">
