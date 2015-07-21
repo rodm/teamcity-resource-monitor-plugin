@@ -35,6 +35,10 @@
                     Create resource
                 </a>
             </p>
+            <div class="expand_collapse">
+                <bs:collapseExpand collapseAction="BS.ResourceUI.collapseAllBuildTypes()"
+                                   expandAction="BS.ResourceUI.expandAllBuildTypes()"/>
+            </div>
             <c:forEach items="${resources}" var="resource">
                 <table id="resource" class="resourceTable">
                     <tbody>

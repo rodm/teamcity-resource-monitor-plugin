@@ -120,6 +120,18 @@ BS.Resource = {
     }
 };
 
+BS.ResourceUI = {
+    collapseAllBuildTypes : function() {
+        jQuery('.buildConfigurationRow').hide();
+        return false
+    },
+
+    expandAllBuildTypes : function() {
+        jQuery('.buildConfigurationRow').show();
+        return false
+    }
+};
+
 BS.ResourceMonitor = {
     start:function (url) {
         this._updater = new BS.PeriodicalUpdater(null, url, {
