@@ -3,6 +3,7 @@ package teamcity.resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class Resource {
 
@@ -15,6 +16,8 @@ public class Resource {
     private int port = -1;
 
     private int buildLimit = 0;
+
+    private List<Pattern> patterns = new ArrayList<Pattern>();
 
     private List<String> buildTypes = new ArrayList<String>();
 
@@ -115,5 +118,13 @@ public class Resource {
         if (buildLimit < 0) {
             throw new InvalidLimitException("invalid limit number");
         }
+    }
+
+    public List<Pattern> getMatchers() {
+        return Collections.unmodifiableList(patterns);
+    }
+
+    public void addBuildTypeMatcher(String pattern) {
+        patterns.add(Pattern.compile(pattern));
     }
 }

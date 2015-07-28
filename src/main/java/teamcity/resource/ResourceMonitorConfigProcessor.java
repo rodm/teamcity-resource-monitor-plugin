@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.*;
+import java.util.regex.Pattern;
 
 public class ResourceMonitorConfigProcessor {
 
@@ -26,6 +27,8 @@ public class ResourceMonitorConfigProcessor {
     private static final String CONFIG_BUILD_LIMIT = "build-limit";
     private static final String CONFIG_BUILD_TYPE = "build-type";
     private static final String CONFIG_BUILD_TYPE_ID = "id";
+    private static final String CONFIG_MATCHER = "matcher";
+    private static final String CONFIG_MATCHER_NAME = "name";
 
     private static final int DEFAULT_CHECK_INTERVAL = 30;
 
@@ -76,6 +79,7 @@ public class ResourceMonitorConfigProcessor {
         Resource resource = new Resource(id, name, host, port);
         resource.setBuildLimit(buildLimit);
         readBuildTypesFrom(element, resource);
+        readMatchersFrom(element, resource);
         return resource;
     }
 
@@ -114,6 +118,15 @@ public class ResourceMonitorConfigProcessor {
         }
     }
 
+    private void readMatchersFrom(Element resourceElement, Resource resource) {
+        final List list = resourceElement.getChildren(CONFIG_MATCHER);
+        for (Object o : list) {
+            final Element element = (Element) o;
+            final String pattern = element.getAttributeValue(CONFIG_MATCHER_NAME);
+            resource.addBuildTypeMatcher(pattern);
+        }
+    }
+
     public void writeTo(Writer writer) throws IOException {
         log.info("ResourceMonitor writing config");
         Element root = new Element(CONFIG_ROOT);
@@ -136,6 +149,7 @@ public class ResourceMonitorConfigProcessor {
         element.setAttribute(CONFIG_PORT, Integer.toString(resource.getPort()));
         element.setAttribute(CONFIG_BUILD_LIMIT, Integer.toString(resource.getBuildLimit()));
         writeBuildTypesTo(resource.getBuildTypes(), element);
+        writeMatchersTo(resource.getMatchers(), element);
     }
 
     private void writeBuildTypesTo(List<String> buildTypeIds, Element parentElement) {
@@ -143,6 +157,14 @@ public class ResourceMonitorConfigProcessor {
             final Element element = new Element(CONFIG_BUILD_TYPE);
             parentElement.addContent(element);
             element.setAttribute(CONFIG_BUILD_TYPE_ID, id);
+        }
+    }
+
+    private void writeMatchersTo(List<Pattern> matchers, Element parentElement) {
+        for (Pattern pattern : matchers) {
+            final Element element = new Element(CONFIG_MATCHER);
+            element.setAttribute(CONFIG_MATCHER_NAME, pattern.pattern());
+            parentElement.addContent(element);
         }
     }
 }

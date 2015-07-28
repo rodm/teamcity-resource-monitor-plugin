@@ -80,6 +80,22 @@ public class ResourceMonitorConfigProcessorTest {
     }
 
     @Test
+    public void shouldWriteOutResourceMatchers() throws Exception {
+        Resource resource = new Resource("1", "Resource1", "localhost", 1000);
+        resource.addBuildTypeMatcher("matcher1");
+        resource.addBuildTypeMatcher("matcher2");
+
+        manager.addResource(resource);
+
+        StringWriter writer = new StringWriter();
+        configProcessor.writeTo(writer);
+
+        assertXpathEvaluatesTo("2", "count(//resource/matcher)", writer.toString());
+        assertXpathEvaluatesTo("matcher1", "//resource/matcher[1]/@name", writer.toString());
+        assertXpathEvaluatesTo("matcher2", "//resource/matcher[2]/@name", writer.toString());
+    }
+
+    @Test
     public void shouldReadEmptyConfig() throws Exception {
         String config = "<monitored-resources check-interval=\"25\"/>";
         Reader reader = new StringReader(config);
@@ -119,5 +135,21 @@ public class ResourceMonitorConfigProcessorTest {
         Resource resource = manager.getResourceById("123");
         assertEquals(1, resource.getBuildTypes().size());
         assertEquals(BUILD_TYPE_ID, resource.getBuildTypes().get(0));
+    }
+
+    @Test
+    public void shouldReadResourceWithMatchers() throws Exception {
+        String config = "<monitored-resources check-interval=\"25\">" +
+                "    <resource id=\"123\" name=\"Resource\" host=\"localhost\" port=\"1234\">" +
+                "        <build-type id=\"" + BUILD_TYPE_ID + "\"/>" +
+                "        <matcher name=\"build type pattern\"/>" +
+                "    </resource>" +
+                "</monitored-resources>";
+        Reader reader = new StringReader(config);
+        configProcessor.readFrom(reader);
+
+        Resource resource = manager.getResourceById("123");
+        assertEquals(1, resource.getMatchers().size());
+        assertEquals("build type pattern", resource.getMatchers().get(0).pattern());
     }
 }
