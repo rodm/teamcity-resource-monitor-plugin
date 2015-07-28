@@ -41,7 +41,9 @@
                 <table id="resource" class="resourceTable">
                     <tbody>
                         <tr class="resource">
-                            <td class="name highlight" onclick="toggleResourceBuildTypes('${resource.id}')">
+                            <td class="name highlight"
+                                onclick="toggleResourceBuildTypes('${resource.id}')"
+                                title="Click to collapse or expand build types">
                                 ${resource.name}
                             </td>
                             <td class="edit highlight">
