@@ -3,6 +3,7 @@ package teamcity.resource;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Resource {
@@ -20,6 +21,8 @@ public class Resource {
     private List<Pattern> patterns = new ArrayList<Pattern>();
 
     private List<String> buildTypes = new ArrayList<String>();
+
+    private List<String> matchedBuildTypes = new ArrayList<String>();
 
     public Resource(String id, String name, String host, int port) {
         this(id, name, host, port, 0);
@@ -126,5 +129,39 @@ public class Resource {
 
     public void addBuildTypeMatcher(String pattern) {
         patterns.add(Pattern.compile(pattern));
+    }
+
+    public void buildTypeRegistered(BuildType buildType) {
+        if (nameMatches(buildType.getFullName())) {
+            matchedBuildTypes.add(buildType.getBuildTypeId());
+        }
+    }
+
+    public void buildTypeUnregistered(BuildType buildType) {
+        if (nameMatches(buildType.getFullName())) {
+            matchedBuildTypes.remove(buildType.getBuildTypeId());
+        }
+    }
+
+    public void buildTypePersisted(BuildType buildType) {
+        if (nameMatches(buildType.getFullName())) {
+            matchedBuildTypes.add(buildType.getBuildTypeId());
+        } else {
+            matchedBuildTypes.remove(buildType.getBuildTypeId());
+        }
+    }
+
+    private boolean nameMatches(String name) {
+        for (Pattern pattern : patterns) {
+            Matcher matcher = pattern.matcher(name);
+            if (matcher.matches()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public List<String> getMatchedBuildTypes() {
+        return Collections.unmodifiableList(matchedBuildTypes);
     }
 }

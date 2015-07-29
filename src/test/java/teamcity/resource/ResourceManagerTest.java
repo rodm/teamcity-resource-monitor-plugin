@@ -531,4 +531,46 @@ public class ResourceManagerTest {
         manager.removeResource(ID);
         verify(listener).resourceRemoved(resource);
     }
+
+    @Test
+    public void buildTypeRegisteredForwardedToResources() {
+        Resource resource1 = spy(new Resource(ID, NAME, HOST, PORT));
+        manager.addResource(resource1);
+        Resource resource2 = spy(new Resource("2", NAME + "2", HOST + "2", PORT));
+        manager.addResource(resource2);
+
+        BuildType buildType = new FakeBuildType("bt1", "Build type name");
+        manager.buildTypeRegistered(buildType);
+
+        verify(resource1).buildTypeRegistered(same(buildType));
+        verify(resource2).buildTypeRegistered(same(buildType));
+    }
+
+    @Test
+    public void buildTypeUnregisteredForwardedToResources() {
+        Resource resource1 = spy(new Resource(ID, NAME, HOST, PORT));
+        manager.addResource(resource1);
+        Resource resource2 = spy(new Resource("2", NAME + "2", HOST + "2", PORT));
+        manager.addResource(resource2);
+
+        BuildType buildType = new FakeBuildType("bt1", "Build type name");
+        manager.buildTypeUnregistered(buildType);
+
+        verify(resource1).buildTypeUnregistered(same(buildType));
+        verify(resource2).buildTypeUnregistered(same(buildType));
+    }
+
+    @Test
+    public void buildTypePersistedForwardedToResources() {
+        Resource resource1 = spy(new Resource(ID, NAME, HOST, PORT));
+        manager.addResource(resource1);
+        Resource resource2 = spy(new Resource("2", NAME + "2", HOST + "2", PORT));
+        manager.addResource(resource2);
+
+        BuildType buildType = new FakeBuildType("bt1", "Build type name");
+        manager.buildTypePersisted(buildType);
+
+        verify(resource1).buildTypePersisted(same(buildType));
+        verify(resource2).buildTypePersisted(same(buildType));
+    }
 }

@@ -178,6 +178,24 @@ public class ResourceManager {
         listeners.add(listener);
     }
 
+    public void buildTypeRegistered(BuildType buildType) {
+        for (Resource resource : resources.values()) {
+            resource.buildTypeRegistered(buildType);
+        }
+    }
+
+    public void buildTypeUnregistered(BuildType buildType) {
+        for (Resource resource : resources.values()) {
+            resource.buildTypeUnregistered(buildType);
+        }
+    }
+
+    public void buildTypePersisted(BuildType buildType) {
+        for (Resource resource : resources.values()) {
+            resource.buildTypePersisted(buildType);
+        }
+    }
+
     private Resource getResource(String id) {
         validResource(id);
         return getResourceById(id);

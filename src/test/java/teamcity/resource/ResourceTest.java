@@ -5,7 +5,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 
 public class ResourceTest {
 
@@ -189,4 +188,74 @@ public class ResourceTest {
         resource.removeBuildType("bt123");
         assertEquals(0, resource.getBuildTypes().size());
     }
+
+    @Test
+    public void registeredBuildTypeMatched() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+        resource.addBuildTypeMatcher(".*test.*");
+
+        BuildType buildType = new FakeBuildType("bt1", "Build type test");
+
+        resource.buildTypeRegistered(buildType);
+        assertEquals(1, resource.getMatchedBuildTypes().size());
+        assertEquals("bt1", resource.getMatchedBuildTypes().get(0));
+    }
+
+    @Test
+    public void registeredBuildTypeNotMatched() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+        resource.addBuildTypeMatcher(".*test.*");
+
+        BuildType buildType = new FakeBuildType("bt1", "Build type");
+
+        resource.buildTypeRegistered(buildType);
+        assertEquals(0, resource.getMatchedBuildTypes().size());
+    }
+
+    @Test
+    public void unregisteredBuildTypeMatched() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+        resource.addBuildTypeMatcher(".*test.*");
+
+        BuildType buildType = new FakeBuildType("bt1", "Build type test");
+        resource.buildTypeRegistered(buildType);
+
+        resource.buildTypeUnregistered(buildType);
+        assertEquals(0, resource.getMatchedBuildTypes().size());
+    }
+
+    @Test
+    public void persistedBuildTypeMatched() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+        resource.addBuildTypeMatcher(".*test.*");
+
+        BuildType buildType = new FakeBuildType("bt1", "Build type test");
+
+        resource.buildTypePersisted(buildType);
+        assertEquals(1, resource.getMatchedBuildTypes().size());
+        assertEquals("bt1", resource.getMatchedBuildTypes().get(0));
+    }
+
+    @Test
+    public void persistedBuildTypeNotMatched() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+        resource.addBuildTypeMatcher(".*test.*");
+
+        BuildType buildType = new FakeBuildType("bt1", "Build type");
+
+        resource.buildTypePersisted(buildType);
+        assertEquals(0, resource.getMatchedBuildTypes().size());
+    }
+
+    @Test
+    public void persistedBuildTypeNoLongerMatches() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+        resource.addBuildTypeMatcher(".*test.*");
+
+        resource.buildTypePersisted(new FakeBuildType("bt1", "Build type test"));
+        resource.buildTypePersisted(new FakeBuildType("bt1", "Build type"));
+        assertEquals(0, resource.getMatchedBuildTypes().size());
+    }
+
 }
+
