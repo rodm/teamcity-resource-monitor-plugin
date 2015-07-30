@@ -18,6 +18,8 @@
 
     <bean id="resourceProjectManagerAdapter" class="teamcity.resource.ProjectManagerAdapter"/>
 
+    <bean id="buildTypeListener" class="teamcity.resource.BuildTypeListener"/>
+
     <bean id="resourceMonitorConfigTab"
           class="teamcity.resource.ResourceConfigExtension"
           init-method="register"/>
