@@ -19,16 +19,15 @@ public class BuildTypeListener extends BuildServerAdapter {
 
     @Override
     public void buildTypeRegistered(@NotNull SBuildType buildType) {
-        resourceManager.buildTypeRegistered(projectManager.findBuildTypeById(buildType.getInternalId()));
+        resourceManager.buildTypeRegistered(projectManager.toBuildType(buildType));
     }
 
     @Override
     public void buildTypeUnregistered(@NotNull SBuildType buildType) {
-        resourceManager.buildTypeUnregistered(projectManager.findBuildTypeById(buildType.getInternalId()));
+        resourceManager.buildTypeUnregistered(projectManager.toBuildType(buildType));
     }
 
-    @Override
     public void buildTypePersisted(@NotNull SBuildType buildType) {
-        resourceManager.buildTypePersisted(projectManager.findBuildTypeById(buildType.getInternalId()));
+        resourceManager.buildTypePersisted(projectManager.toBuildType(buildType));
     }
 }

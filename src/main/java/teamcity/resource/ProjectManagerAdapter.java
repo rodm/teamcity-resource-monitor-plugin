@@ -30,6 +30,11 @@ public class ProjectManagerAdapter implements ProjectManager {
         return buildTypes;
     }
 
+    @Override
+    public BuildType toBuildType(SBuildType buildType) {
+        return createBuildTypeAdapter(buildType);
+    }
+
     private BuildType createBuildTypeAdapter(SBuildType buildType) {
         if (server.getServerMajorVersion() > 7) {
             return new TeamCity8BuildTypeAdapter(buildType);

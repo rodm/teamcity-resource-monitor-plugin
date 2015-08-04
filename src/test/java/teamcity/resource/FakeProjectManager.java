@@ -19,6 +19,10 @@ public class FakeProjectManager implements ProjectManager {
         return new ArrayList<BuildType>(buildTypes.values());
     }
 
+    public BuildType toBuildType(SBuildType buildType) {
+        return new TeamCity7BuildTypeAdapter(buildType);
+    }
+
     public void addBuildType(String id, SBuildType buildType) {
         buildTypes.put(id, new TeamCity7BuildTypeAdapter(buildType));
     }

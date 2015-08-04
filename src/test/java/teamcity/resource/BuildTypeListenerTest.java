@@ -4,8 +4,9 @@ import jetbrains.buildServer.serverSide.SBuildServer;
 import jetbrains.buildServer.serverSide.SBuildType;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 
-import static org.mockito.Matchers.same;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
@@ -17,15 +18,18 @@ public class BuildTypeListenerTest {
     private FakeProjectManager projectManager;
     private ResourceManager resourceManager;
     private BuildTypeListener listener;
+    private ArgumentCaptor<BuildType> argument;
 
     @Before
     public void setup() {
         SBuildServer server = mock(SBuildServer.class);
         buildType = mock(SBuildType.class);
-        when(buildType.getInternalId()).thenReturn("bt1");
+        when(buildType.getBuildTypeId()).thenReturn("bt1");
 
         projectManager = new FakeProjectManager();
         projectManager.addBuildType("bt1", buildType);
+
+        argument = ArgumentCaptor.forClass(BuildType.class);
 
         resourceManager = spy(new ResourceManager(projectManager));
         listener = new BuildTypeListener(server, resourceManager, projectManager);
@@ -35,20 +39,23 @@ public class BuildTypeListenerTest {
     public void forwardBuildTypeRegisteredToResourceManager() {
         listener.buildTypeRegistered(buildType);
 
-        verify(resourceManager).buildTypeRegistered(same(projectManager.findBuildTypeById("bt1")));
+        verify(resourceManager).buildTypeRegistered(argument.capture());
+        assertEquals("bt1", argument.getValue().getBuildTypeId());
     }
 
     @Test
     public void forwardBuildTypeUnregisteredToResourceManager() {
         listener.buildTypeUnregistered(buildType);
 
-        verify(resourceManager).buildTypeUnregistered(same(projectManager.findBuildTypeById("bt1")));
+        verify(resourceManager).buildTypeUnregistered(argument.capture());
+        assertEquals("bt1", argument.getValue().getBuildTypeId());
     }
 
     @Test
     public void forwardBuildTypePersistedToResourceManager() {
         listener.buildTypePersisted(buildType);
 
-        verify(resourceManager).buildTypePersisted(same(projectManager.findBuildTypeById("bt1")));
+        verify(resourceManager).buildTypePersisted(argument.capture());
+        assertEquals("bt1", argument.getValue().getBuildTypeId());
     }
 }
