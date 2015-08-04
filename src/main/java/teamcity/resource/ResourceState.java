@@ -40,6 +40,10 @@ public class ResourceState {
         return resource.getBuildTypes();
     }
 
+    public List<String> getMatchedBuildTypes() {
+        return resource.getMatchedBuildTypes();
+    }
+
     public boolean isAvailable() {
         return available;
     }

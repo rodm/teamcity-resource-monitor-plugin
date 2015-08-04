@@ -90,6 +90,19 @@
                                 </tr>
                             </c:if>
                         </c:forEach>
+                        <c:forEach items="${resource.matchedBuildTypes}" var="buildType">
+                            <c:if test="${not empty buildTypes[buildType]}">
+                                <tr class="buildConfigurationRow">
+                                    <td class="buildConfiguration" colspan="7">
+                                        <a href="<c:url value='/viewType.html?buildTypeId=${buildTypes[buildType].externalId}&tab=buildTypeStatusDiv'/>">
+                                            <c:out value="${buildTypes[buildType].fullName}"/>
+                                        </a>
+                                    </td>
+                                    <td class="edit">
+                                    </td>
+                                </tr>
+                            </c:if>
+                        </c:forEach>
                     </tbody>
                 </table>
                 <p class="addNew">Add dependency:
