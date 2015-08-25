@@ -162,6 +162,8 @@ public class Resource {
     }
 
     public List<String> getMatchedBuildTypes() {
-        return Collections.unmodifiableList(matchedBuildTypes);
+        List<String> result = new ArrayList<String>(matchedBuildTypes);
+        result.removeAll(buildTypes);
+        return Collections.unmodifiableList(result);
     }
 }

@@ -257,5 +257,28 @@ public class ResourceTest {
         assertEquals(0, resource.getMatchedBuildTypes().size());
     }
 
-}
+    @Test
+    public void matchedBuildsExcludedDuplicateLinkedBuilds() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+        resource.addBuildType("bt1");
+        resource.addBuildTypeMatcher(".*test.*");
+        resource.buildTypePersisted(new FakeBuildType("bt1", "Build type test"));
 
+        assertEquals(1, resource.getBuildTypes().size());
+        assertEquals(0, resource.getMatchedBuildTypes().size());
+    }
+
+    @Test
+    public void unlinkedBuildRemainsLinkedByMatchingName() {
+        Resource resource = new Resource(VALID_ID, VALID_NAME, VALID_HOST, VALID_PORT);
+        resource.addBuildType("bt1");
+        resource.addBuildTypeMatcher(".*test.*");
+        resource.buildTypePersisted(new FakeBuildType("bt1", "Build type test"));
+
+        assertEquals(0, resource.getMatchedBuildTypes().size());
+
+        resource.removeBuildType("bt1");
+        assertEquals(0, resource.getBuildTypes().size());
+        assertEquals(1, resource.getMatchedBuildTypes().size());
+    }
+}
