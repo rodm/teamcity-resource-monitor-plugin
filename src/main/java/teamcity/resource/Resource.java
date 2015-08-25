@@ -166,4 +166,11 @@ public class Resource {
         result.removeAll(buildTypes);
         return Collections.unmodifiableList(result);
     }
+
+    public List<String> getAllBuildTypes() {
+        List<String> allBuildTypes = new ArrayList<String>();
+        allBuildTypes.addAll(getBuildTypes());
+        allBuildTypes.addAll(getMatchedBuildTypes());
+        return allBuildTypes;
+    }
 }

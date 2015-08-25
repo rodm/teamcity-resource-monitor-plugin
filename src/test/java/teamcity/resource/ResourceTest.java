@@ -266,6 +266,7 @@ public class ResourceTest {
 
         assertEquals(1, resource.getBuildTypes().size());
         assertEquals(0, resource.getMatchedBuildTypes().size());
+        assertEquals(1, resource.getAllBuildTypes().size());
     }
 
     @Test
@@ -280,5 +281,6 @@ public class ResourceTest {
         resource.removeBuildType("bt1");
         assertEquals(0, resource.getBuildTypes().size());
         assertEquals(1, resource.getMatchedBuildTypes().size());
+        assertEquals(1, resource.getAllBuildTypes().size());
     }
 }

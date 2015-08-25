@@ -112,8 +112,8 @@ public class ResourceManager {
 
     public Resource findResourceByBuildTypeId(String buildTypeId) {
         for (Resource resource : getResources()) {
-            if (resource.getBuildTypes().contains(buildTypeId)) {
-                return resource;
+            if (resource.getAllBuildTypes().contains(buildTypeId)) {
+                    return resource;
             }
         }
         return null;
