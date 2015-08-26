@@ -70,9 +70,11 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
     }
 
     public void loadConfiguration() {
+        File configurationFile = getConfigurationFile();
+        log.info("Loading configuration from location : " + configurationFile.getAbsolutePath());
         try {
             ResourceMonitorConfigProcessor configProcessor = new ResourceMonitorConfigProcessor(resourceManager);
-            configProcessor.readFrom(new FileReader(getConfigurationFile()));
+            configProcessor.readFrom(new FileReader(configurationFile));
             monitor.scheduleMonitor();
         } catch (JDOMException e) {
             log.error("Error loading resources configuration file", e);
@@ -84,10 +86,12 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
     }
 
     public void saveConfiguration() throws IOException {
+        File configurationFile = getConfigurationFile();
+        log.info("Saving configuration to location : " + configurationFile.getAbsolutePath());
         try {
             fileWatcher.setSkipListenersNotification(true);
             ResourceMonitorConfigProcessor configProcessor = new ResourceMonitorConfigProcessor(resourceManager);
-            configProcessor.writeTo(new FileWriter(getConfigurationFile()));
+            configProcessor.writeTo(new FileWriter(configurationFile));
         }
         finally {
             fileWatcher.resetChanged();
