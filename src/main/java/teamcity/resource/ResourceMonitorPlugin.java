@@ -14,8 +14,6 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
 
     public static org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger(ResourceMonitorPlugin.class.getCanonicalName());
 
-    private SBuildServer server;
-
     private ResourceMonitor monitor;
 
     private ResourceManager resourceManager;
@@ -24,15 +22,16 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
 
     private FileWatcher fileWatcher;
 
-    public ResourceMonitorPlugin(SBuildServer server, ResourceMonitor monitor, ResourceManager resourceManager) {
-        this.server = server;
+    private String configDir;
+
+    public ResourceMonitorPlugin(SBuildServer server, ResourceMonitor monitor, ResourceManager resourceManager, ServerPaths serverPaths) {
         this.resourceManager = resourceManager;
         this.name = this.getClass().getSimpleName();
         this.monitor = monitor;
         server.addListener(this);
 
-        ServerPaths serverPaths = new ServerPaths(server.getServerRootPath());
         File logDir = serverPaths.getLogsPath();
+        configDir = serverPaths.getConfigDir();
         FileAppender appender = new FileAppender();
         appender.setName("ResourceMonitorLogger");
         appender.setFile(logDir + File.separator + "resource-monitor.log");
@@ -100,6 +99,6 @@ public class ResourceMonitorPlugin extends BuildServerAdapter implements ChangeL
     }
 
     private File getConfigurationFile() {
-        return new File(server.getConfigDir(), "resources.xml");
+        return new File(configDir, "resources.xml");
     }
 }
