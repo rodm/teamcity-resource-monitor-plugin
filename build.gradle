@@ -1,24 +1,36 @@
 
+buildscript {
+    repositories {
+        maven {
+            url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {
+        classpath group: 'com.github.rodm', name: 'gradle-teamcity-plugin', version: '0.8'
+    }
+}
+
 apply plugin: 'java'
+apply plugin: 'com.github.rodm.teamcity-server'
 apply plugin: 'sonar-runner'
 
-project.ext.teamCityVersion = System.properties['teamcity.version'] ?: '8.1.5'
+group = 'com.github.rodm'
+version = '1.1-SNAPSHOT'
+
+ext.buildVcsNumber = System.properties['build.vcs.number'] ?: new Date().format('yyyyMMddHHmmss')
+ext.buildNumber = System.properties['build.number'] ?: 'dev'
+
+ext.teamcityVersion = System.properties['teamcity.version'] ?: '8.1.5'
+ext.teamcityDir = hasProperty('teamcity.home') ? property('teamcity.home') : "$rootDir/servers/TeamCity-${teamcityVersion}"
+ext.teamcityDataDir = "$rootDir/data/" + (teamcityVersion =~ /(\d+\.\d+).*/)[0][1]
+ext.teamcityJavaHome = System.properties['java.home']
 
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
 archivesBaseName = 'resource-monitor'
 
-repositories {
-    mavenCentral()
-    maven {
-        url "http://repository.jetbrains.com/all"
-    }
-}
-
 dependencies {
-    compile "org.jetbrains.teamcity:server-api:${teamCityVersion}"
-
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '1.10.19'
     testCompile group: 'xmlunit', name: 'xmlunit', version: '1.6'
@@ -28,14 +40,16 @@ jar {
     exclude "**/teamcity-plugin.xml"
 }
 
-task packagePlugin(type: Zip, dependsOn: jar) {
-    destinationDir = file('dist')
-    from(jar.outputs.files) {
-        into 'server'
-    }
-    from("$buildDir/resources/main") {
-        include 'teamcity-plugin.xml'
-    }
+serverPlugin {
+    baseName = project.archivesBaseName
 }
 
-assemble.dependsOn packagePlugin
+teamcity {
+    version = "${teamcityVersion}"
+    descriptor = file("$rootDir/src/main/resources/teamcity-plugin.xml")
+    tokens = [VERSION: project.version, VCS_REVISION: buildVcsNumber, BUILD_NUMBER: buildNumber]
+
+    homeDir = file(teamcityDir)
+    dataDir = file(teamcityDataDir)
+    javaHome = file(teamcityJavaHome)
+}
