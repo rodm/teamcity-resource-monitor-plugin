@@ -10,4 +10,4 @@ env:
     - TEAMCITY_VERSION='9.1.1'
 
 script:
-  - gradle clean build -Dteamcity.version=$TEAMCITY_VERSION
+  - ./gradlew clean build -Dteamcity.version=$TEAMCITY_VERSION
