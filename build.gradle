@@ -26,6 +26,10 @@ ext.teamcityDir = hasProperty('teamcity.home') ? property('teamcity.home') : "$r
 ext.teamcityDataDir = "$rootDir/data/" + (teamcityVersion =~ /(\d+\.\d+).*/)[0][1]
 ext.teamcityJavaHome = System.properties['java.home']
 
+ext.repositoryUrl = hasProperty('repositoryUrl') ? property('repositoryUrl') : 'http://localhost:8080'
+ext.repositoryUsername = hasProperty('repositoryUsername') ? property('repositoryUsername') : ''
+ext.repositoryPassword = hasProperty('repositoryPassword') ? property('repositoryPassword') : ''
+
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
