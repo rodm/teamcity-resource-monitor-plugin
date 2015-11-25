@@ -12,6 +12,7 @@ buildscript {
 
 apply plugin: 'java'
 apply plugin: 'com.github.rodm.teamcity-server'
+apply plugin: 'maven-publish'
 apply plugin: 'sonar-runner'
 
 group = 'com.github.rodm'
@@ -52,4 +53,25 @@ teamcity {
     homeDir = file(teamcityDir)
     dataDir = file(teamcityDataDir)
     javaHome = file(teamcityJavaHome)
+}
+
+artifacts {
+    archives serverPlugin
+}
+
+publishing {
+    publications {
+        plugin(MavenPublication) {
+            artifact serverPlugin
+        }
+    }
+    repositories {
+        maven {
+            url repositoryUrl
+            credentials {
+                username repositoryUsername
+                password repositoryPassword
+            }
+        }
+    }
 }
