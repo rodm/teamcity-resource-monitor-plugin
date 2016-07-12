@@ -7,13 +7,14 @@ buildscript {
     }
     dependencies {
         classpath group: 'com.github.rodm', name: 'gradle-teamcity-plugin', version: '0.8.1'
+        classpath group: 'org.sonarsource.scanner.gradle', name: 'sonarqube-gradle-plugin', version: '2.0.1'
     }
 }
 
 apply plugin: 'java'
 apply plugin: 'com.github.rodm.teamcity-server'
 apply plugin: 'maven-publish'
-apply plugin: 'sonar-runner'
+apply plugin: 'org.sonarqube'
 
 group = 'com.github.rodm'
 version = '1.1-SNAPSHOT'
